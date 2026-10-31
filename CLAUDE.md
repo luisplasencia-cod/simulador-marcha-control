@@ -7,6 +7,7 @@ Cada vez que en una conversación se **cierre una decisión** (técnica, de alca
 
 ## 🔵 Estado actual / qué hacer si el usuario dice "continuar"
 - **Resumen al 2026-10-29 (cierre de sesión):** proyecto = **Etapa 3 del simulador** (etapa 1 = artículo de conferencia, etapa 2 = artículo de revista enviado). Título vigente: *"Control en lazo cerrado de los tres ejes de un simulador de marcha, guiado por la fuerza de reacción del suelo y la presión plantar, para comparar prótesis transtibiales bajo la misma carga de una marcha sana"*. Pendiente de **confirmación de la asesora**.
+- **(2026-10-31) Correo enviado a Dante Elías**, encargado del laboratorio: plantea la nueva etapa como posible tema de tesis pidiendo su opinión/alcance, propone apoyo de practicantes DPB4 desde enero, y pregunta por posible extensión del apoyo económico (set-oct ya coordinado con la profesora Victoria, quien está de licencia de maternidad) a nov-dic. **Pendiente de respuesta de Dante.**
 - **Documento principal (todo el trabajo vive aquí):** https://claude.ai/artifact/EqD1E8VF5qRtKRfDA7n2Dg — síntesis para la presentación, problema clínico, antecedentes con figuras, vacío, objetivos, 4 preguntas, método (6.1 energía), alcance, riesgos, guion 30s, 36 referencias, anexo con diagrama propio. Ecuaciones/tablas propias → imagen PNG con fondo blanco (matplotlib; scripts en el scratchpad de la sesión 66877456…/out).
 - **Próximos pasos útiles:** (1) medir latencia AMTI→Raspberry Pi→ESP32 cuando lleguen IMU/sensor de interfaz/sensores de posición (~mediados nov 2026); (2) simular control en tiempo real vs ILC con la latencia como variable (modelo gray-box); (3) Luis verifica pies pasivos disponibles en el lab; (4) confirmar carga de diseño del simulador con quien hizo el análisis estructural; (5) definir geometría del punto A (CAD) y convención de signos de Fy/θ/ω; (6) conseguir ADC de ≥8 canales; (7) lectura completa de papers por Luis tras la aceptación.
 - `paper-search` (OpenAlex) sigue fallando aquí (sin jq en Windows) — usar script Python directo a la API (detalle en `HISTORIAL.md` § Herramientas de búsqueda), ya probado y funciona.
@@ -117,6 +118,7 @@ Sí — antecedente: Raheema et al. 2021, ANFIS+PID para control de fuerza en pr
 - Regla de uso: solo **buscan y organizan referencias**. El usuario lee y decide — no se redactan síntesis salvo pedido explícito.
 
 ## Pendiente de definir
+- **Respuesta de Dante Elías al correo del 2026-10-31** (opinión/alcance del tema de tesis, DPB4 desde enero, extensión de apoyo económico a nov-dic).
 - Confirmación de la asesora sobre el enfoque/título.
 - Latencia real del lazo AMTI→RPi→ESP32 (decide tiempo real vs ILC).
 - Pies pasivos disponibles para la 2.ª y 3.ª prótesis (Luis lo verifica en el lab).
