@@ -6,6 +6,7 @@
   Los botones de movimiento (MANUAL) estan BLOQUEADOS salvo que marques
   "Permitir mover motores".
 
+Por defecto solo Fz (sin ESP32, a todo el ancho). Con --con-esp32 se agrega el panel de latencia/motores.
 Si el ADC o el ESP32 no estan disponibles la ventana igual abre y lo avisa.
 Solo un programa puede usar el SPI/serial a la vez: cierra otros antes de abrir.
 """
@@ -25,6 +26,7 @@ ttk = tb  # widgets de ttkbootstrap (aceptan bootstyle)
 AQUI = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(AQUI, "..", "pruebas"))
 
+SOLO_FZ = "--con-esp32" not in sys.argv  # por defecto solo el AMTI/ADS1256, a todo el ancho
 PUERTO_ESP32 = "/dev/ttyUSB0"
 VENTANA_S = 10.0
 
@@ -172,9 +174,7 @@ class App(tb.Window):
         self._abrir_log()
 
         izq = ttk.LabelFrame(self, text="AMTI - Fz (ADS1256 directo, AIN0)")
-        der = ttk.LabelFrame(self, text="ESP32 - latencia y posicion")
         izq.pack(side="left", fill="both", expand=True, padx=6, pady=6)
-        der.pack(side="left", fill="both", expand=True, padx=6, pady=6)
 
         self.lbl_fz = ttk.Label(izq, text="--- N", font=("TkDefaultFont", 40, "bold"), bootstyle="success")
         self.lbl_fz.pack(pady=(8, 0))
@@ -189,6 +189,17 @@ class App(tb.Window):
         self.btn_rec.pack(side="left", padx=4)
         self.lbl_rec = ttk.Label(izq, text="")
         self.lbl_rec.pack()
+
+        self.lbl_media = ttk.Label(izq, text="", font=("TkDefaultFont", 14))
+        self.lbl_media.pack()
+        if SOLO_FZ:
+            self.botones = []
+            threading.Thread(target=hilo_adc, daemon=True).start()
+            self.after(100, self.refrescar)
+            self.protocol("WM_DELETE_WINDOW", self.cerrar)
+            return
+        der = ttk.LabelFrame(self, text="ESP32 - latencia y posicion")
+        der.pack(side="left", fill="both", expand=True, padx=6, pady=6)
 
         self.lbl_esp = ttk.Label(der, text="", font=("TkDefaultFont", 11))
         self.lbl_esp.pack(pady=(8, 0))
@@ -250,7 +261,7 @@ class App(tb.Window):
     def escribir_log(self, ahora, rtts):
         n = [d for d in desde(self.t_log) if d[0] <= ahora]
         self.t_log = ahora
-        estado = f"{adc_estado['msg']} / {esp_estado['msg']}"
+        estado = adc_estado["msg"] if SOLO_FZ else f"{adc_estado['msg']} / {esp_estado['msg']}"
         if estado != self.estado_prev:
             self.evento(f"estado: {estado}")
             self.estado_prev = estado
@@ -265,7 +276,7 @@ class App(tb.Window):
         else:
             fzs, v = "-", float("nan")
         rtt = f"{rtts[-1][1]:.2f}" if rtts else "-"
-        x, y, k = esp_estado["pos"]
+        x, y, k = esp_estado["pos"] if not SOLO_FZ else ("-", "-", "-")
         self.log.write(f"{time.strftime('%H:%M:%S')} n={len(n)} Fz={fzs} V={v:+.5f} RTT={rtt} pos={x},{y},{k}\n")
 
     def actualizar_botones(self):
@@ -318,11 +329,19 @@ class App(tb.Window):
             tasa = len(datos) / t_span
             self.lbl_adc.config(text=f"{adc_estado['msg']}  |  {datos[-1][1]:+.4f} V  |  {tasa:.0f} muestras/s")
             dibujar(self.cv_fz, [(d[0], d[2] - self.offset_n) for d in datos], unidad="N")
+            r2 = [d for d in datos if d[0] >= datos[-1][0] - 2.0]
+            mn = statistics.mean(d[2] - self.offset_n for d in r2)
+            mv = statistics.mean(d[1] for d in r2) * 1000
+            self.lbl_media.config(text=f"media 2 s: {mn:.2f} N   |   {mv:.3f} mV  (crudo, sin tara)")
         else:
             self.lbl_fz.config(text="--- N")
             self.lbl_adc.config(text=adc_estado["msg"])
             dibujar(self.cv_fz, [])
 
+        if SOLO_FZ:
+            self.escribir_log(ahora, [])
+            self.after(100, self.refrescar)
+            return
         rtts = [r for r in esp_rtt if r[0] >= ahora - 30]
         self.lbl_esp.config(text=esp_estado["msg"])
         if rtts:
@@ -340,7 +359,8 @@ class App(tb.Window):
 
     def cerrar(self):
         adc_stop.set()
-        esp_stop.set()
+        if not SOLO_FZ:
+            esp_stop.set()
         if self.grabando:
             self.grabando[0].close()
         time.sleep(0.3)
