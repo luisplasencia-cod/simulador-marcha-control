@@ -1,0 +1,1 @@
+acAubin PM, Cowley MS, Ledoux WR. Gait simulation via a 6-DOF parallel robot with iterative learning control. IEEE Trans Biomed Eng 2008. DOI: 10.1109/tbme.2007.908072 (metadata en Europe PMC). Texto completo no obtenido (academia.edu 403) -> PENDIENTE descarga manual.

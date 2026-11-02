@@ -1,0 +1,1 @@
+Aubin PM, Whittaker EC, Ledoux WR. A Robotic Cadaveric Gait Simulator With Fuzzy Logic Vertical Ground Reaction Force Control. IEEE Trans. Robotics 28(1):246-255, 2012. DOI: 10.1109/TRO.2011.2168690 (DOI no probado con resolver; PDF obtenido de courses.washington.edu/bioen520/notes).

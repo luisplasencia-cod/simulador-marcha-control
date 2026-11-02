@@ -1,0 +1,1 @@
+Horst F, Slijepcevic D, Simak M, Schöllhorn WI. Gutenberg Gait Database, a ground reaction force database of level overground walking in healthy individuals. Sci Data 8:232, 2021. DOI: 10.1038/s41597-021-01014-6. Datos en Figshare (enlace exacto no verificado).

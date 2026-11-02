@@ -1,0 +1,16 @@
+# Infraestructura de orquestación del hive (no es contenido de la tesis)
+hive/
+roster.json
+roster-backups/
+
+# Artefactos de build de PlatformIO (se regeneran, no se versionan)
+.pio/
+.pioenvs/
+.piolibdeps/
+
+# Python
+__pycache__/
+*.pyc
+
+# Archivo vacío accidental
+/1

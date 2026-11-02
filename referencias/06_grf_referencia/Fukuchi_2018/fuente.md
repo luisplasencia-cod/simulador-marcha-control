@@ -1,0 +1,1 @@
+Fukuchi CA, Fukuchi RK, Duarte M. A public dataset of overground and treadmill walking kinematics and kinetics in healthy individuals. PeerJ 6:e4640, 2018. DOI: 10.7717/peerj.4640. Datos: Figshare DOI 10.6084/m9.figshare.5722711.
