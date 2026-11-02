@@ -30,8 +30,8 @@ H = 7 * S  # alto comun AMTI / ADS1256 / RPi (pines alineados)
 # ---------------- AMTI (sensor, izquierda) ----------------
 AM_W = 11
 amti = elm.Ic(pins=[
-    elm.IcPin(name='Señal Fz', anchorname='SIG', side='right', slot='2/2'),
-    elm.IcPin(name='Referencia', anchorname='REF', side='right', slot='1/2'),
+    elm.IcPin(name='Señal Fz', anchorname='SIG', side='right', slot='7/7'),
+    elm.IcPin(name='Referencia', anchorname='REF', side='right', slot='6/7'),
 ], size=(AM_W, H)).at((-16, 10)).anchor('SIG')
 d.add(amti)
 AM_L = amti.SIG.x - (AM_W + 0.5)
@@ -50,7 +50,7 @@ ads = elm.Ic(pins=[
     elm.IcPin(name='AIN0', anchorname='AIN0', side='left', slot='7/7'),
     elm.IcPin(name='GND (junto a AIN0)', anchorname='GND0', side='left', slot='6/7'),
     elm.IcPin(name='(AIN1-7 + GND: 7 pares similares, libres)', anchorname='LIBRES', side='left', slot='4/7'),
-    elm.IcPin(name='5V', anchorname='V5', side='right', slot='8/8' if False else '8/8'),
+    elm.IcPin(name='5V', anchorname='V5', side='right', slot='8/8'),
     elm.IcPin(name='GND', anchorname='DGND', side='right', slot='7/8'),
     elm.IcPin(name='SCLK', anchorname='SCLK', side='right', slot='6/8'),
     elm.IcPin(name='DIN', anchorname='DIN', side='right', slot='5/8'),
@@ -87,17 +87,17 @@ d.add(elm.Line().at(amti.REF).right().tox(ads.GND0))
 RPI_X = ads.V5.x + 9.0
 RPI_W = 13
 rpi = elm.Ic(pins=[
-    elm.IcPin(name='5V', anchorname='V5', side='left', slot='7/7'),
-    elm.IcPin(name='GND', anchorname='GND', side='left', slot='6/7'),
-    elm.IcPin(name='GPIO11 = SCLK (SPI0_SCLK)', anchorname='SCLK', side='left', slot='5/7'),
-    elm.IcPin(name='GPIO10 = DIN (SPI0_MOSI)', anchorname='MOSI', side='left', slot='4/7'),
-    elm.IcPin(name='GPIO9 = DOUT (SPI0_MISO)', anchorname='MISO', side='left', slot='3/7'),
-    elm.IcPin(name='GPIO17 = DRDY', anchorname='DRDY', side='left', slot='2/7'),
-    elm.IcPin(name='GPIO8 = CS (SPI0_CE0)', anchorname='CS', side='left', slot='1/7'),
+    elm.IcPin(name='5V', anchorname='V5', side='left', slot='8/8'),
+    elm.IcPin(name='GND', anchorname='GND', side='left', slot='7/8'),
+    elm.IcPin(name='GPIO11 = SCLK (SPI0_SCLK)', anchorname='SCLK', side='left', slot='6/8'),
+    elm.IcPin(name='GPIO10 = DIN (SPI0_MOSI)', anchorname='MOSI', side='left', slot='5/8'),
+    elm.IcPin(name='GPIO9 = DOUT (SPI0_MISO)', anchorname='MISO', side='left', slot='4/8'),
+    elm.IcPin(name='GPIO17 = DRDY', anchorname='DRDY', side='left', slot='3/8'),
+    elm.IcPin(name='GPIO8 = CS (SPI0_CE0)', anchorname='CS', side='left', slot='2/8'),
 ], size=(RPI_W, H)).at((RPI_X, ads.V5.y)).anchor('V5')
 d.add(rpi)
 text((RPI_X + RPI_W / 2, rpi.V5.y + 1.6), 'Raspberry Pi', size=10, halign='center', valign='bottom')
-text((RPI_X + 0.3, rpi.CS.y - 1.6),
+text((RPI_X + 0.3, ads.PDWN.y - 4.0),
      'GPIO8/9/10/11 (SPI0): FIJOS por\n'
      'hardware en cualquier RPi de 40\n'
      'pines — no dependen de tu placa.\n'
@@ -131,7 +131,7 @@ text((AM_L, TOP), 'Conexion AMTI (Fz) -> ADS1256 -> Raspberry Pi', size=16)
 text((AM_L, TOP - 1.0), 'LADO ANALOGICO (AMTI + entrada ADS1256)', size=10, color=BLUE)
 text((RPI_X, TOP - 1.0), 'LADO DIGITAL (SPI, 3.3 V)', size=10, color=GREEN)
 
-NY = amti.REF.y - 5.0
+NY = ads.PDWN.y - 6.0
 text((AM_L, NY),
      'ANTES DE ENERGIZAR (con multimetro, todo apagado):\n'
      '1. VREF de esta placa: NO IDENTIFICADO como pin aparte. Full-scale single-ended = 2*VREF/PGA; con PGA=1 se necesita\n'
