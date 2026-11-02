@@ -74,11 +74,11 @@ text((AD_X - 7.0, ads.LIBRES.y - 2.6),
      'el mismo nodo electrico.',
      size=9, halign='left', color=BLUE)
 text((AD_CX, ads.PDWN.y - 4.2),
-     'VREF de esta placa: NO SE VE UN PIN VREF APARTE en lo que reportaste.\n'
-     'Puede ser referencia interna fija (no accesible) o un test point sin etiqueta.\n'
-     'POR VERIFICAR: revisar si hay un punto de prueba VREF en la placa, o buscar\n'
-     'el modelo exacto impreso en el circuito para confirmar su VREF de fabrica.',
-     size=9, halign='center', color=RED)
+     'VREF = 2.5V (chip ADR03B identificado en la placa, Analog Devices,\n'
+     'referencia de precision, grado B = +/-0.1%). Full-scale con PGA=1:\n'
+     '2*VREF/PGA = 5V. Los 3.4V maximos del AMTI quedan al 68% del rango,\n'
+     'sin riesgo de saturar.',
+     size=9, halign='center', color=GREEN)
 
 d.add(elm.Line().at(amti.SIG).right().tox(ads.AIN0))
 d.add(elm.Line().at(amti.REF).right().tox(ads.GND0))
@@ -134,9 +134,8 @@ text((RPI_X, TOP - 1.0), 'LADO DIGITAL (SPI, 3.3 V)', size=10, color=GREEN)
 NY = ads.PDWN.y - 6.0
 text((AM_L, NY),
      'ANTES DE ENERGIZAR (con multimetro, todo apagado):\n'
-     '1. VREF de esta placa: NO IDENTIFICADO como pin aparte. Full-scale single-ended = 2*VREF/PGA; con PGA=1 se necesita\n'
-     '   VREF >= 1.7 V para que los 3.4 V maximos del AMTI no saturen. Buscar el modelo exacto de la placa o un punto de\n'
-     '   prueba VREF antes de confiar en que no satura. NO conectar la senal del AMTI hasta confirmar esto.\n'
+     '1. VREF = 2.5V (chip ADR03B identificado en la placa). Full-scale con PGA=1 = 2*VREF/PGA = 5V; los 3.4V maximos\n'
+     '   del AMTI quedan al 68% del rango, sin riesgo de saturar. Resuelto, no bloquea.\n'
      '2. Senal Fz del AMTI -> AIN0. Referencia del AMTI -> el GND que esta junto a AIN0 en la placa (NO el GND de 5V/logica,\n'
      '   salvo que confirmes que son el mismo nodo internamente).\n'
      '3. PDWN -> atado fijo a +3.3V del RPi (NO a un GPIO), para que quede en ALTO siempre, incluso antes de correr el script.\n'
@@ -153,8 +152,8 @@ text((AM_L, NY - 7.2),
      '• Nombres y orden de pines de ESTA placa (AIN0/GND por canal; 5V, GND, SCLK, DIN, DOUT, DRDY, CS, PDWN): leidos\n'
      '  directamente de la etiqueta fisica de la placa por Luis, 2026-11-02 — no es generico, es la placa real en mano.\n'
      '• Escala 1.7 V/1000 N, maximo 2000 N (3.4 V): medicion/dato propio de Luis en el lab, NO de hoja del AMTI.\n'
-     '• VREF real de esta placa: NO VERIFICADO — no se identifico un pin VREF en la etiqueta; pendiente confirmar si es\n'
-     '  referencia interna fija o si hay un punto de prueba, y el modelo exacto de la placa.\n'
+     '• VREF = 2.5V: chip ADR03B identificado fisicamente en la placa por Luis, 2026-11-02; grado B (+/-0.1%) confirmado\n'
+     '  por busqueda web de la familia ADR01/02/03/06 de Analog Devices (ADR03 = 2.5V nominal), 2026-11-02.\n'
      '• Mapeo de los 8 pines digitales a GPIO especificos del Raspberry Pi: NO DEFINIDO AUN — lo elige Luis en el software.',
      size=10)
 
