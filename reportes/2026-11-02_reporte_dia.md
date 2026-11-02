@@ -29,7 +29,7 @@ Resumen de lo avanzado hoy en la etapa de control del simulador de marcha, para 
 
 ## Pendiente para continuar
 1. Correr `medir_latencia_ping_pong.py` en el Raspberry Pi real y documentar el resultado.
-2. Escribir el script de lectura del ADS1256 (AMTI) — todavía no existe.
+2. ~~Script de lectura del ADS1256~~ — hecho (ver anexo 2). Falta la **calibración con pesas conocidas** (escala 1.7665 mV/N y signo): hacerla con masas estáticas y anotadas.
 3. Con la latencia medida, avanzar a la Fase 3: decidir tiempo real vs. ILC.
 4. Identificar modelo exacto de la placa ADS1256 (no crítico, VREF ya resuelto por el chip identificado).
 5. Respuesta de Dante Elías y confirmación de la asesora (pendientes desde antes, sin novedad hoy).
@@ -39,3 +39,12 @@ Resumen de lo avanzado hoy en la etapa de control del simulador de marcha, para 
 - **Latencia RPi↔ESP32 medida** (ESP32 ya conectado, `/dev/ttyUSB0`): 100/100 válidos, RTT medio 5.974 ms, desv. 0.185 ms, mín/máx 4.139/6.047 ms. Dominado por el polling de 5 ms del firmware. Detalle en `pruebas/2026-11-02_latencia_amti_rpi_esp32.md`, datos en `pruebas/latencia_ping_pong.csv/.png`. (Un primer intento antes de conectar el ESP32 dio 0 respuestas.)
 - **SPI deshabilitado** en el RPi (`dtparam=spi=on` comentado) → hay que activarlo antes de leer el ADS1256.
 - Firmware del ESP32: sin cambios; se edita/flashea solo desde la laptop.
+
+## Anexo 2 — ADS1256/AMTI y cierre del día (2026-11-02, tarde)
+- **Lectura del ADS1256 funcionando:** `pruebas/leer_ads1256_fz.py` corregido (el bug era `RDATA` + relleno de bytes; ahora replica la secuencia de init del firmware de referencia y verifica por readback). 1000 muestras/s, Fz en reposo ≈ 21.5 N de offset, σ ≈ 0.85 N.
+- **Incidente ~17:50:** el ADS1256 dejó de responder (DRDY no bajaba, registros en 0). **Se recuperó reiniciando el RPi**; causa raíz no determinada. Tras el reinicio: STATUS=0x30 y AIN0≈38.9 mV (≈22 N).
+- **Incidente git:** el apagado dejó 8 objetos vacíos en `.git`; se perdió un commit local no subido (su contenido seguía en los archivos y se recommiteó). Remoto cambiado a SSH (el RPi ya tenía clave); push funciona.
+- **Monitor** (`herramientas/monitor_gaitsim.py`): ahora abre por defecto solo con Fz a todo el ancho (panel ESP32 con `--con-esp32`); añade media de 2 s en N y mV crudos. Acceso de escritorio `Monitor-Fz-ESP32` usa este archivo.
+- **Script `pruebas/calibracion_pesas.py`** (ajuste lineal V vs F, compara con 1.7665 mV/N, reporta signo): creado, **sin ejecutar**.
+- **Grabación del monitor** `pruebas/lecturas_fz_20261102_175759.csv` (17.5 s, 16200 muestras, ≈928 muestras/s): reposo con lectura cruda ≈ −1.0 N (≈ −1.7 mV), luego ~11 s de carga con fuerza variable (máx. instantáneo 397 N, mín. -22 N) y vuelta al reposo. **No es una calibración:** no hay mesetas estáticas ni masas anotadas, así que **no valida todavía la escala ni el signo** (el signo sí es positivo con carga).
+- **Dos puntos a revisar mañana:** (1) el offset en reposo pasó de ≈ +21.5 N (mañana/diagnóstico) a ≈ −1 N (esta grabación): puede ser peso apoyado antes o deriva del AMTI, hay que repetir con el plato vacío; (2) la tasa efectiva fue ≈928 muestras/s en vez de 1000: el monitor pierde algo de muestras, relevante para la latencia del lazo.
