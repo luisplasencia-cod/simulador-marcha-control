@@ -15,7 +15,7 @@ RPi↔ESP32: por cable (serial, 115200 baud). El ESP32 corre el firmware de `Cod
 2. **Medir latencia RPi↔ESP32:** `python pruebas/medir_latencia_ping_pong.py --puerto /dev/ttyUSB0 --n 100` (ajusta el puerto con `ls /dev/tty*` si no es ese). Genera un CSV.
 3. **Graficar el resultado:** `python pruebas/graficar_latencia.py --csv latencia_ping_pong.csv`. Genera un PNG (histograma + serie por intento).
 4. **Llenar el plan de prueba** en `pruebas/2026-11-02_latencia_amti_rpi_esp32.md` con los resultados — no dejarlo solo en el CSV/PNG, documentar ahí también.
-5. **Lectura del ADC (AMTI vía ADS1256):** aún no hay script. Si Luis lo pide, escribirlo nuevo en `pruebas/`, siguiendo la configuración ya verificada en `esquemas/amti_ads1256_rpi/CONFIGURACION_ACTUAL.md` (PGA=1, AIN0, GPIO8/9/10/11 fijos de SPI0, DRDY=GPIO17, PDWN atado a 3.3V no a GPIO).
+5. **Lectura del ADC (AMTI vía ADS1256):** script listo — `pruebas/leer_ads1256_fz.py` (`pip install spidev RPi.GPIO`, luego `python leer_ads1256_fz.py --n 100`). **No probado en hardware real** (se escribió y verificó la lógica de conversión bit→volts→Newtons en una laptop sin RPi/ADS1256 — revisar primero que el reloj CLKIN de la placa sea el típico 7.68 MHz; si DRDY nunca baja o las lecturas no tienen sentido, ese es el primer sospechoso, ver el AVISO al inicio del script). Con 0 N reales debería dar ~0 N (si no, hay offset de cero pendiente, Paso 4 del plan de latencia).
 
 ## Reglas del proyecto (no te las saltes)
 - Verificar datos de hardware contra fuente real (datasheet, etiqueta física, medición) — nunca de memoria. Ya hay precedente de esto en el repo, sigue el mismo estándar.
