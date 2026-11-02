@@ -14,3 +14,5 @@ __pycache__/
 
 # Archivo vacío accidental
 /1
+.venv/
+logs/

@@ -1,24 +1,27 @@
-"""Lee el canal Fz del AMTI a traves del ADS1256, usando la configuracion ya
-verificada en esquemas/amti_ads1256_rpi/CONFIGURACION_ACTUAL.md:
-  - Senal -> AIN0, referencia -> AINCOM (el pin que en ESTA placa esta
-    etiquetado "GND junto a AIN0" - electricamente es el AINCOM del chip).
-  - VREF = 2.5V (chip ADR03B identificado en la placa).
-  - PGA = 1 -> full-scale = 2*VREF/PGA = 5V.
-  - SPI0 por hardware: CS=GPIO8, SCLK=GPIO11, MOSI(DIN)=GPIO10, MISO(DOUT)=GPIO9.
-  - DRDY = GPIO17 (entrada, activo en bajo: indica dato nuevo listo).
-  - PDWN esta atado FIJO a 3.3V en hardware (no se controla por software).
-  - Escala AMTI: 1.7 V por cada 1000 N (medido por Luis), maximo 2000 N -> 3.4 V.
+"""Lee el canal Fz del AMTI a traves del ADS1256, conectado DIRECTO al RPi por SPI0.
 
-AVISO NO VERIFICADO: la frecuencia del oscilador CLKIN de ESTA placa no se
-confirmo (el valor tipico en placas ADS1256 es 7.68 MHz, pero no se midio).
-Por eso el script usa un reloj SPI conservador (200 kHz) con bytes de relleno
-de sobra para cubrir el retardo t6 del datasheet (50 tCLKIN) con margen,
-en vez de calcular el tiempo exacto. Si las lecturas salen inconsistentes o
-DRDY nunca baja, confirmar CLKIN y ajustar SPI_HZ/PADDING.
+Arquitectura vigente (2026-11-02): el unico ESP32 con este RPi es el de control de
+motores. El ADS1256 lo lee el RPi mismo. El firmware `Codigo ESP32 ADS1256/` fue una
+prueba aislada y se usa SOLO como referencia de la secuencia de inicializacion
+(RESET -> SDATAC -> ADCON -> MUX -> DRATE -> SELFCAL -> SYNC -> WAKEUP -> RDATAC),
+que ya funciono en hardware. Esta secuencia esta replicada aqui.
+
+Configuracion (esquemas/amti_ads1256_rpi/CONFIGURACION_ACTUAL.md):
+  - Senal Fz -> AIN0, referencia -> AINCOM (pin "GND junto a AIN0"): MUX = 0x08.
+    (El firmware de referencia usaba diferencial AIN1/AIN0 con SU cableado; aqui
+    es el cableado de ESTE montaje, no mezclar.)
+  - VREF = 2.5 V (ADR03B), PGA = 1 -> full-scale = 2*VREF/PGA = 5 V.
+  - SPI0: CS=GPIO8, SCLK=GPIO11, MOSI(DIN)=GPIO10, MISO(DOUT)=GPIO9. DRDY=GPIO17.
+  - PDWN fijo a 3.3 V. Escala AMTI: 1.7665 mV/N (OPT SC serie 4306, ganancia Fz 2000).
+
+Lectura: modo continuo (RDATAC). Con DRDY en bajo se hacen 3 lecturas de reloj y
+listo. El metodo anterior (comando RDATA + bytes de relleno) desplazaba el dato
+fuera de la ventana y devolvia siempre 0x000000/0xFFFFFF (0 V / -1 LSB en TODOS
+los canales) - corregido 2026-11-02.
 
 Uso:
-    pip install spidev RPi.GPIO
-    python leer_ads1256_fz.py --n 100 --salida lecturas_fz.csv
+    python leer_ads1256_fz.py --n 1000 --salida lecturas_fz.csv
+    python leer_ads1256_fz.py --diagnostico      # registros + 8 canales
 """
 import argparse
 import csv
@@ -27,113 +30,176 @@ import time
 import RPi.GPIO as GPIO
 import spidev
 
-# --- Comandos ADS1256 (Table 24 del datasheet TI ADS1256 Rev K, verificados 2026-11-02) ---
+# --- Comandos (datasheet ADS1256 Rev K, Table 24) ---
 CMD_WAKEUP = 0x00
-CMD_RDATA = 0x01
 CMD_SDATAC = 0x0F
+CMD_RDATAC = 0x03
 CMD_RREG = 0x10
 CMD_WREG = 0x50
 CMD_SELFCAL = 0xF0
+CMD_SYNC = 0xFC
 CMD_RESET = 0xFE
 
-REG_STATUS = 0x00
-REG_MUX = 0x01
-REG_ADCON = 0x02
-REG_DRATE = 0x03
+REG_STATUS, REG_MUX, REG_ADCON, REG_DRATE, REG_IO = 0x00, 0x01, 0x02, 0x03, 0x04
 
-DRDY_PIN = 17  # BCM, GPIO17 (ver esquema)
-SPI_HZ = 200_000  # conservador; ver AVISO arriba
-PADDING_BYTES = 6  # bytes de relleno tras RDATA antes de leer, para cubrir t6 con margen
+MUX_AIN0_AINCOM = 0x08  # PSEL=AIN0, NSEL=AINCOM
+ADCON_PGA1 = 0x00
+DRATE_1000SPS = 0xA1    # 30 kSPS (reset) es demasiado rapido para Python
 
-VREF = 2.5  # chip ADR03B, confirmado fisicamente en la placa
+DRDY_PIN = 17
+SPI_HZ = 500_000  # byte = 16 us > t6 (~6.5 us con CLKIN 7.68 MHz): RREG alineado
+
+VREF = 2.5
 PGA = 1
-FULL_SCALE_V = 2 * VREF / PGA  # 5.0 V
-N_PER_1000N = 1.7  # V por cada 1000 N, medido por Luis en el lab
+FULL_SCALE_V = 2 * VREF / PGA
+N_PER_1000N = 1.7665  # V por 1000 N
 
 
 def to_signed24(b0, b1, b2):
     raw = (b0 << 16) | (b1 << 8) | b2
-    if raw & 0x800000:
-        raw -= 1 << 24
-    return raw
+    return raw - (1 << 24) if raw & 0x800000 else raw
 
 
 class ADS1256:
-    def __init__(self, bus=0, device=0):
+    def __init__(self, bus=0, device=0, mux=MUX_AIN0_AINCOM, drate=DRATE_1000SPS):
+        self.mux, self.drate = mux, drate
         self.spi = spidev.SpiDev()
         self.spi.open(bus, device)
         self.spi.max_speed_hz = SPI_HZ
-        self.spi.mode = 0b01  # ADS1256 usa SPI modo 1 (CPOL=0, CPHA=1)
-
+        self.spi.mode = 0b01  # CPOL=0, CPHA=1
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(DRDY_PIN, GPIO.IN)
-
         self._init_chip()
+
+    # -- bajo nivel
+    def _cmd(self, c):
+        self.spi.xfer2([c])
+        time.sleep(0.00002)
 
     def _wreg(self, reg, value):
         self.spi.xfer2([CMD_WREG | reg, 0x00, value])
+        time.sleep(0.00002)
 
-    def _init_chip(self):
-        self.spi.xfer2([CMD_RESET])
-        time.sleep(0.01)
-        self.spi.xfer2([CMD_SDATAC])
-        self._wreg(REG_MUX, 0x08)      # PSEL=AIN0 (0000), NSEL=AINCOM (1000)
-        self._wreg(REG_ADCON, 0x00)    # CLK off, SDCS off, PGA=1 (000)
-        # DRATE: se deja el valor de reset (F0h, maxima tasa) - no se cambia a proposito
-        self.spi.xfer2([CMD_SELFCAL])
-        self._wait_drdy(timeout_s=2.0)
+    def rreg(self, reg):
+        """Lee un registro (solo en modo SDATAC). Dato en el 4.o byte (comprobado en hardware)."""
+        return self.spi.xfer2([CMD_RREG | reg, 0x00, 0x00, 0x00])[-1]
 
     def _wait_drdy(self, timeout_s=1.0):
         t0 = time.monotonic()
         while GPIO.input(DRDY_PIN) == 1:
             if time.monotonic() - t0 > timeout_s:
                 raise TimeoutError("DRDY no bajo a tiempo - revisar cableado/VREF/CLKIN")
-            time.sleep(0.0005)
+            time.sleep(0.0001)
 
+    def _wait_drdy_alto_bajo(self, timeout_s=2.0):
+        """Espera a que DRDY suba y vuelva a bajar (fin de una calibracion/sync)."""
+        t0 = time.monotonic()
+        while GPIO.input(DRDY_PIN) == 0 and time.monotonic() - t0 < 0.05:
+            time.sleep(0.0001)  # tras el comando DRDY sube; si ya estaba bajo, no esperar de mas
+        self._wait_drdy(timeout_s)
+
+    # -- inicializacion (misma secuencia que el firmware de referencia)
+    def _init_chip(self):
+        # Si un programa anterior se cerro sin cerrar() el chip sigue en RDATAC y solo acepta
+        # SDATAC: mandarlo primero (varias veces) y recien despues RESET.
+        for _ in range(3):
+            self._cmd(CMD_SDATAC)
+        self._cmd(CMD_RESET)
+        time.sleep(0.1)  # el reset interno tarda ~8 ms; DRDY no es confiable justo despues
+        self._cmd(CMD_SDATAC)
+        self._wreg(REG_ADCON, ADCON_PGA1)
+        self._wreg(REG_MUX, self.mux)
+        self._wreg(REG_DRATE, self.drate)
+        # Verificar que el SPI realmente responde (detecta MISO/CS mal conectado)
+        leido = {"ADCON": self.rreg(REG_ADCON), "MUX": self.rreg(REG_MUX), "DRATE": self.rreg(REG_DRATE)}
+        esperado = {"ADCON": ADCON_PGA1, "MUX": self.mux, "DRATE": self.drate}
+        if leido != esperado:
+            raise RuntimeError(f"El ADS1256 no devolvio lo escrito: leido={leido} esperado={esperado}")
+        self._cmd(CMD_SELFCAL)
+        self._wait_drdy_alto_bajo(2.0)
+        self._cmd(CMD_SYNC)
+        time.sleep(0.00001)
+        self._cmd(CMD_WAKEUP)
+        self._cmd(CMD_RDATAC)  # modo continuo: a partir de aqui NO se aceptan RREG/WREG
+        self._wait_drdy(1.0)
+
+    # -- lectura
     def leer_codigo(self):
         self._wait_drdy()
-        resp = self.spi.xfer2([CMD_RDATA] + [0x00] * PADDING_BYTES + [0x00, 0x00, 0x00])
-        b0, b1, b2 = resp[-3], resp[-2], resp[-1]
-        return to_signed24(b0, b1, b2)
+        b = self.spi.xfer2([0x00, 0x00, 0x00])
+        return to_signed24(*b)
 
     def leer_volts(self):
-        codigo = self.leer_codigo()
-        return codigo * FULL_SCALE_V / (1 << 23)
+        return self.leer_codigo() * FULL_SCALE_V / (1 << 23)
+
+    def cambiar_mux(self, mux):
+        """Cambia de canal (solo diagnostico): sale de RDATAC, escribe, sincroniza y vuelve."""
+        self._cmd(CMD_SDATAC)
+        self._wreg(REG_MUX, mux)
+        self._cmd(CMD_SYNC)
+        time.sleep(0.00001)
+        self._cmd(CMD_WAKEUP)
+        self._cmd(CMD_RDATAC)
+        self.mux = mux
+        self.leer_codigo()  # descarta la conversion de transicion
+        self.leer_codigo()
 
     def cerrar(self):
-        self.spi.close()
-        GPIO.cleanup()
+        try:
+            self._cmd(CMD_SDATAC)
+        finally:
+            self.spi.close()
+            GPIO.cleanup()
 
 
 def volts_a_newtons(v):
     return v * 1000.0 / N_PER_1000N
 
 
+def diagnostico():
+    adc = ADS1256()
+    try:
+        adc._cmd(CMD_SDATAC)
+        print("Registros (STATUS, MUX, ADCON, DRATE):",
+              [hex(adc.rreg(r)) for r in (REG_STATUS, REG_MUX, REG_ADCON, REG_DRATE)])
+        adc._cmd(CMD_RDATAC)
+        print("Canales vs AINCOM (100 muestras c/u). Canal con senal real: media != 0 y ruido de varios uV:")
+        for ch in range(8):
+            adc.cambiar_mux((ch << 4) | 0x08)
+            v = [adc.leer_volts() for _ in range(100)]
+            m = sum(v) / len(v)
+            print(f"  AIN{ch}: media {m*1000:+10.4f} mV   pico-pico {(max(v)-min(v))*1e6:8.1f} uV")
+    finally:
+        adc.cerrar()
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=100)
     ap.add_argument("--salida", default="lecturas_fz.csv")
-    ap.add_argument("--periodo_s", type=float, default=0.0, help="pausa entre lecturas, 0 = lo mas rapido posible")
+    ap.add_argument("--diagnostico", action="store_true")
     a = ap.parse_args()
+    if a.diagnostico:
+        diagnostico()
+        raise SystemExit
 
     adc = ADS1256()
     filas = []
+    t0 = time.perf_counter()
     try:
         for i in range(a.n):
-            t0 = time.perf_counter()
             v = adc.leer_volts()
-            n = volts_a_newtons(v)
-            filas.append([i, round(v, 6), round(n, 3)])
-            print(f"[{i}] {v:.6f} V  ->  {n:.2f} N")
-            if a.periodo_s > 0:
-                time.sleep(a.periodo_s)
+            filas.append([i, round(time.perf_counter() - t0, 6), round(v, 6), round(volts_a_newtons(v), 3)])
     finally:
         adc.cerrar()
 
     with open(a.salida, "w", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["intento", "volts", "newtons"])
+        w.writerow(["intento", "t_s", "volts", "newtons"])
         w.writerows(filas)
-    print(f"\nCSV guardado en: {a.salida}")
-    print("IMPORTANTE: con 0 N reales aplicados, 'newtons' deberia estar cerca de 0 (offset en reposo).")
-    print("Si no, hay un offset de cero del AMTI/ADS1256 pendiente de restar (calibracion, Paso 4 del plan).")
+    n = [r[3] for r in filas]
+    dt = filas[-1][1] - filas[0][1]
+    print(f"{len(filas)} lecturas en {dt:.2f} s -> {(len(filas)-1)/dt:.0f} muestras/s (esperado ~1000)")
+    print(f"Fz: min {min(n):.2f}  media {sum(n)/len(n):.2f}  max {max(n):.2f} N")
+    print(f"CSV: {a.salida}")
+    print("Con 0 N reales, Fz debe estar cerca de 0 (si no, hay offset de cero pendiente de tarar).")

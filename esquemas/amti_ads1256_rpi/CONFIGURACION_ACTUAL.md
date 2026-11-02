@@ -5,7 +5,7 @@ Esquema: `salida/esquema_amti_ads1256_rpi.png` (generado por `esquema_amti_ads12
 ## Estado (2026-11-02)
 - Conectado hoy: solo el canal **Fz** del AMTI.
 - AMTI entrega salida single-ended: 1 cable de señal + 1 cable de referencia.
-- Escala medida por Luis: **1.7 V por cada 1000 N**, máximo **2000 N → 3.4 V**.
+- Escala (Luis, 2026-11-02): **1.7665 mV/N** (AMTI OPT SC serie 4306, ganancia Fz 2000), máximo **2000 N → 3.53 V** (antes 1.7 mV/N; la diferencia es 3.9 %). A verificar con pesas conocidas.
 - ADC: **ADS1256** (8 canales, 24 bit). Modelo exacto de la placa breakout: **por confirmar**.
 
 ## Conexión analógica (pines leídos de la etiqueta física de la placa, por Luis, 2026-11-02)

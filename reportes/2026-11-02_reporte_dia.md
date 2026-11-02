@@ -33,3 +33,9 @@ Resumen de lo avanzado hoy en la etapa de control del simulador de marcha, para 
 3. Con la latencia medida, avanzar a la Fase 3: decidir tiempo real vs. ILC.
 4. Identificar modelo exacto de la placa ADS1256 (no crítico, VREF ya resuelto por el chip identificado).
 5. Respuesta de Dante Elías y confirmación de la asesora (pendientes desde antes, sin novedad hoy).
+
+## Anexo — sesión en el Raspberry Pi (2026-11-02)
+- `git pull` hecho; entorno `.venv` creado (matplotlib instalado; pyserial ya presente). `.venv/` añadido a `.gitignore`.
+- **Latencia RPi↔ESP32 medida** (ESP32 ya conectado, `/dev/ttyUSB0`): 100/100 válidos, RTT medio 5.974 ms, desv. 0.185 ms, mín/máx 4.139/6.047 ms. Dominado por el polling de 5 ms del firmware. Detalle en `pruebas/2026-11-02_latencia_amti_rpi_esp32.md`, datos en `pruebas/latencia_ping_pong.csv/.png`. (Un primer intento antes de conectar el ESP32 dio 0 respuestas.)
+- **SPI deshabilitado** en el RPi (`dtparam=spi=on` comentado) → hay que activarlo antes de leer el ADS1256.
+- Firmware del ESP32: sin cambios; se edita/flashea solo desde la laptop.
