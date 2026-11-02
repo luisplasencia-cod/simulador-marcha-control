@@ -48,78 +48,80 @@ AD_X = amti.SIG.x + 9.0
 AD_W = 15
 ads = elm.Ic(pins=[
     elm.IcPin(name='AIN0', anchorname='AIN0', side='left', slot='7/7'),
-    elm.IcPin(name='AINCOM', anchorname='AINCOM', side='left', slot='6/7'),
-    elm.IcPin(name='AVDD', anchorname='AVDD', side='left', slot='5/7'),
-    elm.IcPin(name='AGND', anchorname='AGND', side='left', slot='4/7'),
-    elm.IcPin(name='VREFP', anchorname='VREFP', side='left', slot='3/7'),
-    elm.IcPin(name='VREFN', anchorname='VREFN', side='left', slot='2/7'),
-    elm.IcPin(name='(AIN1-7: libres)', anchorname='LIBRES', side='left', slot='1/7'),
-    elm.IcPin(name='DVDD', anchorname='DVDD', side='right', slot='7/7'),
-    elm.IcPin(name='DGND', anchorname='DGND', side='right', slot='6/7'),
-    elm.IcPin(name='CS', anchorname='CS', side='right', slot='5/7'),
-    elm.IcPin(name='DRDY', anchorname='DRDY', side='right', slot='4/7'),
-    elm.IcPin(name='DOUT', anchorname='DOUT', side='right', slot='3/7'),
-    elm.IcPin(name='DIN', anchorname='DIN', side='right', slot='2/7'),
-    elm.IcPin(name='SCLK', anchorname='SCLK', side='right', slot='1/7'),
+    elm.IcPin(name='GND (junto a AIN0)', anchorname='GND0', side='left', slot='6/7'),
+    elm.IcPin(name='(AIN1-7 + GND: 7 pares similares, libres)', anchorname='LIBRES', side='left', slot='4/7'),
+    elm.IcPin(name='5V', anchorname='V5', side='right', slot='8/8' if False else '8/8'),
+    elm.IcPin(name='GND', anchorname='DGND', side='right', slot='7/8'),
+    elm.IcPin(name='SCLK', anchorname='SCLK', side='right', slot='6/8'),
+    elm.IcPin(name='DIN', anchorname='DIN', side='right', slot='5/8'),
+    elm.IcPin(name='DOUT', anchorname='DOUT', side='right', slot='4/8'),
+    elm.IcPin(name='DRDY', anchorname='DRDY', side='right', slot='3/8'),
+    elm.IcPin(name='CS', anchorname='CS', side='right', slot='2/8'),
+    elm.IcPin(name='PDWN', anchorname='PDWN', side='right', slot='1/8'),
 ], size=(AD_W, H)).at((AD_X, amti.SIG.y)).anchor('AIN0')
 d.add(ads)
 AD_CX = AD_X + AD_W / 2
-text((AD_CX, ads.AIN0.y + 1.6), 'ADS1256 (24 bit, 8 canales single-ended)\nplaca exacta de Luis: POR VERIFICAR', size=10, halign='center', valign='bottom', color=RED)
-text((AD_X - 0.3, ads.LIBRES.y - 1.4),
+text((AD_CX, ads.AIN0.y + 1.6), 'ADS1256 (placa generica, 8 canales single-ended)\nPines leidos de la etiqueta FISICA de la placa\npor Luis, 2026-11-02 (no de datasheet generico)', size=10, halign='center', valign='bottom', color=GREEN)
+text((AD_X - 7.0, ads.LIBRES.y - 2.6),
      'Single-ended: señal -> AINx,\n'
-     'comun -> AINCOM.\n'
-     'AINCOM NO necesita ir a GND\n'
-     '(puede ser la referencia propia\n'
-     'del AMTI) — datasheet pag. con\n'
-     '"use AINCOM as common input".',
+     'retorno -> el GND junto a ese AINx\n'
+     '(segun la etiqueta de ESTA placa).\n'
+     'Si tu AMTI tiene un cable de\n'
+     'referencia aparte, va a ese GND.\n\n'
+     'GND comun: este GND (analogico,\n'
+     'junto a AIN0), el GND digital de la\n'
+     'placa y el GND del RPi deben ser\n'
+     'el mismo nodo electrico.',
      size=9, halign='left', color=BLUE)
+text((AD_X - 0.3, ads.PDWN.y - 1.6),
+     'PDWN: debe quedar en ALTO\n'
+     'para operacion normal (no en\n'
+     'power-down). Verificar si la\n'
+     'placa ya lo deja en alto o si\n'
+     'hay que conectarlo tu a 5V/3V3\n'
+     '— POR VERIFICAR.',
+     size=9, halign='left', color=RED)
+text((AD_CX, ads.PDWN.y - 4.2),
+     'VREF de esta placa: NO SE VE UN PIN VREF APARTE en lo que reportaste.\n'
+     'Puede ser referencia interna fija (no accesible) o un test point sin etiqueta.\n'
+     'POR VERIFICAR: revisar si hay un punto de prueba VREF en la placa, o buscar\n'
+     'el modelo exacto impreso en el circuito para confirmar su VREF de fabrica.',
+     size=9, halign='center', color=RED)
 
 d.add(elm.Line().at(amti.SIG).right().tox(ads.AIN0))
-d.add(elm.Line().at(amti.REF).right().tox(ads.AINCOM))
-
-# VREFP/VREFN -> fuente de referencia (en la propia placa; valor POR VERIFICAR)
-d.push()
-d.add(elm.Line().at(ads.VREFP).left(1.6))
-d.add(elm.Dot())
-text((ads.VREFP.x - 1.8, ads.VREFP.y - 0.1), 'VREF: valor exacto\nPOR VERIFICAR\n(medir VREFP-VREFN\ncon multimetro)', size=9, halign='right', color=RED)
-d.pop()
+d.add(elm.Line().at(amti.REF).right().tox(ads.GND0))
 
 # ---------------- RASPBERRY PI (derecha) ----------------
-RPI_X = ads.DVDD.x + 9.0
+RPI_X = ads.V5.x + 9.0
 RPI_W = 13
 rpi = elm.Ic(pins=[
-    elm.IcPin(name='5V / 3V3 (ver placa)', anchorname='V5', side='left', slot='7/7'),
-    elm.IcPin(name='GND', anchorname='GND', side='left', slot='6/7'),
-    elm.IcPin(name='CS (SPI_CE)', anchorname='CS', side='left', slot='5/7'),
-    elm.IcPin(name='DRDY (GPIO libre)', anchorname='DRDY', side='left', slot='4/7'),
-    elm.IcPin(name='MISO (SPI_SDI)', anchorname='MISO', side='left', slot='3/7'),
-    elm.IcPin(name='MOSI (SPI_SDO)', anchorname='MOSI', side='left', slot='2/7'),
-    elm.IcPin(name='SCLK (SPI_SCK)', anchorname='SCLK', side='left', slot='1/7'),
-], size=(RPI_W, H)).at((RPI_X, ads.DVDD.y)).anchor('V5')
+    elm.IcPin(name='5V', anchorname='V5', side='left', slot='8/8'),
+    elm.IcPin(name='GND', anchorname='GND', side='left', slot='7/8'),
+    elm.IcPin(name='SCLK (SPI_SCK)', anchorname='SCLK', side='left', slot='6/8'),
+    elm.IcPin(name='DIN -> MOSI (SPI_SDO)', anchorname='MOSI', side='left', slot='5/8'),
+    elm.IcPin(name='DOUT -> MISO (SPI_SDI)', anchorname='MISO', side='left', slot='4/8'),
+    elm.IcPin(name='DRDY (GPIO libre)', anchorname='DRDY', side='left', slot='3/8'),
+    elm.IcPin(name='CS (SPI_CE)', anchorname='CS', side='left', slot='2/8'),
+    elm.IcPin(name='PDWN (GPIO o 3V3 fijo)', anchorname='PDWN', side='left', slot='1/8'),
+], size=(RPI_W, H)).at((RPI_X, ads.V5.y)).anchor('V5')
 d.add(rpi)
 text((RPI_X + RPI_W / 2, rpi.V5.y + 1.6), 'Raspberry Pi', size=10, halign='center', valign='bottom')
-text((RPI_X + 0.3, rpi.SCLK.y - 1.4),
-     'Numeros de pin/GPIO fisicos:\n'
-     'POR VERIFICAR — dependen del\n'
-     'modelo exacto de la placa ADS1256\n'
-     '(ej. Waveshare u otra). Dibujado\n'
-     'solo por funcion. Confirmar con\n'
-     'el esquematico de la placa antes\n'
-     'de cablear.',
+text((RPI_X + 0.3, rpi.PDWN.y - 1.6),
+     'Numeros de GPIO fisicos exactos:\n'
+     'POR VERIFICAR — tu decides a que\n'
+     'pin del header del RPi va cada cable\n'
+     '(ej. CS suele ir a GPIO8/CE0, SCLK a\n'
+     'GPIO11, DIN a GPIO10, DOUT a GPIO9,\n'
+     'pero DRDY y PDWN son libres, tu\n'
+     'eliges). Confirmar en el software\n'
+     'que lea el ADS1256 cual GPIO\n'
+     'corresponde a cada uno.',
      size=9, color=RED)
 
-for a, b in ((ads.DVDD, rpi.V5), (ads.DGND, rpi.GND), (ads.CS, rpi.CS), (ads.DRDY, rpi.DRDY),
-             (ads.DOUT, rpi.MISO), (ads.DIN, rpi.MOSI), (ads.SCLK, rpi.SCLK)):
+for a, b in ((ads.V5, rpi.V5), (ads.DGND, rpi.GND), (ads.SCLK, rpi.SCLK), (ads.DIN, rpi.MOSI),
+             (ads.DOUT, rpi.MISO), (ads.DRDY, rpi.DRDY), (ads.CS, rpi.CS), (ads.PDWN, rpi.PDWN)):
     d.add(elm.Line().at(a).right().tox(b))
 
-# AVDD/AGND del ADS1256 -> alimentacion analogica + GND comun
-d.push()
-d.add(elm.Line().at(ads.AVDD).left(1.6))
-text((ads.AVDD.x - 1.8, ads.AVDD.y), 'AVDD: alimentacion\nanalogica de la placa\n(ver su documentacion)', size=9, halign='right')
-d.pop()
-d.add(elm.Line().at(ads.AGND).left(1.6))
-d.add(elm.Ground())
-text((ads.AGND.x - 1.8, ads.AGND.y - 1.3), 'GND comun:\nAGND = DGND del ADS1256\n= GND del RPi', size=9, halign='right', color=RED)
 
 # ---------------- TITULO Y NOTAS ----------------
 TOP = amti.SIG.y + 4.0
@@ -130,24 +132,28 @@ text((RPI_X, TOP - 1.0), 'LADO DIGITAL (SPI, 3.3 V)', size=10, color=GREEN)
 NY = amti.REF.y - 5.0
 text((AM_L, NY),
      'ANTES DE ENERGIZAR (con multimetro, todo apagado):\n'
-     '1. Medir VREFP-VREFN de la placa ADS1256. Full-scale single-ended = 2*VREF/PGA. Con PGA=1 se necesita\n'
-     '   VREF >= 1.7 V para que los 3.4 V maximos del AMTI no saturen. NO conectar la senal del AMTI hasta confirmar esto.\n'
-     '2. Senal Fz del AMTI -> AIN0. Referencia del AMTI -> AINCOM (NO a GND salvo que la hoja de la placa lo exija).\n'
-     '3. Confirmar en la documentacion de TU placa ADS1256 (no en este esquema) el mapeo real de pines a GPIO del RPi\n'
-     '   antes de cablear el lado digital — este esquema lo dibuja solo por funcion.\n'
-     '4. AGND y DGND del ADS1256 van al mismo GND que el RPi.\n'
-     '5. Verificar en software que PGA=1 (o el valor que corresponda) antes de la primera lectura, para no saturar ni perder resolucion.',
+     '1. VREF de esta placa: NO IDENTIFICADO como pin aparte. Full-scale single-ended = 2*VREF/PGA; con PGA=1 se necesita\n'
+     '   VREF >= 1.7 V para que los 3.4 V maximos del AMTI no saturen. Buscar el modelo exacto de la placa o un punto de\n'
+     '   prueba VREF antes de confiar en que no satura. NO conectar la senal del AMTI hasta confirmar esto.\n'
+     '2. Senal Fz del AMTI -> AIN0. Referencia del AMTI -> el GND que esta junto a AIN0 en la placa (NO el GND de 5V/logica,\n'
+     '   salvo que confirmes que son el mismo nodo internamente).\n'
+     '3. PDWN debe quedar en ALTO para operacion normal — confirmar si la placa ya lo fuerza alto o si hay que cablearlo.\n'
+     '4. Tu decides a que GPIO del RPi va cada pin (SCLK/DIN/DOUT/DRDY/CS/PDWN) — anotarlo en CONFIGURACION_ACTUAL.md\n'
+     '   apenas lo definas, para que quede igual la proxima vez.\n'
+     '5. Todo GND (analogico y digital de la placa) al mismo GND que el RPi.\n'
+     '6. Verificar en software que PGA=1 (o el valor que corresponda) antes de la primera lectura, para no saturar ni perder resolucion.',
      size=10, color=RED)
 
-text((AM_L, NY - 6.4),
+text((AM_L, NY - 7.2),
      'FUENTES DE CADA DATO:\n'
-     '• Pinout ADS1256 (28 pines), regla de AINCOM para single-ended, full-scale = 2*VREF/PGA, rango absoluto de entrada\n'
-     '  (AGND-0.1 a AVDD+0.1 con buffer OFF): datasheet TI ADS1256 "Very Low Noise 24-Bit ADC" Rev K (SBAS288K), leido\n'
-     '  directamente del PDF el 2026-11-02 (paginas de Terminal Functions, Absolute Maximum Ratings y Analog Input).\n'
+     '• Full-scale = 2*VREF/PGA y la logica de single-ended (senal + retorno comun): datasheet TI ADS1256 "Very Low Noise\n'
+     '  24-Bit ADC" Rev K (SBAS288K), leido directamente del PDF el 2026-11-02 — esto es del CHIP, aplica a cualquier placa.\n'
+     '• Nombres y orden de pines de ESTA placa (AIN0/GND por canal; 5V, GND, SCLK, DIN, DOUT, DRDY, CS, PDWN): leidos\n'
+     '  directamente de la etiqueta fisica de la placa por Luis, 2026-11-02 — no es generico, es la placa real en mano.\n'
      '• Escala 1.7 V/1000 N, maximo 2000 N (3.4 V): medicion/dato propio de Luis en el lab, NO de hoja del AMTI.\n'
-     '• VREF real de la placa de Luis: NO VERIFICADO — pendiente medir con multimetro.\n'
-     '• Mapeo de pines ADS1256 <-> GPIO del Raspberry Pi: NO VERIFICADO — depende del modelo exacto de la placa breakout;\n'
-     '  dibujado aqui solo por funcion (CS, DRDY, MISO, MOSI, SCLK), no como numero de pin fisico.',
+     '• VREF real de esta placa: NO VERIFICADO — no se identifico un pin VREF en la etiqueta; pendiente confirmar si es\n'
+     '  referencia interna fija o si hay un punto de prueba, y el modelo exacto de la placa.\n'
+     '• Mapeo de los 8 pines digitales a GPIO especificos del Raspberry Pi: NO DEFINIDO AUN — lo elige Luis en el software.',
      size=10)
 
 d.save(OUT + '.png', dpi=170, transparent=False)
