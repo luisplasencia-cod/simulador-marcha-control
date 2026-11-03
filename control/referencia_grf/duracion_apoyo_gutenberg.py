@@ -7,7 +7,7 @@ muestras de apoyo (el resto del vector es NaN).
 => duracion del apoyo = (numero de muestras no-NaN) / 250 Hz (resolucion 4 ms; apoyo definido con Fz >= 25 N).
 Mismo filtro que la curva: SPEED=2 (autoseleccionada), sin plantilla ortopedica, todos HC.
 Procedimiento: media por sujeto y luego media +- DE entre sujetos.
-Uso: python duracion_apoyo_gutenberg.py [carpeta_con_csv]  (descarga lo que falte de Figshare)
+Uso: python duracion_apoyo_gutenberg.py [carpeta_con_csv] [clase_velocidad 1|2|3]  (descarga lo que falte de Figshare)
 """
 import csv
 import os
@@ -18,6 +18,7 @@ import urllib.request
 FS = 250.0
 URL = {"GRF_F_V_RAW_right.csv": 26576491, "GRF_metadata.csv": 26576495, "GRF_walking_speed.csv": 26576497}
 carpeta = sys.argv[1] if len(sys.argv) > 1 else "datos_gutenberg"
+CLASE = sys.argv[2] if len(sys.argv) > 2 else "2"   # 1=lenta, 2=autoseleccionada, 3=rapida
 os.makedirs(carpeta, exist_ok=True)
 for n, fid in URL.items():
     r = os.path.join(carpeta, n)
@@ -42,7 +43,7 @@ with open(os.path.join(carpeta, "GRF_F_V_RAW_right.csv")) as f:
     for fila in rd:
         d, s, ses, tr = fila[:4]
         m = meta.get((d, s, ses))
-        if not m or m["CLASS_LABEL"] != "HC" or m["SPEED"] != "2" or m["ORTHOPEDIC_INSOLE"] != "0":
+        if not m or m["CLASS_LABEL"] != "HC" or m["SPEED"] != CLASE or m["ORTHOPEDIC_INSOLE"] != "0":
             continue
         n = sum(1 for v in fila[4:] if v not in ("", "NaN", "nan"))
         if n < 30:
@@ -52,6 +53,8 @@ with open(os.path.join(carpeta, "GRF_F_V_RAW_right.csv")) as f:
         if (d, s, ses, tr) in vel:
             spd.setdefault((d, s), []).append(vel[(d, s, ses, tr)])
 
+if not dur:
+    sys.exit(f"Sin datos para SPEED={CLASE}: en esta base los sanos solo estan en la clase 2 (autoseleccionada).")
 por_sujeto = [st.mean(v) for v in dur.values()]
 vs = [st.mean(v) for v in spd.values()]
 print(f"sujetos={len(por_sujeto)}  pisadas={len(trials)}")

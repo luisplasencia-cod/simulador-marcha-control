@@ -1,6 +1,6 @@
 # Propuesta de cambio de firmware — reducir el sondeo del puerto serie
 
-**No aplicado, no compilado, no probado** (sin PlatformIO en el RPi). Se aplica y flashea **desde la laptop**.
+**OPCIONAL. Decisión de Luis (2026-11-03): no se modifica el firmware.** **No aplicado, no compilado, no probado** (sin PlatformIO en el RPi). Se aplica y flashea **desde la laptop**.
 
 `reducir_polling_rx.patch` cambia `vTaskDelay(pdMS_TO_TICKS(5))` por 1 ms en `communication_rx()` (`communication.h`). El sondeo de 5 ms estaba en dos esperas: primer byte y bytes siguientes del mismo mensaje. Por eso el RTT medido (5.97 ms) es casi todo sondeo.
 

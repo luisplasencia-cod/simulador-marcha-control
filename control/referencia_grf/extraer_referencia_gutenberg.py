@@ -10,7 +10,7 @@ ORTHOPEDIC_INSOLE 0=sin plantilla; SHOD_CONDITION 0=descalzo 1=zapato normal 2=o
 Procedimiento (sin ajustes manuales): filtro HC (todos los de la base son sanos), SPEED y plantilla
 configurables; promedio por SUJETO (todas sus pisadas) y luego media +- DE ENTRE sujetos.
 
-Uso:  python extraer_referencia_gutenberg.py [carpeta_con_csv]   (si faltan, se descargan de Figshare)
+Uso:  python extraer_referencia_gutenberg.py [carpeta_con_csv] [clase_velocidad 1|2|3]   (si faltan, se descargan de Figshare)
 """
 import csv
 import os
@@ -20,6 +20,7 @@ import urllib.request
 
 URL = {"GRF_F_V_PRO_right.csv": 26576493, "GRF_metadata.csv": 26576495, "GRF_walking_speed.csv": 26576497}
 carpeta = sys.argv[1] if len(sys.argv) > 1 else "datos_gutenberg"
+CLASE = sys.argv[2] if len(sys.argv) > 2 else "2"   # 1=lenta, 2=autoseleccionada (por defecto), 3=rapida
 os.makedirs(carpeta, exist_ok=True)
 for nombre, fid in URL.items():
     ruta = os.path.join(carpeta, nombre)
@@ -41,7 +42,7 @@ with open(os.path.join(carpeta, "GRF_walking_speed.csv")) as f:
         except ValueError:
             pass
 
-SPEED_CLASE, INSOLE = "2", "0"   # autoseleccionada, sin plantilla ortopedica
+SPEED_CLASE, INSOLE = CLASE, "0"   # clase de velocidad elegida, sin plantilla ortopedica
 por_sujeto, vels, sujeto_info = {}, {}, {}
 with open(os.path.join(carpeta, "GRF_F_V_PRO_right.csv")) as f:
     rd = csv.reader(f)
@@ -63,11 +64,13 @@ with open(os.path.join(carpeta, "GRF_F_V_PRO_right.csv")) as f:
         if (d, s, ses, tr) in vel:
             vels.setdefault(k, []).append(vel[(d, s, ses, tr)])
 
+if not por_sujeto:
+    sys.exit(f"Sin datos para SPEED={CLASE}: en esta base los sanos solo estan en la clase 2 (autoseleccionada).")
 medias = [[st.mean(col) for col in zip(*ys)] for ys in por_sujeto.values()]
 n = len(medias)
 media = [st.mean(c) for c in zip(*medias)]
 de = [st.stdev(c) for c in zip(*medias)]
-with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "referencia_fz_gutenberg.csv"), "w", newline="") as f:
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "referencia_fz_gutenberg.csv" if CLASE == "2" else f"referencia_fz_gutenberg_speed{CLASE}.csv"), "w", newline="") as f:
     w = csv.writer(f)
     w.writerow(["pct_apoyo", "Fz_BW_media", "Fz_BW_DE_entre_sujetos"])
     for i in range(101):

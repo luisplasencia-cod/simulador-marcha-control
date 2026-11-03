@@ -1,0 +1,1 @@
+Gutenberg (verificado ejecutando los scripts, 2026-11-03): clases SPEED=1 (lenta) y SPEED=3 (rapida) con CLASS_LABEL=HC y sin plantilla -> 0 sujetos, 0 pisadas. Solo existe SPEED=2 (autoseleccionada, 350 sujetos). Esta base NO sirve para marcha lenta.

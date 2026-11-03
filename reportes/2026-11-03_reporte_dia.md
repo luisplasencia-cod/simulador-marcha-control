@@ -12,7 +12,7 @@ Etapa de control del simulador de marcha (Luis Plasencia). Sesión en el Raspber
 ## 1. Estado del RPi
 - Luis reparó el RPi tras el incidente del 2026-11-02. Sesión gráfica en Wayland (`rpd-labwc`) para el modo táctil; el monitor (`herramientas/monitor_gaitsim.py`) abre bien.
 - ADS1256 responde (STATUS=0x30; MUX/ADCON/DRATE leídos de vuelta coinciden con lo escrito).
-- **ESP32 de motores: no conectado hoy** (no existe `/dev/ttyUSB0`).
+- **ESP32 de motores:** no estaba conectado al inicio de la sesión; Luis lo conectó después (`/dev/ttyUSB0`). Prueba **solo de lectura** (no se envió `HOME` ni ningún movimiento; no se tocó la memoria de trayectorias): `PING` 5.37 ms de media (n=99/100; σ 10.25 ms por **un valor atípico de 106.7 ms** en la primera llamada, mínimo 1.98 ms), `GET_POSITION` 4.935 ms (σ 0.018), `TRAJ_STATUS` 4.923 ms (σ 0.088); posición `0:0:0` (sin HOME). Mismo orden que el 2026-11-02. Datos: `pruebas/latencia_comandos_2026-11-03.csv`.
 - **Observación sin resolver:** AIN0 (Fz del AMTI) marcó −55 mV con 55 mV pico a pico en el diagnóstico de hoy; el 2026-11-02 estaba estable en +38.9 mV. Apunta a conexión/estado del AMTI.
 
 ## 2. Latencia de adquisición RPi + ADS1256 (Paso 2 del plan)
@@ -35,6 +35,8 @@ Subida y bajada no difieren de forma relevante (50 %: 1.59 / 1.62 ms; 90 %: 2.40
 **Metodología.** (a) Se buscó en el manual (`referencias/amti_manual/AMTI_Gen5_User_Manual.pdf`, texto extraído con `pdftotext`): **no declara un retardo**. Sí declara, y se usó, lo siguiente: filtro anti-aliasing **1000 Hz pasa-bajos, Butterworth de 2 polos** (p. 55, § 10); filtro de reconstrucción de la salida analógica **1000 Hz, Butterworth de 3 polos** (p. 55); DAC de 16 bit con salida continua y **refresco de 2 kHz** (p. 12, § 2.5); la "tasa de adquisición" de NetForce (1000 Hz en el archivo `Trial00535.txt`) es solo para el flujo **digital por USB** (p. 27), no para la salida analógica. (b) Se calculó el **retardo de grupo** de cada filtro con la derivada numérica de la fase de los polos del Butterworth y se verificó contra la fórmula analítica (√2/ωc para 2 polos, 2/ωc para 3 polos). (c) Retenedor del DAC a 2 kHz: retardo medio = medio periodo. Script `pruebas/calcular_retardo_amti_manual.py`.
 
 **Resultado.** A frecuencias de la marcha (≤ 200 Hz) el retardo de grupo casi no varía: 2 polos = 0.225 ms; 3 polos = 0.318 ms (a 1–10 Hz; 0.234 y 0.325 ms a 200 Hz). Retenedor DAC: 0.25 ms (rango 0–0.5 ms). **Cota inferior = 0.225 + 0.318 + 0.250 = 0.79 ms.**
+
+**Búsqueda en internet (2026-11-03, 3 consultas):** no se encontró ninguna cifra publicada de retardo, latencia, retardo de fase ni respuesta en frecuencia de la salida analógica del Gen 5. Pistas, **no verificadas por mí**: (i) una nota técnica de AMTI "Gen 5 Setup and Optimization" referida en resultados de búsqueda (no se obtuvo); (ii) la documentación de QTM (Qualisys) indica un buffer de 16 muestras del Gen 5 en el flujo **digital**, no en el analógico. Del manual: en los dos modos de salida analógica (*Fully Conditioned* y *MSA 6 Compatible*) se aplica el mismo acondicionamiento salvo la corrección de diafonía (p. 28), así que el modo no cambia la cadena de filtros; no se sabe cuál modo usa Luis (la escala de 1.7665 mV/N con ganancia 2000 sugiere modo MSA 6, sin verificar).
 
 **Limitaciones.** Es una **cota inferior**, no el retardo total: el manual menciona sobremuestreo y procesamiento digital de señal (§ 2.1) **sin dar su retardo**, y no se midió. **Para obtener el valor completo hay que consultar al soporte técnico de AMTI** (fuente oficial) por el retardo de grupo de la ruta salida analógica del Gen 5, o medirlo con un estímulo de referencia independiente; ninguna de las dos está hecha. Esta consulta/medición queda como pendiente de Luis.
 
@@ -129,16 +131,31 @@ Archivos en `control/diagramas/salida/`: `diagrama.png/.svg`, `leyenda_variables
 ## 8. Tipo de control — propuesta PROVISIONAL
 Detalle en [`control/DECISION_TIPO_CONTROL.md`](../control/DECISION_TIPO_CONTROL.md). **Propuesta:** híbrido por eje (Fz, Fy) = realimentación de fuerza en tiempo real + ILC ciclo a ciclo encima. Se apoya en §4 y §7, con las limitaciones de §7.5. **No está cerrada**: falta identificar servo y rigidez, la latencia restante y la confirmación de la asesora.
 
-## 9. Firmware del ESP32 — propuesta (no aplicada)
-**Hallazgo (leído del código, no medido por separado):** `communication_rx()` espera con `vTaskDelay(5 ms)` en **dos** sitios (primer byte y bytes siguientes), coherente con que el RTT de 5.97 ms sea casi todo sondeo. **Propuesta:** sondeo de 1 ms (`control/firmware/reducir_polling_rx.patch`; explicación y pasos en `control/firmware/README.md` y en `Codigo ESP32 MOV/CAMBIOS_PENDIENTES_DESDE_RPI.md`, que lee la sesión de la laptop). **No compilado ni probado**; el beneficio esperado (RTT ≈ 2–3 ms) es una hipótesis hasta medirlo.
+## 9. Firmware del ESP32: interfaz de movimiento (leída del código, no probada) y decisión de no modificarlo
+**Objetivo.** Saber qué puede hacer el firmware actual antes de decidir el tipo de control, y no afectar un ESP32 que funciona (decisión de Luis: **no se modifica el firmware**).
+
+**Metodología.** Lectura de `Codigo ESP32 MOV/platformIO_control_trayectoria_v1/src/` (`main.cpp`, `communication.h`, `hardware_config.h`, `configurable_motion_data.h`, `description.md`) y de la sección de motores del artículo de conferencia (`conferencia_copy.pdf`). No se ejecutó nada que mueva motores.
+
+**Resultado (verificado en el código y en el artículo).**
+- **Motores** (artículo): los ejes **horizontal y vertical** usan servomotores AC (A6M80-750H2·1-M17, 0.75 kW, 3000 rpm; el vertical con freno) con drivers servo de lazo cerrado A6-750RS de **entradas de pulso y dirección** opto-aisladas (hasta 100 kHz); solo el eje **sagital** es un motor a pasos de lazo cerrado (34E1K-120, driver CL86Y). El firmware los llama "stepper" por la interfaz STEP/DIR.
+- **Órdenes disponibles:** `PING`, `HOME`, `MANUAL` (relativo, en pasos, **a la velocidad fija de homing de cada eje**: no recibe velocidad), `GOTO` (absoluto), `GET_POSITION`, carga de trayectoria (`TRAJ_BEGIN`/`TRAJ_POINT`/`TRAJ_END`), `RUN`/`PAUSE`/`RESUME`/`ABORT` y `TRAJ_STATUS`.
+- **Cada movimiento** (`axis_move_steps`) es una ráfaga de pasos a **frecuencia constante** generada por un temporizador de hardware, sin rampa de aceleración en el firmware; si el eje ya se está moviendo, la nueva orden se **ignora** sin aviso.
+- **Trayectoria temporizada:** hasta `MAX_DATA_LENGTH = 500` puntos, cada uno con (`dt_ms`, pasos en X, Y, K); se ejecuta punto a punto con `vTaskDelay(dt_ms)` (resolución 1 ms).
+- **Consecuencia (deducida del código):** **no existe una orden para cambiar posición o velocidad de forma continua mientras el eje se mueve**; por eso un lazo de fuerza en tiempo real a cientos de Hz **no es posible con la interfaz actual sin cambiar el firmware**. En cambio, **ILC es compatible sin tocar el firmware**: entre ciclos se modifican los arreglos de pasos y se recargan con `TRAJ_*`. **Por confirmar (no medido):** el tiempo de carga (si cada `TRAJ_POINT` tarda ≈ 5 ms como las otras órdenes, 500 puntos serían ≈ 2.5 s, **estimación**), si se puede cargar durante `RUN` (los arreglos se comparten: no se asume), y cuánto dura el hueco entre ciclos.
+
+**Cambio propuesto antes (sondeo RX de 5 ms → 1 ms):** queda **como propuesta opcional, NO aplicada y NO necesaria** para la fase ILC (ver `Codigo ESP32 MOV/CAMBIOS_PENDIENTES_DESDE_RPI.md`); solo bajaría ≈ 3–5 ms de latencia de comunicación.
+
+**Limitaciones.** Lectura de código, sin prueba en hardware; el artículo es la fuente de los modelos de motor (Luis indicó que usa motores a pasos: en X/Y el artículo dice servos AC, **por confirmar con Luis** si el hardware cambió).
 
 ## 10. Pendientes
 1. **AMTI:** consultar a soporte técnico de AMTI el retardo de la salida analógica del Gen 5 (o medirlo con una referencia independiente) — Luis.
 2. **Amplitud del objetivo de Fz a x6** — decisión de Luis (§5).
 3. Revisar AIN0 inestable (monitor abierto, plato vacío); repetir offset y calibración con pesas (`pruebas/calibracion_pesas.py`, sin ejecutar); revisar la pérdida de muestras del monitor (≈ 928/s vs 1000).
-4. Identificar τ del servo vertical y rigidez de contacto con ≥ 2 prótesis; repetir la simulación con impacto de talón.
+4. Identificar la respuesta del servo vertical y la rigidez de contacto con ≥ 2 prótesis (protocolo propuesto en `control/identificacion/PROTOCOLO.md`, **no ejecutado**); repetir la simulación con impacto de talón.
+   - Medir el tiempo de carga de trayectoria (`TRAJ_BEGIN/POINT/END`): sobrescribe la trayectoria en RAM del ESP32 (sin mover motores); **requiere OK de Luis**.
+   - Opcional, sin cambiar firmware: leer con un GPIO del RPi la señal STEP del ESP32 (3.3 V, GND común, resistencia en serie) para medir la latencia de ejecución; **requiere cableado de Luis**.
 5. Conectar el ESP32 de motores para el Paso 3 (latencia total); medir cómputo del RPi y ejecución del ESP32.
-6. Aplicar/probar el cambio de firmware desde la laptop.
+6. (Opcional, **no se modifica el firmware por decisión de Luis**) cambio de sondeo RX; solo si más adelante se necesita menos latencia.
 7. Respuesta de Dante Elías y confirmación de la asesora (sin novedad).
 
 ## 11. Fuentes
