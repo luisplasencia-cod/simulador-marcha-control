@@ -37,6 +37,15 @@ Full-scale con PGA=1 = 2·VREF/PGA = **5V**. Los 3.4V máximos del AMTI quedan a
 
 Los otros 2 chips de la placa, identificados: **AMS1117-3.3** (regulador LDO genérico, alimenta la lógica de 3.3V — NO es la referencia, su tolerancia ±1.5-2% es demasiado imprecisa para eso) y **ADS1256** mismo (el ADC, marcaje "...DB" = empaque SSOP-28). Hay además un chip **"BB OPA 3550A"** (op-amp Burr-Brown/TI, probablemente buffer de la señal de entrada, no afecta esta conclusión).
 
+## Conexión TEMPORAL — prueba de latencia (2026-11-03, hecha por Luis; retirar al terminar las pruebas)
+No forma parte de la configuración permanente. Solo sirve para `pruebas/medir_latencia_gpio_adc.py`.
+| Origen | → | Destino |
+|---|---|---|
+| RPi GPIO27 (pin físico 13) | → | R1 = 10 kΩ |
+| R1 (otra pata) = nodo del divisor | → | AIN1 (placa ADS1256) |
+| Nodo del divisor | → | R2 = 10 kΩ → GND junto a AIN1 (AINCOM) |
+Valores reales usados: 10k/10k (Luis). Nivel bajo medido 47 mV, alto 1613 mV (salto 1.566 V). GPIO27 queda además reservado mientras esté armado.
+
 ## Pendiente
 1. Modelo exacto de la placa ADS1256 (fabricante/vendedor) — no crítico ya, VREF resuelto por chip identificado.
 

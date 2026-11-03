@@ -79,7 +79,8 @@ def main():
             time.sleep(random.uniform(0.020, 0.070))  # fase aleatoria respecto al muestreo del ADC
             subida = not estado
             objetivo_50 = (lambda v: v > umb50) if subida else (lambda v: v < umb50)
-            objetivo_90 = (lambda v: v > umb90) if subida else (lambda v: v < umb90)
+            u90 = umb90 if subida else v_lo + 0.1 * (v_hi - v_lo)  # 90 % del escalon, en su sentido
+            objetivo_90 = (lambda v: v > u90) if subida else (lambda v: v < u90)
             t0 = time.perf_counter_ns()
             GPIO.output(PIN_ESCALON, GPIO.HIGH if subida else GPIO.LOW)
             t50 = t90 = None
