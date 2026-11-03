@@ -13,9 +13,11 @@ Metodos:
     RT+FF  : RT + prealimentacion u_ff = dFref/dt / k_est   (k_est != k_real: error de modelo)
     ILC    : RT + Fcmd = Fref + delta_j ; delta_{j+1} = Q[delta_j + gamma*e_j(t+m)]  (cada ciclo)
 d(t): perturbacion NO repetible (pulso aleatorio por ciclo) -> ILC no la puede aprender.
-Referencia: doble pico SINTETICO con picos 97.4 y 102.5 %BW al 19 % y 45 % del ciclo (valores de
-la curva propia del simulador, conferencia Fig. 5c); la forma entre picos es inventada.
+Referencia: curva REAL de Fz (media de 350 sujetos sanos, Gutenberg Gait Database, Horst 2021,
+DOI 10.1038/s41597-021-01014-6) en ../referencia_grf/referencia_fz_gutenberg.csv (ver extraer_referencia_gutenberg.py).
+Ya no hay forma inventada. Siguen SIN medir: tau_a, k_real, duracion del apoyo a x6 -> se barren (sensibilidad).
 """
+import os
 import sys
 import numpy as np
 import matplotlib
@@ -30,11 +32,14 @@ KP = 10.0           # ganancia de lazo (1/s)
 GAMMA = 0.5
 
 
+_REF = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "referencia_grf", "referencia_fz_gutenberg.csv")
+
+
 def referencia(n):
+    """Fz objetivo en %BW, 101 puntos reales interpolados a n muestras (0 % -> 100 % del apoyo)."""
+    d = np.genfromtxt(_REF, delimiter=",", skip_header=1)
     p = np.arange(n) / n
-    g = lambda c, a, s: a * np.exp(-0.5 * ((p - c) / s) ** 2)
-    f = g(0.19, 97.4, 0.10) + g(0.45, 102.5, 0.10)
-    return f * np.clip(p / 0.05, 0, 1) * np.clip((1 - p) / 0.05, 0, 1)  # rampa suave de 5 % en extremos
+    return np.interp(p, d[:, 0] / 100.0, d[:, 1] * 100.0)
 
 
 def suavizar(x, n):  # filtro de fase cero (Q del ILC)
@@ -43,9 +48,9 @@ def suavizar(x, n):  # filtro de fase cero (Q del ILC)
     return np.convolve(pad, w, "same")[n:-n]
 
 
-def simular(metodo, T, n_ciclos, kp=KP, perturb=False, seed=0):
+def simular(metodo, T, n_ciclos, kp=KP, perturb=False, seed=0, tau=TAU_A, k_real=K_REAL, tc=TC):
     rng = np.random.default_rng(seed)
-    n = int(TC / DT)
+    n = int(tc / DT)
     ref = referencia(n)
     dref = np.gradient(ref, DT)
     nd = int(round(T / DT))
@@ -65,8 +70,8 @@ def simular(metodo, T, n_ciclos, kp=KP, perturb=False, seed=0):
             u = kp * (fcmd - Fm)
             if metodo == "RT+FF":
                 u += dref[i] / K_EST
-            v += DT * (u - v) / TAU_A
-            F += DT * (K_REAL * v + d[i])
+            v += DT * (u - v) / tau
+            F += DT * (k_real * v + d[i])
             Ft[i] = F
             if abs(F) > 1e4:
                 return np.full(n_ciclos, np.inf), None, ref
@@ -108,13 +113,24 @@ if __name__ == "__main__":
     for k in res:
         res[k] = [x if np.isfinite(x) else np.nan for x in res[k]]
 
+    print("\nSENSIBILIDAD a parametros NO medidos (T=10 ms, Kp=10): RMS ultimo ciclo [%BW] RT / ILC")
+    print("  tau_a[ms]  k_real |   RT    ILC")
+    for tau in (0.01, 0.02, 0.05):
+        for kr in (0.5, 0.8, 1.0, 1.5):
+            r1 = simular("RT", 0.010, 3, tau=tau, k_real=kr)[0][-1]
+            r2 = simular("ILC", 0.010, NC, tau=tau, k_real=kr)[0][-1]
+            f = lambda x: "inestable" if not np.isfinite(x) else f"{x:6.2f}"
+            print(f"  {tau*1e3:8.0f}  {kr:6.1f} | {f(r1):>9} {f(r2):>9}")
+    print("SENSIBILIDAD a la duracion del apoyo (tau=20 ms, k=0.8, T=10 ms): RMS RT / ILC")
+    for tc in (3.0, 4.0, 5.0):
+        print(f"  apoyo {tc:.0f} s | {simular('RT', 0.010, 3, tc=tc)[0][-1]:6.2f} {simular('ILC', 0.010, NC, tc=tc)[0][-1]:6.2f}")
     fig, ax = plt.subplots(2, 2, figsize=(11, 8))
     p = np.arange(int(TC / DT)) / int(TC / DT) * 100
     for met, c in (("RT", "tab:red"), ("RT+FF", "tab:orange"), ("ILC", "tab:green")):
         r, F, ref = simular(met, 0.010, NC if met == "ILC" else 3)
         ax[0, 0].plot(p, F, c, label=met)
     ax[0, 0].plot(p, ref, "k--", label="objetivo"); ax[0, 0].set_title("(a) Fz con T = 10 ms (ultimo ciclo)")
-    ax[0, 0].set_xlabel("% del ciclo"); ax[0, 0].set_ylabel("%BW"); ax[0, 0].legend()
+    ax[0, 0].set_xlabel("% del apoyo"); ax[0, 0].set_ylabel("%BW"); ax[0, 0].legend()
     for k, c, ls in (("RT", "tab:red", "-"), ("RT+FF", "tab:orange", "-"), ("ILC", "tab:green", "-")):
         ax[0, 1].plot(Ts * 1e3, res[k], c, ls=ls, marker="o", label=k)
     ax[0, 1].axvline(tmax * 1e3, color="gray", ls=":"); ax[0, 1].text(tmax * 1e3, 60, " T max (PM 45°)", fontsize=8)
@@ -126,5 +142,5 @@ if __name__ == "__main__":
     for k, c in (("RT+pert", "tab:red"), ("ILC+pert", "tab:green")):
         ax[1, 1].plot(Ts * 1e3, res[k], c, marker="o", label=k.replace("+pert", ""))
     ax[1, 1].set_yscale("log"); ax[1, 1].set_ylim(0.1, 100); ax[1, 1].set_title("(d) Con perturbacion no repetible (pulso 3 %BW)"); ax[1, 1].set_xlabel("latencia total T [ms]"); ax[1, 1].set_ylabel("RMS [%BW]"); ax[1, 1].legend()
-    fig.suptitle("Modelo con SUPUESTOS (tau_a=20 ms, Kp=10 1/s, k real = 0.8 k modelo, ciclo 4 s)", fontsize=10)
+    fig.suptitle("Objetivo REAL: Fz media de 350 sanos (Gutenberg, 1.40 m/s). Planta con SUPUESTOS (tau_a=20 ms, k real=0.8 k modelo, apoyo 4 s)", fontsize=9)
     fig.tight_layout(); fig.savefig("control/simulacion/rt_vs_ilc_latencia.png", dpi=130)

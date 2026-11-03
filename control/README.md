@@ -4,6 +4,7 @@
 
 | Carpeta / archivo | Qué es | Estado |
 |---|---|---|
+| `referencia_grf/` | Curva objetivo REAL de Fz (Gutenberg, 350 sanos) + script reproducible | verificada |
 | `simulacion/` | Simulación control en tiempo real vs ILC con la latencia como variable (modelo con supuestos) | hecha 2026-11-03, ver `simulacion/NOTAS.md` |
 | `../pruebas/2026-11-02_latencia_amti_rpi_esp32.md` | Plan y resultados de latencia (Paso 1 y 2 medidos; Paso 3 pendiente) | parcial |
 | `../pruebas/latencia_*.csv/.png` | Datos crudos de latencia | medido |

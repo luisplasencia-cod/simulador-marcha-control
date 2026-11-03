@@ -1,1 +1,2 @@
-Horst F, Slijepcevic D, Simak M, Schöllhorn WI. Gutenberg Gait Database, a ground reaction force database of level overground walking in healthy individuals. Sci Data 8:232, 2021. DOI: 10.1038/s41597-021-01014-6. Datos en Figshare (enlace exacto no verificado).
+Horst F, Slijepcevic D, Simak M, Schöllhorn WI. Gutenberg Gait Database, a ground reaction force database of level overground walking in healthy individuals. Sci Data 8:232, 2021. DOI: 10.1038/s41597-021-01014-6.
+Datos (Figshare, CC0), colección 10.6084/m9.figshare.c.5311538 (verificado 2026-11-03 por API): GRF_F_V_PRO_right.csv (ndownloader.figshare.com/files/26576493), GRF_metadata.csv (26576495), GRF_walking_speed.csv (26576497). Texto completo: Europe PMC PMC8413275.
