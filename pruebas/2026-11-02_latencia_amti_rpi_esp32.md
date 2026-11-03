@@ -24,18 +24,16 @@ Protocolo confirmado: 115200 baudios; RPi envía `<PING>`; ESP32 responde `PONG\
 **Comandos reales (2026-11-02, `pruebas/medir_latencia_comandos.py`, solo lectura, sin mover motores, N=100):** PING 5.36 ms media (un outlier de 106 ms, 99/100 válidos; probable arranque), GET_POSITION 4.93 ms (desv 0.02), TRAJ_STATUS 4.92 ms (desv 0.08). Mismo orden que PING (~5 ms): la latencia con comandos reales equivale al polling del firmware, el procesamiento del comando no añade nada medible. Posición leída `0:0:0` (sin HOME). **No medido todavía:** ack de `MANUAL` (mueve motores; script listo con `--mover`, requiere simulador despejado) ni ejecución de trayectoria.
 
 ## Paso 2 — Latencia de adquisición AMTI → RPi
-**(2026-11-02, resuelto) El problema de lectura en 0 V era un bug del script** (`RDATA` + bytes de relleno sacaba el dato de la ventana), no del AMTI ni del cableado — corregido en `leer_ads1256_fz.py`, ahora lee bien (ver estado en `CLAUDE.md`).
+**(2026-11-02, resuelto) El problema de lectura en 0 V era un bug del script** (`RDATA` + bytes de relleno), no del AMTI ni del cableado — corregido en `leer_ads1256_fz.py`.
 
-**(2026-11-03) ADC ya validado contra el AMTI real** por separado (RMSE 1.89 N, error pico a pico 4.03%, ver `pruebas/comparar_amti_vs_ads1256.py`) — eso confirma escala/signo, pero **no es la latencia de adquisición**, son cosas distintas. Esta sección sigue pendiente.
+**(2026-11-03) ADC ya validado contra el AMTI real** (RMSE 1.89 N, pico a pico 4.03 %, `pruebas/comparar_amti_vs_ads1256.py`): confirma escala/signo, no es latencia.
 
-Método: aplicar un escalón de fuerza conocido (golpe seco o carga rápida) y comparar el instante físico vs. el instante en que el RPi registra el cambio en su lectura. Script: `pruebas/medir_latencia_escalon_amti.py` — registra el instante de DETECCIÓN del RPi; para la latencia real falta una referencia física independiente (ver aviso en el script). No reportar un número aquí sin esa referencia.
-
-- Repetición 1: _____ ms
-- Repetición 2: _____ ms
-- Repetición 3: _____ ms
-- (agregar más filas si se hacen más repeticiones)
-- Media / desviación: _____ / _____ ms
-- Observaciones (ruido, offset, canal usado): _____
+**(2026-11-03) MEDIDO sin video, con escalón eléctrico** (GPIO27 → divisor 10k/10k → AIN1; `pruebas/medir_latencia_gpio_adc.py`, datos `pruebas/latencia_gpio_adc.csv`). n=200 (100 subidas/100 bajadas), 0 fallos, 1000 SPS, mismo reloj para flanco y detección.
+- 50 % del escalón: media **1.61 ms**, σ 0.28 ms, máx 2.12 ms
+- 90 % del escalón: media **2.40 ms**, σ 0.28 ms, máx 2.90 ms
+- Incluye filtro ADS1256 + SPI + Python. **No incluye el retardo del amplificador del AMTI** (manual, pendiente). t0 tomado justo antes de `GPIO.output()` (cota superior, decenas de µs).
+- Latencia de adquisición total = esto + retardo AMTI (manual).
+- `medir_latencia_escalon_amti.py` con fuerza real solo da jitter de detección; sin referencia independiente no se reporta número absoluto con pisada.
 
 ## Paso 3 — Latencia total del loop
 Total = Paso 2 + cómputo RPi + Paso 1 + ejecución ESP32 (ej. medir con GPIO/LED en el instante que el ESP32 recibe el comando).
