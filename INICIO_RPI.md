@@ -19,7 +19,10 @@ Luis ya está sentado con el AMTI y puede aplicar cargas físicas. **Lo único q
 3. **Llenar el Paso 2 del plan** en `pruebas/2026-11-02_latencia_amti_rpi_esp32.md` con lo que salga (reales, no estimados).
 4. **Paso 3 — latencia total del lazo:** solo si el Paso 2 ya tiene un número real. Total = Paso 1 + Paso 2 + cómputo RPi + ejecución ESP32 (ver método en el plan).
 
-## Retomar tras el reinicio del 2026-11-03 (lee esto primero)
+## ESTADO AL CIERRE DEL 2026-11-03 (lee esto primero)
+Latencia de adquisición RPi+ADS1256 ya MEDIDA (1.61/2.40 ms) y ESP32 probado en solo lectura; el plan de abajo (Pasos 2-3 originales) quedó superado: ver `reportes/2026-11-03_reporte_dia.md` (resumen al inicio) y el bloque de estado de `CLAUDE.md`. **El firmware del ESP32 NO se modifica.** El divisor GPIO27→AIN1 es una conexión TEMPORAL. Pendiente aquí: revisar AIN0 inestable con el plato vacío.
+
+## (Histórico) Retomar tras el reinicio del 2026-11-03
 1. Se cambió la sesión a Wayland (`rpd-labwc`) para recuperar el modo táctil. **Verifica:** `echo $XDG_SESSION_TYPE`, que no haya cursor de mouse y que `squeekboard` aparezca. Abre el monitor (`herramientas/monitor_gaitsim.py`) y confirma que funciona; si no, revierte `/etc/lightdm/lightdm.conf` a `rpd-x`.
 2. Luis NO puede grabar video → el Paso 2 se hace con **escalón eléctrico GPIO→ADS1256** (ver `CLAUDE.md`, entrada 2026-11-03). Falta que Luis confirme AIN1/AINCOM y GPIO libre (propuesto GPIO27) en la etiqueta física. Luego escribir `pruebas/medir_latencia_gpio_adc.py` (revisar antes cómo `leer_ads1256_fz.py` elige canal). **No inventar** el retardo del amplificador del AMTI: sale del manual.
 3. AIN0 estaba en −29 mV con 58 mV p-p (ayer +38.9 mV estable): Luis estaba conectando el AMTI; re-verificar con `python pruebas/leer_ads1256_fz.py --diagnostico`.

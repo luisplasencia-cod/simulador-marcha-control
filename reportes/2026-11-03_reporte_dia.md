@@ -4,6 +4,36 @@ Etapa de control del simulador de marcha (Luis Plasencia). Sesión en el Raspber
 
 **Regla de este reporte:** cada tema trae *Objetivo → Metodología → Resultado → Limitaciones → Fuentes*. Todo dato es **medido**, **tomado de una fuente citada** o está marcado como **NO VERIFICADO / elección de diseño**. No se usan valores supuestos como si fueran datos.
 
+## Resumen del día (léelo primero)
+**Qué se logró hoy (todo con método, resultado y fuente en las secciones indicadas):**
+1. **Latencia de adquisición medida** sin video, con escalón eléctrico: ADS1256 + SPI + Python = 1.61 ms (50 %) / 2.40 ms (90 %), n = 200 (§2).
+2. **Retardo del amplificador AMTI:** el manual no lo declara; cota inferior calculada 0.79 ms; búsqueda en internet sin cifra publicada; falta consultar a AMTI (§3).
+3. **Latencia acumulada parcial ≥ 8.4–9.2 ms** y ESP32 probado en solo lectura (§1, §4).
+4. **Curva objetivo de Fz REAL** (Gutenberg, 350 sanos) y **duración del apoyo medida** (0.615 s → 3.69 s a x6) (§5, §6).
+5. **Marcha lenta real** (Fukuchi, 24 jóvenes, 0.50–1.81 m/s): a 0.50 m/s la curva es una meseta de ≈ 100 %BW; exclusiones de datos incoherentes documentadas (§5b).
+6. **Simulación RT vs ILC con latencia variable**, con las dos curvas reales y barrido de lo no medido (§7, §7.7); **diagrama de bloques** del lazo (§7.2b).
+7. **Tipo de control propuesto (provisional): híbrido realimentación + ILC** (§8).
+8. **Interfaz real del firmware** (sin orden de velocidad continua → ILC compatible sin tocar el ESP32; RT dentro del ciclo requeriría firmware) y **decisión de Luis: no modificarlo** (§9).
+9. **Protocolo propuesto** para medir rigidez por prótesis y respuesta del actuador (no ejecutado) (§10, `control/identificacion/PROTOCOLO.md`).
+
+**Qué NO se pudo cerrar:** retardo completo del AMTI; latencia total (faltan cómputo del RPi y ejecución del ESP32); servo y rigidez reales (la simulación los barre); cuál curva usar a x6 (decisión de Luis); respuesta de Dante Elías y de la asesora.
+
+**Mapa de lo producido hoy**
+| Carpeta | Contenido |
+|---|---|
+| `reportes/` | este reporte (`2026-11-03_reporte_dia.md`) |
+| `pruebas/` | `medir_latencia_gpio_adc.py` + `latencia_gpio_adc.csv` (latencia ADS1256); `calcular_retardo_amti_manual.py` (retardo AMTI desde el manual); `latencia_comandos_2026-11-03.csv` (ESP32, solo lectura); `medir_latencia_escalon_amti.py` corregido; Paso 2 completado en `2026-11-02_latencia_amti_rpi_esp32.md` |
+| `control/` | índice `README.md`; `DECISION_TIPO_CONTROL.md`; `simulacion/` (modelo, figuras, notas); `referencia_grf/` (curvas reales y sus scripts reproducibles); `diagramas/` (bloques, leyenda, ecuaciones); `identificacion/PROTOCOLO.md`; `firmware/` (parche opcional, no aplicado) |
+| `referencias/` | `amti_manual/` (PDF del Gen 5, subido por Luis); notas verificadas de `06_grf_referencia/` (Horst 2021, Fukuchi 2018) |
+| `herramientas/` | `mostrar_figura.py` (muestra figuras en la pantalla del RPi) |
+| `esquemas/amti_ads1256_rpi/` | conexión TEMPORAL del divisor GPIO27 → AIN1 |
+| `Codigo ESP32 MOV/` | `CAMBIOS_PENDIENTES_DESDE_RPI.md` (propuesta opcional; **el código no se modificó**) |
+| raíz | `CLAUDE.md` (estado y reglas, compacto), `HISTORIAL.md` (narrativa, incidentes y razonamiento descartado), `INICIO_RPI.md` |
+
+**Para la sesión de la laptop (análisis sin RPi ni simulación):** leer este reporte y `control/DECISION_TIPO_CONTROL.md`; los datos crudos de Gutenberg/Fukuchi se regeneran con los scripts (descargan de Figshare), no están en el repo.
+
+---
+
 ## Índice
 1. Estado del RPi · 2. Latencia de adquisición RPi + ADS1256 · 3. Retardo del amplificador AMTI · 4. Latencia acumulada · 5. Curva objetivo de Fz (5b. Marcha lenta) · 6. Duración del apoyo · 7. Simulación RT vs ILC · 8. Tipo de control (provisional) · 9. Firmware (propuesta) · 10. Pendientes · 11. Fuentes
 
