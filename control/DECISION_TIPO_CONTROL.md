@@ -17,6 +17,9 @@
 | 7 | ILC ≪ RT puro se mantiene al barrer servo (10–50 ms), rigidez (0.5–1.5) y apoyo (3–5 s): RT 6.1–17.9 %BW, ILC 0.21–1.56 %BW | simulación, sensibilidad |
 | 8 | La latencia medida hoy (≈ 8–9 ms parcial) **no obliga** a abandonar el tiempo real a ganancia moderada | medición + simulación |
 
+## Restricción de la interfaz actual del ESP32 (verificada en el código, no probada; decisión de Luis: no modificar el firmware)
+El firmware no tiene una orden de velocidad/posición continua (solo movimientos finitos y trayectorias precargadas de hasta 500 puntos; una orden nueva sobre un eje en movimiento se ignora). Entonces: **ILC** (recargar los arreglos de pasos entre ciclos) es compatible sin cambiar el firmware; el **lazo de realimentación en tiempo real** dentro del ciclo necesitaría firmware nuevo. Orden de trabajo coherente con no tocar el ESP32: **primero ILC sobre la interfaz actual**; la realimentación en tiempo real queda como mejora posterior que requeriría cambiar el firmware (a decidir con Luis). Por confirmar: tiempo de carga de una trayectoria y si se puede recargar entre ciclos (reporte § 9).
+
 ## Qué cambiaría la propuesta
 - Variabilidad ciclo a ciclo alta (prótesis activa prototipo, holguras) → ILC aprende poco: pesar más el tiempo real + prealimentación.
 - Latencia total medida ≫ 30 ms (con cómputo RPi y ESP32) → bajar Kp; el ILC pasa a hacer casi todo el seguimiento.

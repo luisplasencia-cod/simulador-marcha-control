@@ -1,0 +1,6 @@
+T01: velocidad 0.50 m/s (DE 0.06); sujetos=24; apoyos=858; apoyo 1.071 s (DE 0.134); 1er pico 104.2 %BW (33 %), valle 98.2 %BW (45 %), 2do pico 100.5 %BW (66 %); DE entre sujetos en picos 3.4/1.7
+T02: velocidad 0.69 m/s (DE 0.08); sujetos=24; apoyos=1023; apoyo 0.868 s (DE 0.077); 1er pico 104.2 %BW (32 %), valle 94.9 %BW (47 %), 2do pico 101.7 %BW (75 %); DE entre sujetos en picos 3.1/2.7
+T03: velocidad 0.87 m/s (DE 0.11); sujetos=24; apoyos=1152; apoyo 0.754 s (DE 0.064); 1er pico 102.0 %BW (30 %), valle 91.0 %BW (48 %), 2do pico 104.8 %BW (78 %); DE entre sujetos en picos 2.1/4.2
+T05: velocidad 1.24 m/s (DE 0.15); sujetos=24; apoyos=1385; apoyo 0.612 s (DE 0.052); 1er pico 110.0 %BW (24 %), valle 78.7 %BW (48 %), 2do pico 110.2 %BW (79 %); DE entre sujetos en picos 7.7/7.1
+T08: velocidad 1.81 m/s (DE 0.22); sujetos=24; apoyos=1655; apoyo 0.500 s (DE 0.047); 1er pico 137.6 %BW (21 %), valle 55.8 %BW (50 %), 2do pico 115.9 %BW (80 %); DE entre sujetos en picos 11.2/11.0
+Pruebas del grupo Young excluidas por incoherencia (banda sin senal o suma fuera de 0.85-1.05 de m*g): 0

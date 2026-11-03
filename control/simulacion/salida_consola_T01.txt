@@ -1,0 +1,40 @@
+Latencia maxima con margen de fase >= 45 grados (analitico, tau_a=20 ms):
+   Kp=  2 1/s -> ancho de banda de lazo  0.32 Hz, T max =  373.1 ms
+   Kp=  5 1/s -> ancho de banda de lazo  0.79 Hz, T max =  137.9 ms
+   Kp= 10 1/s -> ancho de banda de lazo  1.56 Hz, T max =   60.3 ms
+   Kp= 20 1/s -> ancho de banda de lazo  2.98 Hz, T max =   22.8 ms
+   Kp= 40 1/s -> ancho de banda de lazo  5.30 Hz, T max =    5.9 ms
+   Kp= 80 1/s -> ancho de banda de lazo  8.63 Hz, T max =    0.0 ms
+Kp=10.0 1/s, tau=20 ms: wgc=9.8 rad/s; T max con margen de fase 45 deg = 60 ms
+Referencia: Fz media de 24 jovenes sanos (Fukuchi, cinta, 0.50 m/s); apoyo x6 = 6.43 s
+RMS del error [%BW] (referencia pico ~100 %BW), ultimo ciclo:
+T[ms]        RT     RT+FF       ILC  ILC+pert   RT+pert
+    0      4.83      1.02      0.22      0.41      4.84
+    5      4.66      0.86      0.22      0.42      4.67
+   10      4.49      0.71      0.23      0.43      4.50
+   20      4.15      0.52      0.25      0.46      4.16
+   40      3.48      0.92      0.33      0.54      3.50
+   60      2.86      1.74      0.44      0.66      2.89
+   80      2.40      2.68      0.62      0.87      2.43
+  100      2.28      3.77      0.96      1.83      2.33
+  130      3.32      5.91    362.51    181.49      3.38
+  160      6.88     10.26   inestable   inestable      7.12
+
+SENSIBILIDAD a parametros NO medidos (T=10 ms, Kp=10): RMS ultimo ciclo [%BW] RT / ILC
+  tau_a[ms]  k_real |   RT    ILC
+        10     0.5 |      6.96      0.31
+        10     0.8 |      4.44      0.22
+        10     1.0 |      3.54      0.19
+        10     1.5 |      2.29      0.20
+        20     0.5 |      7.02      0.32
+        20     0.8 |      4.49      0.23
+        20     1.0 |      3.59      0.20
+        20     1.5 |      2.33      0.19
+        50     0.5 |      7.24      0.50
+        50     0.8 |      4.67      0.40
+        50     1.0 |      3.76      0.38
+        50     1.5 |      2.51      0.36
+SENSIBILIDAD a la duracion del apoyo (tau=20 ms, k=0.8, T=10 ms): RMS RT / ILC
+  apoyo 5.62 s |   5.09   0.30
+  apoyo 6.43 s |   4.49   0.23
+  apoyo 7.23 s |   4.03   0.18

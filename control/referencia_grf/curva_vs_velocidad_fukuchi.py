@@ -13,6 +13,10 @@ PROCESAMIENTO (decisiones propias, documentadas):
   - normalizacion por la fuerza vertical media TOTAL (suma de las dos bandas) de la prueba: en marcha estable
     equivale al peso corporal y evita depender de la tara de la cinta (en el sujeto 1 la suma da ~7 % menos que masa x g);
   - cada apoyo se lleva a 101 puntos (0-100 %); se promedia por sujeto y luego entre sujetos.
+CRITERIOS DE INCLUSION (verificados con los datos, 2026-11-03): solo grupo 'Young' y pruebas donde AMBAS bandas tienen senal y la suma
+  de las dos bandas esta entre 0.85 y 1.05 de masa x g. Se excluyeron las pruebas del grupo 'Older' con estructura incoherente en la
+  cinta: una banda en cero constante (sujetos 43-49), suma de bandas ~1.8 x masa x g (sujetos 39, 40, 42) o ~0.08 x (sujeto 41), y
+  varias con suma < 0.85. Sin este filtro la DE entre sujetos llegaba a 165 %BW y los picos a 145 %BW (no creibles).
 Uso: python curva_vs_velocidad_fukuchi.py [carpeta_cache]
 """
 import csv
@@ -57,13 +61,14 @@ class RangoHTTP(io.RawIOBase):
         if self.pos >= self.n:
             return 0
         fin = min(self.pos + len(b), self.n) - 1
-        for intento in range(3):
+        for intento in range(6):
             try:
                 d = urllib.request.urlopen(urllib.request.Request(self.url, headers={"Range": f"bytes={self.pos}-{fin}"})).read()
                 break
             except urllib.error.HTTPError:
-                if intento == 2:
+                if intento == 5:
                     raise
+                time.sleep(2 * (intento + 1))
                 self._resolver()
         b[:len(d)] = d
         self.pos += len(d)
@@ -73,7 +78,7 @@ class RangoHTTP(io.RawIOBase):
 info_path = os.path.join(CACHE, "WBDSinfo.csv")
 if not os.path.exists(info_path):
     urllib.request.urlretrieve(URL_INFO, info_path)
-vel, grupo = {}, {}
+vel, grupo, masa = {}, {}, {}
 with open(info_path, newline="") as f:
     for r in csv.DictReader(f):
         nm = r["FileName"]
@@ -83,6 +88,7 @@ with open(info_path, newline="") as f:
             except ValueError:
                 continue
             grupo[nm] = r["AgeGroup"]
+            masa[nm] = float(r["Mass"])
 
 def filtro_cero_fase(x, fc=20.0, fs=FS):
     """Butterworth 2.o orden pasa-bajos (bilineal), aplicado hacia adelante y hacia atras (fase cero), con relleno por reflexion."""
@@ -103,8 +109,40 @@ def filtro_cero_fase(x, fc=20.0, fs=FS):
     return z[pad:-pad]
 
 
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
+
+_loc = threading.local()
+
+
+def _leer_remoto(nm):
+    for intento in range(4):
+        try:
+            if not hasattr(_loc, "zf"):
+                _loc.zf = zipfile.ZipFile(io.BufferedReader(RangoHTTP(URL_ZIP), 1 << 20))
+            datos = _loc.zf.read("51subjs/" + nm)       # primero se lee completo y recien despues se escribe
+            break
+        except Exception:
+            if hasattr(_loc, "zf"):
+                del _loc.zf
+            if intento == 3:
+                raise
+            time.sleep(5 * (intento + 1))
+    with open(os.path.join(CACHE, nm), "wb") as g:
+        g.write(datos)
+
+
+faltan = [nm for nm in sorted(vel) if grupo[nm] == "Young" and nm[10:13] in ("T01", "T02", "T03", "T05", "T08")
+          and (not os.path.exists(os.path.join(CACHE, nm)) or os.path.getsize(os.path.join(CACHE, nm)) == 0)]
+if faltan:
+    print(f"descargando {len(faltan)} archivos con 3 hilos...", flush=True)
+    with ThreadPoolExecutor(3) as ex:
+        list(ex.map(_leer_remoto, faltan))
+
 zf = None
-cond = [f"T{c:02d}" for c in range(1, 9)]
+excluidas = []
+cond = ["T01", "T02", "T03", "T05", "T08"]   # lenta (40 %), 55 %, 70 %, comoda (100 %), rapida (145 %)
 curvas = {c: {} for c in cond}       # cond -> sujeto -> lista de curvas (101,)
 duras = {c: {} for c in cond}        # cond -> sujeto -> lista de duraciones (s)
 vels = {c: {} for c in cond}
@@ -112,15 +150,14 @@ for nm in sorted(vel):
     sujeto = nm[4:6]
     c = nm[10:13]
     ruta = os.path.join(CACHE, nm)
-    if not os.path.exists(ruta) or os.path.getsize(ruta) == 0:
-        if zf is None:
-            zf = zipfile.ZipFile(io.BufferedReader(RangoHTTP(URL_ZIP), 1 << 20))
-        datos = zf.read("51subjs/" + nm)      # primero se lee completo y recien despues se escribe
-        with open(ruta, "wb") as g:
-            g.write(datos)
+    if c not in cond or grupo[nm] != "Young":
+        continue
     d = np.loadtxt(ruta, skiprows=1)
     fy1, fy2 = d[:, 2], d[:, 9]
     bw = np.mean(fy1 + fy2)
+    if np.std(fy1) < 10 or np.std(fy2) < 10 or not (0.85 <= bw / (masa[nm] * 9.81) <= 1.05):
+        excluidas.append(nm)
+        continue
     for fy in (fy1, fy2):
         s = filtro_cero_fase(fy)
         on = s >= UMBRAL_N
@@ -162,6 +199,7 @@ with open(salida_csv, "w", newline="") as f:
     w.writerow(["pct_apoyo"] + [f"{c}_Fz_BW_media" for c in medias])
     for i in range(101):
         w.writerow([i] + [f"{medias[c][i] / 100:.5f}" for c in medias])
+resumen.append(f"Pruebas del grupo Young excluidas por incoherencia (banda sin senal o suma fuera de 0.85-1.05 de m*g): {len(excluidas)}")
 txt = "\n".join(resumen)
 open(os.path.join(AQUI, "resumen_velocidad_fukuchi.txt"), "w").write(txt + "\n")
 print(txt)

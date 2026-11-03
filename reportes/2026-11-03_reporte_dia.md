@@ -5,7 +5,7 @@ Etapa de control del simulador de marcha (Luis Plasencia). Sesión en el Raspber
 **Regla de este reporte:** cada tema trae *Objetivo → Metodología → Resultado → Limitaciones → Fuentes*. Todo dato es **medido**, **tomado de una fuente citada** o está marcado como **NO VERIFICADO / elección de diseño**. No se usan valores supuestos como si fueran datos.
 
 ## Índice
-1. Estado del RPi · 2. Latencia de adquisición RPi + ADS1256 · 3. Retardo del amplificador AMTI · 4. Latencia acumulada · 5. Curva objetivo de Fz · 6. Duración del apoyo · 7. Simulación RT vs ILC · 8. Tipo de control (provisional) · 9. Firmware (propuesta) · 10. Pendientes · 11. Fuentes
+1. Estado del RPi · 2. Latencia de adquisición RPi + ADS1256 · 3. Retardo del amplificador AMTI · 4. Latencia acumulada · 5. Curva objetivo de Fz (5b. Marcha lenta) · 6. Duración del apoyo · 7. Simulación RT vs ILC · 8. Tipo de control (provisional) · 9. Firmware (propuesta) · 10. Pendientes · 11. Fuentes
 
 ---
 
@@ -58,6 +58,32 @@ Suma parcial = **8.4 ms (50 %) a 9.2 ms (90 %)**, usando el RTT completo (ida y 
 **Resultado.** 350 sujetos, 8819 pisadas, velocidad de marcha 1.40 ± 0.16 m/s (n=284 con dato). **1.er pico 115.4 %BW (22 % del apoyo), valle 71.1 %BW (49 %), 2.º pico 117.8 %BW (78 %)**; DE entre sujetos 11.1 y 9.0 %BW en los picos.
 
 **Limitaciones.** Es marcha **normal (1.40 m/s)**. El factor x6 estira el **tiempo**; no se verificó cómo cambia la amplitud de la fuerza a velocidades menores (la curva propia del simulador a 0.48 m/s mostró picos ≈ 100 %BW, valor leído de su figura 5c, no verificado de otra fuente). Qué amplitud es el objetivo físico del control a x6 queda **por decidir con Luis**.
+
+## 5b. Marcha lenta (a x6 la marcha equivale a ≈ 0.23 m/s)
+**Objetivo.** Luis señaló que a x6 la marcha es "súper lenta" y pidió datos de marcha lenta de la literatura (no solo la curva a velocidad normal de §5).
+
+**Metodología.** (1) *Gutenberg:* se verificó ejecutando los scripts que sus clases de velocidad lenta (`SPEED=1`) y rápida (`SPEED=3`) tienen **0 sujetos sanos** (solo existe la autoseleccionada): esa base **no sirve** para marcha lenta (`control/referencia_grf/salida_clases_velocidad.txt`). (2) *Fukuchi 2018:* base pública con cinta instrumentada de dos bandas, GRF a 300 Hz y 8 velocidades de cinta por sujeto (T01–T08 = 40, 55, 70, 85, 100, 115, 130 y 145 % de la velocidad cómoda adimensional, según el artículo); la **velocidad real de cada prueba viene medida** en `WBDSinfo.csv`. Se leyó el ZIP de 687 MB por rangos HTTP (solo T01, T02, T03, T05 y T08). Se verificó con los datos que la fuerza vertical es `Fy` (la suma de las dos bandas ≈ peso). Procesamiento (decisiones propias): filtro Butterworth 2.º orden de fase cero a 20 Hz (el mismo de Gutenberg); apoyo de cada banda con Fy ≥ 25 N y duración 0.3–2.0 s; normalización por la fuerza vertical media total de cada prueba, porque en el grupo joven la suma de bandas da 0.90–0.95 de masa×g (tara de la cinta); apoyos a 101 puntos; media por sujeto y luego entre sujetos. Script reproducible `control/referencia_grf/curva_vs_velocidad_fukuchi.py`.
+
+**Exclusiones (verificadas con los datos).** Un primer cálculo con todos los sujetos dio picos de 145 %BW y desviaciones de hasta 165 %BW (no creíbles). Al revisar: varios sujetos del grupo mayor tienen archivos de cinta incoherentes (una banda en cero constante, sujetos 43–49; suma de bandas ≈ 1.8×masa×g, sujetos 39, 40 y 42; ≈ 0.08×, sujeto 41; y otros con suma < 0.85). Se usó **solo el grupo joven (24 sujetos)**, con la suma de bandas entre 0.85 y 1.05 de masa×g (ninguna prueba del grupo joven quedó excluida por ese criterio).
+
+**Resultado** (media entre 24 jóvenes sanos; Gutenberg como referencia):
+| Condición | Velocidad (m/s) | Apoyo (s) | 1.er pico (%BW, % apoyo) | Valle | 2.º pico |
+|---|---|---|---|---|---|
+| Fukuchi T01 | 0.50 ± 0.06 | 1.071 ± 0.134 | 104.2 (33 %) | 98.2 (45 %) | 100.5 (66 %) |
+| Fukuchi T02 | 0.69 ± 0.08 | 0.868 ± 0.077 | 104.2 (32 %) | 94.9 (47 %) | 101.7 (75 %) |
+| Fukuchi T03 | 0.87 ± 0.11 | 0.754 ± 0.064 | 102.0 (30 %) | 91.0 (48 %) | 104.8 (78 %) |
+| Fukuchi T05 | 1.24 ± 0.15 | 0.612 ± 0.052 | 110.0 (24 %) | 78.7 (48 %) | 110.2 (79 %) |
+| Fukuchi T08 | 1.81 ± 0.22 | 0.500 ± 0.047 | 137.6 (21 %) | 55.8 (50 %) | 115.9 (80 %) |
+| Gutenberg (suelo, 350 sanos) | 1.40 ± 0.16 | 0.615 ± 0.047 | 115.4 (22 %) | 71.1 (49 %) | 117.8 (78 %) |
+Figura: [`control/referencia_grf/curvas_fz_vs_velocidad.png`](../control/referencia_grf/curvas_fz_vs_velocidad.png).
+
+![Curvas de Fz vs velocidad](../control/referencia_grf/curvas_fz_vs_velocidad.png)
+
+**Lectura.** A menor velocidad los picos bajan hacia 100 %BW y el valle sube hasta casi desaparecer: a 0.50 m/s la curva es una **meseta de ≈ 100 %BW** (el valle es el 94 % del primer pico). A 1.24 m/s Fukuchi es consistente con Gutenberg a 1.40 m/s. La curva propia del simulador a 0.48 m/s (picos ≈ 97–103 %BW, valores leídos de su figura 5c, no verificados de otra fuente) es del mismo orden que T01.
+
+**Conexión con x6.** La velocidad equivalente (1.40/6 ≈ 0.23 m/s) está **por debajo del mínimo medido** (0.50 m/s): la forma exacta a 0.23 m/s **sería una extrapolación y no se afirma**. Qué curva usar como objetivo (normal, lenta de 0.50 m/s u otra) es **decisión de Luis, pendiente**.
+
+**Limitaciones.** Cinta (no suelo), descalzos, solo jóvenes sanos (n = 24), sin amputados; T04, T06 y T07 no se usaron; la normalización por la fuerza media de cada prueba hace que la dispersión entre sujetos (1.7–11 %BW) **no sea comparable** con la de Gutenberg (≈ 10 %BW, normalizada por peso medido).
 
 ## 6. Duración de la fase de apoyo
 **Objetivo.** Fijar la duración del apoyo a x6 con una referencia, no con un supuesto.
@@ -128,6 +154,19 @@ Archivos en `control/diagramas/salida/`: `diagrama.png/.svg`, `leyenda_variables
 ### 7.6 Cómo explicarlo en 30 segundos
 "Usé la curva real de fuerza vertical de 350 personas sanas y la duración real del apoyo de esa misma base, multiplicada por 6. Simulé un lazo de fuerza variando la latencia: el control en tiempo real llega tarde (≈ 11 %BW de error) y el ILC sigue la curva (≈ 0.4 %BW) tras unos 12 ciclos, aguantando bastante retardo. Con la latencia que medí (≈ 8–9 ms) el retardo no es el problema principal. La planta la barrí porque aún no está medida; lo siguiente es medir el servo y la rigidez reales."
 
+### 7.7 Repetición con la curva de marcha lenta (Fukuchi T01, 0.50 m/s; apoyo 1.071 s × 6 = 6.43 s)
+Mismo modelo y mismos parámetros; solo cambian el objetivo (§5b) y la duración. Figura: [`control/simulacion/rt_vs_ilc_latencia_T01.png`](../control/simulacion/rt_vs_ilc_latencia_T01.png); números: `control/simulacion/salida_consola_T01.txt`. Barrido del apoyo: media ± 1 DE entre sujetos (5.62 / 6.43 / 7.23 s).
+| | Gutenberg (1.40 m/s, 3.69 s) | Fukuchi T01 (0.50 m/s, 6.43 s) |
+|---|---|---|
+| RT, T = 10 ms | 11.5 %BW | 4.49 %BW |
+| RT+FF, T = 10 ms | 2.00 | 0.71 |
+| ILC, T = 10 ms (ciclo 12) | 0.40 | 0.23 |
+| ILC a T = 60 / 80 / 100 ms | 0.78 / 1.4 / 3.4 | 0.44 / 0.62 / 0.96 |
+| ILC inestable desde | ≈ 130 ms | ≈ 130 ms |
+| Sensibilidad (τ, k) RT / ILC | 6.1–17.9 / 0.21–1.56 | 2.29–7.24 / 0.19–0.50 |
+| Sensibilidad al apoyo RT / ILC | 14.0–9.3 / 0.85–0.21 | 5.09–4.03 / 0.30–0.18 |
+**Lectura:** la ordenación (ILC ≪ RT+FF < RT) se mantiene con las dos curvas reales; el **error absoluto del tiempo real depende de la curva objetivo** (con la curva lenta, que cambia más despacio, baja a menos de la mitad). El límite de latencia por estabilidad no cambia (depende de la ganancia de lazo, no de la curva). Sigue valiendo la limitación §7.5: la planta no está medida.
+
 ## 8. Tipo de control — propuesta PROVISIONAL
 Detalle en [`control/DECISION_TIPO_CONTROL.md`](../control/DECISION_TIPO_CONTROL.md). **Propuesta:** híbrido por eje (Fz, Fy) = realimentación de fuerza en tiempo real + ILC ciclo a ciclo encima. Se apoya en §4 y §7, con las limitaciones de §7.5. **No está cerrada**: falta identificar servo y rigidez, la latencia restante y la confirmación de la asesora.
 
@@ -149,7 +188,7 @@ Detalle en [`control/DECISION_TIPO_CONTROL.md`](../control/DECISION_TIPO_CONTROL
 
 ## 10. Pendientes
 1. **AMTI:** consultar a soporte técnico de AMTI el retardo de la salida analógica del Gen 5 (o medirlo con una referencia independiente) — Luis.
-2. **Amplitud del objetivo de Fz a x6** — decisión de Luis (§5).
+2. **Qué curva de Fz usar como objetivo a x6** (normal 1.40 m/s, lenta de 0.50 m/s u otra) — decisión de Luis (§5, §5b). A 0.23 m/s equivalentes no hay dato medido.
 3. Revisar AIN0 inestable (monitor abierto, plato vacío); repetir offset y calibración con pesas (`pruebas/calibracion_pesas.py`, sin ejecutar); revisar la pérdida de muestras del monitor (≈ 928/s vs 1000).
 4. Identificar la respuesta del servo vertical y la rigidez de contacto con ≥ 2 prótesis (protocolo propuesto en `control/identificacion/PROTOCOLO.md`, **no ejecutado**); repetir la simulación con impacto de talón.
    - Medir el tiempo de carga de trayectoria (`TRAJ_BEGIN/POINT/END`): sobrescribe la trayectoria en RAM del ESP32 (sin mover motores); **requiere OK de Luis**.
@@ -162,4 +201,5 @@ Detalle en [`control/DECISION_TIPO_CONTROL.md`](../control/DECISION_TIPO_CONTROL
 - Horst F, Slijepcevic D, Simak M, Schöllhorn WI. *Gutenberg Gait Database, a ground reaction force database of level overground walking in healthy individuals.* Sci Data 8:232 (2021). DOI 10.1038/s41597-021-01014-6. Datos CC0: Figshare colección 10.6084/m9.figshare.c.5311538 (archivos 26576491, 26576493, 26576495, 26576497).
 - AMTI. *Gen 5 User Manual*, `referencias/amti_manual/AMTI_Gen5_User_Manual.pdf` (pp. 11–12, 27, 55).
 - Revisión usada solo como comprobación cruzada (fuente secundaria): Frontiers in Neurology 2021, PMC8217618, Tabla 3; datos adaptados de Lai DT, Begg RK, Palaniswami M. IEEE Trans Inf Technol Biomed 13:687–702 (2009), DOI 10.1109/TITB.2009.2022913 (no leída).
+- Fukuchi CA, Fukuchi RK, Duarte M. *A public dataset of overground and treadmill walking kinematics and kinetics in healthy individuals.* PeerJ 6:e4640 (2018). DOI 10.7717/peerj.4640. Datos CC BY 4.0: Figshare DOI 10.6084/m9.figshare.5722711 (archivos 68194516 y 68504641).
 - Mediciones propias: `pruebas/latencia_gpio_adc.csv`, `pruebas/latencia_ping_pong.csv`, `pruebas/2026-11-02_latencia_amti_rpi_esp32.md`.
