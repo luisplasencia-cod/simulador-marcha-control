@@ -1,11 +1,11 @@
 """Simulacion: control de Fz en tiempo real vs ILC, con la latencia del lazo como variable.
 
 ES UN MODELO CON SUPUESTOS, NO UN MODELO IDENTIFICADO DEL SIMULADOR. Los parametros marcados
-(SUPUESTO) no estan medidos; el objetivo es ver COMO escala el error con la latencia y ordenar
+(SIN MEDIR) no estan medidos; el objetivo es ver COMO escala el error con la latencia y ordenar
 que parametros hay que medir/identificar despues. Lo unico medido es la latencia (ver reportes).
 
 Modelo (un eje, Fz, normalizado en %BW):
-    servo (SUPUESTO):  tau_a * dv/dt = u - v          (velocidad del actuador sigue al comando)
+    servo (SIN MEDIR):  tau_a * dv/dt = u - v          (velocidad del actuador sigue al comando)
     contacto:          dF/dt = k_real * v + d(t)       (F = rigidez efectiva x desplazamiento)
     medicion:          F_med(t) = F(t - T)             (T = latencia total del lazo, la variable)
 Metodos:
@@ -15,7 +15,7 @@ Metodos:
 d(t): perturbacion NO repetible (pulso aleatorio por ciclo) -> ILC no la puede aprender.
 Referencia: curva REAL de Fz (media de 350 sujetos sanos, Gutenberg Gait Database, Horst 2021,
 DOI 10.1038/s41597-021-01014-6) en ../referencia_grf/referencia_fz_gutenberg.csv (ver extraer_referencia_gutenberg.py).
-Ya no hay forma inventada. Siguen SIN medir: tau_a, k_real, duracion del apoyo a x6 -> se barren (sensibilidad).
+Ya no hay forma inventada. Duracion del apoyo = 0.615 s medidos en esa misma base x6. Siguen SIN medir: tau_a, k_real -> se barren (sensibilidad), NO son datos.
 """
 import os
 import sys
@@ -25,9 +25,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 DT = 0.0005
-TC = 4.0            # SUPUESTO: ciclo de apoyo a x6 (~0.67 s reales x 6)
-TAU_A = 0.02        # SUPUESTO: constante del servo (s)
-K_REAL, K_EST = 0.8, 1.0   # SUPUESTO: rigidez real 20 % menor que la usada por el modelo
+TC = 3.69           # DATO: apoyo medio 0.615 s (Gutenberg, 350 sanos, ../referencia_grf/duracion_apoyo_gutenberg.py) x 6 (factor confirmado por Luis)
+TAU_A = 0.02        # SIN MEDIR: valor de partida, se barre (10-50 ms)
+K_REAL, K_EST = 0.8, 1.0   # SIN MEDIR: valor de partida, se barre (0.5-1.5); k_est=1 es la rigidez que usa el modelo
 KP = 10.0           # ganancia de lazo (1/s)
 GAMMA = 0.5
 
@@ -122,8 +122,8 @@ if __name__ == "__main__":
             f = lambda x: "inestable" if not np.isfinite(x) else f"{x:6.2f}"
             print(f"  {tau*1e3:8.0f}  {kr:6.1f} | {f(r1):>9} {f(r2):>9}")
     print("SENSIBILIDAD a la duracion del apoyo (tau=20 ms, k=0.8, T=10 ms): RMS RT / ILC")
-    for tc in (3.0, 4.0, 5.0):
-        print(f"  apoyo {tc:.0f} s | {simular('RT', 0.010, 3, tc=tc)[0][-1]:6.2f} {simular('ILC', 0.010, NC, tc=tc)[0][-1]:6.2f}")
+    for tc in (2.92, 3.69, 4.76):   # rango REAL entre sujetos (0.487-0.793 s) x 6
+        print(f"  apoyo {tc:.2f} s | {simular('RT', 0.010, 3, tc=tc)[0][-1]:6.2f} {simular('ILC', 0.010, NC, tc=tc)[0][-1]:6.2f}")
     fig, ax = plt.subplots(2, 2, figsize=(11, 8))
     p = np.arange(int(TC / DT)) / int(TC / DT) * 100
     for met, c in (("RT", "tab:red"), ("RT+FF", "tab:orange"), ("ILC", "tab:green")):
@@ -142,5 +142,5 @@ if __name__ == "__main__":
     for k, c in (("RT+pert", "tab:red"), ("ILC+pert", "tab:green")):
         ax[1, 1].plot(Ts * 1e3, res[k], c, marker="o", label=k.replace("+pert", ""))
     ax[1, 1].set_yscale("log"); ax[1, 1].set_ylim(0.1, 100); ax[1, 1].set_title("(d) Con perturbacion no repetible (pulso 3 %BW)"); ax[1, 1].set_xlabel("latencia total T [ms]"); ax[1, 1].set_ylabel("RMS [%BW]"); ax[1, 1].legend()
-    fig.suptitle("Objetivo REAL: Fz media de 350 sanos (Gutenberg, 1.40 m/s). Planta con SUPUESTOS (tau_a=20 ms, k real=0.8 k modelo, apoyo 4 s)", fontsize=9)
+    fig.suptitle("Objetivo REAL: Fz media de 350 sanos (Gutenberg, 1.40 m/s). Planta SIN MEDIR (tau_a=20 ms, k real=0.8, valores de partida que se barren); apoyo 3.69 s = 0.615 s x 6", fontsize=9)
     fig.tight_layout(); fig.savefig("control/simulacion/rt_vs_ilc_latencia.png", dpi=130)

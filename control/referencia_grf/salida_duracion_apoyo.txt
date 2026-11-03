@@ -1,0 +1,5 @@
+sujetos=350  pisadas=8819
+duracion del apoyo por sujeto: media 0.615 s, DE entre sujetos 0.047 s, rango 0.487-0.793 s
+por pisada: mediana 0.604 s, p5 0.544, p95 0.696
+velocidad de marcha (sujetos con dato, n=284): 1.40 +- 0.16 m/s
+x6 (factor confirmado por Luis): apoyo = 3.69 s (rango entre sujetos 2.92-4.76 s)
