@@ -93,3 +93,9 @@ Lo único medido de verdad es la latencia. El resto hay que identificarlo en el 
 
 ### 5.6 Cómo explicarlo en 30 segundos
 "Simulé un lazo de fuerza con la latencia como variable. El control en tiempo real llega tarde a la curva porque solo reacciona; el ILC la sigue casi exacto después de unos 10 ciclos y aguanta mucho más retardo. Con la latencia que medí hasta ahora (unos 8–9 ms), el retardo no es el problema principal sino el ancho de banda. Todo esto es con un modelo supuesto; lo siguiente es medir el servo y la rigidez reales para confirmar."
+
+## 6. Tipo de control — propuesta provisional
+Detalle y justificación en [`control/DECISION_TIPO_CONTROL.md`](../control/DECISION_TIPO_CONTROL.md). **Propuesta:** control híbrido por eje (Fz, Fy) = realimentación de fuerza en tiempo real como base + ILC ciclo a ciclo encima. Se apoya en la simulación (§ 5, con supuestos) y en la latencia medida; **no está cerrada**: faltan servo y rigidez reales, la latencia restante y la confirmación de la asesora.
+
+## 7. Firmware del ESP32 — propuesta (no aplicada)
+`communication_rx()` espera con `vTaskDelay(5 ms)` en **dos** sitios (primer byte y bytes siguientes del mensaje), por eso el RTT de 5.97 ms es casi todo sondeo. Parche propuesto (sondeo de 1 ms) en `control/firmware/reducir_polling_rx.patch`, explicación en `control/firmware/README.md`. **No compilado ni probado**; se aplica y flashea desde la laptop y se mide de nuevo con `medir_latencia_ping_pong.py`.

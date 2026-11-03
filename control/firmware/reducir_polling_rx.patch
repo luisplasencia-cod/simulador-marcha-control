@@ -1,0 +1,31 @@
+--- a/Codigo ESP32 MOV/platformIO_control_trayectoria_v1/src/communication.h
++++ b/Codigo ESP32 MOV/platformIO_control_trayectoria_v1/src/communication.h
+@@ -103,6 +103,10 @@
+ Packet rxPacket;
+ Packet txPacket;
+ 
++// Periodo de sondeo del puerto serie (ms). Antes: 5 ms fijos -> sumaba hasta 5 ms por cada espera
++// (primer byte Y bytes siguientes del mismo mensaje). 1 ms = 1 tick de FreeRTOS (Arduino-ESP32: 1000 Hz).
++#define RX_POLL_MS 1
++
+ void communication_init(){
+   Serial.setRxBufferSize(BUFFER_SIZE);
+   Serial.setTxBufferSize(BUFFER_SIZE);
+@@ -126,7 +130,7 @@
+     switch(state){
+ 
+       case COMM_IDLE:
+-        while(!Serial.available()) {vTaskDelay(pdMS_TO_TICKS(5));}
++        while(!Serial.available()) {vTaskDelay(pdMS_TO_TICKS(RX_POLL_MS));}
+         data_part = (char) Serial.read();
+ 
+         if (data_part == '<'){
+@@ -138,7 +142,7 @@
+       break;
+ 
+       case COMM_READ_STREAM:
+-        while(!Serial.available()) {vTaskDelay(pdMS_TO_TICKS(5));}
++        while(!Serial.available()) {vTaskDelay(pdMS_TO_TICKS(RX_POLL_MS));}
+         data_part = (char) Serial.read();
+ 
+         if (data_part == ':' || data_part == '>'){
