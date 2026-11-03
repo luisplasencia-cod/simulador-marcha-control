@@ -1,0 +1,130 @@
+"""Simulacion: control de Fz en tiempo real vs ILC, con la latencia del lazo como variable.
+
+ES UN MODELO CON SUPUESTOS, NO UN MODELO IDENTIFICADO DEL SIMULADOR. Los parametros marcados
+(SUPUESTO) no estan medidos; el objetivo es ver COMO escala el error con la latencia y ordenar
+que parametros hay que medir/identificar despues. Lo unico medido es la latencia (ver reportes).
+
+Modelo (un eje, Fz, normalizado en %BW):
+    servo (SUPUESTO):  tau_a * dv/dt = u - v          (velocidad del actuador sigue al comando)
+    contacto:          dF/dt = k_real * v + d(t)       (F = rigidez efectiva x desplazamiento)
+    medicion:          F_med(t) = F(t - T)             (T = latencia total del lazo, la variable)
+Metodos:
+    RT     : u = Kp*(Fref - F_med)
+    RT+FF  : RT + prealimentacion u_ff = dFref/dt / k_est   (k_est != k_real: error de modelo)
+    ILC    : RT + Fcmd = Fref + delta_j ; delta_{j+1} = Q[delta_j + gamma*e_j(t+m)]  (cada ciclo)
+d(t): perturbacion NO repetible (pulso aleatorio por ciclo) -> ILC no la puede aprender.
+Referencia: doble pico SINTETICO con picos 97.4 y 102.5 %BW al 19 % y 45 % del ciclo (valores de
+la curva propia del simulador, conferencia Fig. 5c); la forma entre picos es inventada.
+"""
+import sys
+import numpy as np
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
+DT = 0.0005
+TC = 4.0            # SUPUESTO: ciclo de apoyo a x6 (~0.67 s reales x 6)
+TAU_A = 0.02        # SUPUESTO: constante del servo (s)
+K_REAL, K_EST = 0.8, 1.0   # SUPUESTO: rigidez real 20 % menor que la usada por el modelo
+KP = 10.0           # ganancia de lazo (1/s)
+GAMMA = 0.5
+
+
+def referencia(n):
+    p = np.arange(n) / n
+    g = lambda c, a, s: a * np.exp(-0.5 * ((p - c) / s) ** 2)
+    f = g(0.19, 97.4, 0.10) + g(0.45, 102.5, 0.10)
+    return f * np.clip(p / 0.05, 0, 1) * np.clip((1 - p) / 0.05, 0, 1)  # rampa suave de 5 % en extremos
+
+
+def suavizar(x, n):  # filtro de fase cero (Q del ILC)
+    w = np.hanning(n); w /= w.sum()
+    pad = np.r_[x[::-1][-n:], x, x[::-1][:n]]
+    return np.convolve(pad, w, "same")[n:-n]
+
+
+def simular(metodo, T, n_ciclos, kp=KP, perturb=False, seed=0):
+    rng = np.random.default_rng(seed)
+    n = int(TC / DT)
+    ref = referencia(n)
+    dref = np.gradient(ref, DT)
+    nd = int(round(T / DT))
+    delta = np.zeros(n)
+    m = int(round((T + 1.0 / kp) / DT))
+    F = v = 0.0
+    cola = [0.0] * (nd + 1)
+    rms, ultimo = [], None
+    for j in range(n_ciclos):
+        d = np.zeros(n)
+        if perturb:
+            i0 = int(rng.uniform(0.3, 0.6) * n); d[i0:i0 + int(0.1 / DT)] = rng.choice([-1, 1]) * 30.0
+        Ft = np.empty(n)
+        for i in range(n):
+            cola.append(F); Fm = cola.pop(0)
+            fcmd = ref[i] + (delta[i] if metodo == "ILC" else 0.0)
+            u = kp * (fcmd - Fm)
+            if metodo == "RT+FF":
+                u += dref[i] / K_EST
+            v += DT * (u - v) / TAU_A
+            F += DT * (K_REAL * v + d[i])
+            Ft[i] = F
+            if abs(F) > 1e4:
+                return np.full(n_ciclos, np.inf), None, ref
+        e = ref - Ft
+        rms.append(np.sqrt(np.mean(e ** 2)))
+        if metodo == "ILC":
+            e_adel = np.r_[e[m:], np.zeros(m)]
+            delta = suavizar(delta + GAMMA * e_adel, int(0.1 / DT))
+        ultimo = Ft
+    return np.array(rms), ultimo, ref
+
+
+def margen_fase_Tmax(kp=KP, tau=TAU_A, pm_deg=45):
+    w = np.linspace(1e-3, 200, 200000)
+    wgc = w[np.argmin(np.abs(kp / (w * np.sqrt(1 + (w * tau) ** 2)) - 1))]
+    return max(0.0, (np.deg2rad(90 - pm_deg) - np.arctan(wgc * tau)) / wgc), wgc
+
+
+if __name__ == "__main__":
+    Ts = np.array([0, 5, 10, 20, 40, 60, 80, 100, 130, 160]) / 1000
+    NC = 12
+    res = {"RT": [], "RT+FF": [], "ILC": [], "ILC+pert": [], "RT+pert": []}
+    for T in Ts:
+        res["RT"].append(simular("RT", T, 3)[0][-1])
+        res["RT+FF"].append(simular("RT+FF", T, 3)[0][-1])
+        res["ILC"].append(simular("ILC", T, NC)[0][-1])
+        res["RT+pert"].append(np.mean(simular("RT", T, 6, perturb=True, seed=1)[0][2:]))
+        res["ILC+pert"].append(np.mean(simular("ILC", T, NC, perturb=True, seed=1)[0][-4:]))
+    tmax, wgc = margen_fase_Tmax()
+    print("Latencia maxima con margen de fase >= 45 grados (analitico, tau_a=20 ms):")
+    for kp in (2, 5, 10, 20, 40, 80):
+        t, w = margen_fase_Tmax(kp)
+        print(f"   Kp={kp:3d} 1/s -> ancho de banda de lazo {w/(2*np.pi):5.2f} Hz, T max = {t*1e3:6.1f} ms")
+    print(f"Kp={KP} 1/s, tau={TAU_A*1e3:.0f} ms: wgc={wgc:.1f} rad/s; T max con margen de fase 45 deg = {tmax*1e3:.0f} ms")
+    print("RMS del error [%BW] (referencia pico ~100 %BW), ultimo ciclo:")
+    print("T[ms] " + " ".join(f"{k:>9}" for k in res))
+    for i, T in enumerate(Ts):
+        print(f"{T*1e3:5.0f} " + " ".join(("  inestable" if not np.isfinite(res[k][i]) else f"{res[k][i]:9.2f}") for k in res))
+    for k in res:
+        res[k] = [x if np.isfinite(x) else np.nan for x in res[k]]
+
+    fig, ax = plt.subplots(2, 2, figsize=(11, 8))
+    p = np.arange(int(TC / DT)) / int(TC / DT) * 100
+    for met, c in (("RT", "tab:red"), ("RT+FF", "tab:orange"), ("ILC", "tab:green")):
+        r, F, ref = simular(met, 0.010, NC if met == "ILC" else 3)
+        ax[0, 0].plot(p, F, c, label=met)
+    ax[0, 0].plot(p, ref, "k--", label="objetivo"); ax[0, 0].set_title("Fz con T = 10 ms (ultimo ciclo)")
+    ax[0, 0].set_xlabel("% del ciclo"); ax[0, 0].set_ylabel("%BW"); ax[0, 0].legend()
+    for k, c, ls in (("RT", "tab:red", "-"), ("RT+FF", "tab:orange", "-"), ("ILC", "tab:green", "-")):
+        ax[0, 1].plot(Ts * 1e3, res[k], c, ls=ls, marker="o", label=k)
+    ax[0, 1].axvline(tmax * 1e3, color="gray", ls=":"); ax[0, 1].text(tmax * 1e3, 60, " T max (PM 45°)", fontsize=8)
+    ax[0, 1].set_yscale("log"); ax[0, 1].set_ylim(0.1, 100); ax[0, 1].set_title("Error RMS vs latencia (sin perturbacion)")
+    ax[0, 1].set_xlabel("latencia total T [ms]"); ax[0, 1].set_ylabel("RMS [%BW]"); ax[0, 1].legend()
+    for T, c in ((0.010, "tab:green"), (0.060, "tab:purple")):
+        ax[1, 0].plot(range(1, NC + 1), simular("ILC", T, NC)[0], c, marker="o", label=f"ILC, T={T*1e3:.0f} ms")
+    ax[1, 0].set_yscale("log"); ax[1, 0].set_title("Aprendizaje ILC: error por ciclo"); ax[1, 0].set_xlabel("ciclo"); ax[1, 0].set_ylabel("RMS [%BW]"); ax[1, 0].legend()
+    for k, c in (("RT+pert", "tab:red"), ("ILC+pert", "tab:green")):
+        ax[1, 1].plot(Ts * 1e3, res[k], c, marker="o", label=k.replace("+pert", ""))
+    ax[1, 1].set_yscale("log"); ax[1, 1].set_ylim(0.1, 100); ax[1, 1].set_title("Con perturbacion no repetible (pulso 3 %BW)"); ax[1, 1].set_xlabel("latencia total T [ms]"); ax[1, 1].set_ylabel("RMS [%BW]"); ax[1, 1].legend()
+    fig.suptitle("Modelo con SUPUESTOS (tau_a=20 ms, Kp=10 1/s, k real = 0.8 k modelo, ciclo 4 s)", fontsize=10)
+    fig.tight_layout(); fig.savefig("control/simulacion/rt_vs_ilc_latencia.png", dpi=130)

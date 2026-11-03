@@ -44,3 +44,10 @@ Parcial ≈ 8–9 ms. El umbral tolerable lo da la simulación (tiempo real vs I
 4. Retardo del amplificador del AMTI desde el manual.
 5. Conectar el ESP32 de motores para el Paso 3 (latencia total).
 6. Respuesta de Dante Elías y confirmación de la asesora (sin novedad).
+
+## 5. Simulación de control en tiempo real vs ILC (sin hardware)
+Todo lo de control quedó en `control/` (índice `control/README.md`). Detalle y advertencias en `control/simulacion/NOTAS.md`; figura `control/simulacion/rt_vs_ilc_latencia.png`.
+- Modelo **con supuestos** (no identificado): no decide RT vs ILC por sí solo.
+- Límite de latencia por estabilidad (margen de fase 45°): Kp=10 → 60 ms, Kp=20 → 23 ms, Kp=40 → 6 ms. La latencia limita el ancho de banda de lazo que se puede pedir.
+- Con la latencia parcial medida (~8–9 ms) el error de RT solo-realimentación (~9 %BW a Kp=10) lo domina el ancho de banda, no la latencia; ILC llega a ~0.3 %BW en ~10 ciclos y es poco sensible a T hasta ~100 ms.
+- Falta para cerrarlo: τ del servo, rigidez de contacto, impacto de talón, y la latencia restante (AMTI manual, cómputo RPi, ESP32).
