@@ -5,20 +5,19 @@ Si acabas de clonar este repo en el RPi y es tu primera vez aquí: lee esto comp
 ## Qué es este repo
 Tesis de control del simulador de marcha (Luis Plasencia, PUCP). Contexto completo del proyecto en `CLAUDE.md` (léelo primero, siempre). Detalle de auditorías/búsquedas pasadas en `HISTORIAL.md`.
 
-## Estado físico ahora mismo (2026-11-02)
+## Estado físico ahora mismo (2026-11-03)
 - **Un solo ESP32 con este RPi: el de control de motores** (`Codigo ESP32 MOV/platformIO_control_trayectoria_v1/`, `PING`→`PONG`, serial 115200, `/dev/ttyUSB0`). Se edita/flashea desde la laptop.
 - **ADC: el RPi lee el ADS1256 directo por SPI0** (AMTI Fz → AIN0 vs AINCOM; detalle en `esquemas/amti_ads1256_rpi/CONFIGURACION_ACTUAL.md`). `Codigo ESP32 ADS1256/` es una prueba aislada de otro montaje: solo referencia de la secuencia de init, no está conectado aquí.
-- **Verificado en hardware (2026-11-02):** 1000 muestras/s, Fz en reposo ≈ 21.5 N de offset estable (hay que tarar), ruido σ≈0.85 N.
+- **ADC YA VALIDADO contra el AMTI real (2026-11-03):** se comparó una grabación directa del AMTI (software NetForce, `.bsf`→`.txt`) contra `lecturas_fz_20261102_175759.csv` del ADS1256 — RMSE 1.89 N, error pico a pico 4.03% (picos ~400 N), correlación r=0.9999. Ver `pruebas/comparar_amti_vs_ads1256.py` y el PNG. **Ya no hace falta repetir la validación de escala/signo del Paso 3 del plan de latencia — está hecha.**
+- 1000 muestras/s confirmado, Fz en reposo ≈21.5 N de offset estable (hay que tarar — botón "Poner a cero" en el monitor), ruido σ≈0.85 N.
 
-## Bloqueo de las ~17:50 (2026-11-02) — RESUELTO
-El ADS1256 dejó de responder (DRDY no bajaba, registros en 0). Tras reiniciar el RPi volvió: `--diagnostico` da STATUS=0x30 y AIN0≈38.9 mV (≈22 N de offset). Causa raíz no determinada; si reaparece: revisar PDWN/RESET/CS/alimentación de la placa antes de tocar código.
+## Qué hacer, en orden — PRIORIDAD: Paso 2 del plan de latencia
+Luis ya está sentado con el AMTI y puede aplicar cargas físicas. **Lo único que falta para decidir tiempo real vs. ILC es la latencia de adquisición AMTI→RPi (Paso 2) y la latencia total del lazo (Paso 3)** — el Paso 1 (comunicación RPi↔ESP32, RTT 5.97 ms) ya está medido y documentado en `pruebas/2026-11-02_latencia_amti_rpi_esp32.md`.
 
-## Qué hacer, en orden
 1. Entorno: `source .venv/bin/activate` (tiene pyserial, spidev, RPi.GPIO, ttkbootstrap).
-2. **Ver el ADC funcionando:** `python pruebas/leer_ads1256_fz.py --n 3000` (resumen + CSV) · `python pruebas/leer_ads1256_fz.py --diagnostico` (registros y 8 canales) · monitor en vivo: `python herramientas/monitor_gaitsim.py` (botón "Poner a cero" para restar el offset).
-3. **Probar con carga conocida** (pesas sobre el AMTI) para validar la escala 1.7665 mV/N y el signo; documentar en `pruebas/`.
-4. **Latencia RPi↔ESP32 de motores:** `python pruebas/medir_latencia_ping_pong.py --puerto /dev/ttyUSB0 --n 100` y `python pruebas/graficar_latencia.py` (ya medido: RTT 5.97 ms, ver `pruebas/2026-11-02_latencia_amti_rpi_esp32.md`).
-5. Pendiente: latencia de adquisición AMTI→RPi (escalón de fuerza conocido) y latencia total del lazo.
+2. **Paso 2 — latencia de adquisición, script nuevo:** `python pruebas/medir_latencia_escalon_amti.py --umbral_n 30 --n_eventos 10` mientras Luis aplica y retira carga sobre el AMTI repetidamente. **Lee el aviso al inicio del script antes de correrlo**: el script solo registra el instante en que el RPi DETECTA el cambio (reloj de pared); no mide la latencia absoluta por sí solo porque no hay un disparador físico independiente conectado al AMTI. Para la latencia real hace falta una referencia externa (ej. video del instante de pisar + pantalla con la hora del sistema visible, o un golpe audible). Si no se consigue esa referencia en esta sesión, documenta el log de cruces igual (sirve para ver consistencia/jitter) pero **no inventes un número de latencia sin esa referencia**.
+3. **Llenar el Paso 2 del plan** en `pruebas/2026-11-02_latencia_amti_rpi_esp32.md` con lo que salga (reales, no estimados).
+4. **Paso 3 — latencia total del lazo:** solo si el Paso 2 ya tiene un número real. Total = Paso 1 + Paso 2 + cómputo RPi + ejecución ESP32 (ver método en el plan).
 
 ## Reglas del proyecto (no te las saltes)
 - Verificar datos de hardware contra fuente real (datasheet, etiqueta física, medición) — nunca de memoria. Ya hay precedente de esto en el repo, sigue el mismo estándar.
