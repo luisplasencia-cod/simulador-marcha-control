@@ -30,6 +30,9 @@ Luis ya está sentado con el AMTI y puede aplicar cargas físicas. **Lo único q
 - No redactar síntesis/texto de tesis salvo pedido explícito — Luis decide el enfoque, tú organizas/ejecutas lo técnico.
 - Git: commitear y hacer `git push` cuando termines algo con sentido (no cada línea), para que la laptop de Luis vea el avance.
 
+## Skill de diagramas de control (2026-11-03)
+Se agregó `.claude/skills/diagrama-bloques-control/` al repo — dibuja diagramas de bloques de control (lazo cerrado, PID, etc.) en estilo libro de texto con ecuaciones en LaTeX, para cuando se diseñe/documente el controlador RT/ILC. Es una skill de proyecto (Claude Code la detecta sola al estar en `.claude/skills/` dentro del repo); no hace falta instalar nada aparte.
+
 ## Firmware del ESP32 — importante
 Las actualizaciones al firmware de control de motores (`Codigo ESP32 MOV/.../main.cpp`) se hacen **desde la laptop** (sesión de Claude ahí), no desde aquí — ahí es donde está el cable USB al ESP32 para flashear con PlatformIO. Si necesitas un cambio de firmware, dilo en el commit/push y Luis lo coordina con esa sesión; no asumas que tú vas a flashear el ESP32 desde el RPi.
 
