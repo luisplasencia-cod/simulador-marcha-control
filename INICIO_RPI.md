@@ -32,3 +32,6 @@ Luis ya está sentado con el AMTI y puede aplicar cargas físicas. **Lo único q
 
 ## Firmware del ESP32 — importante
 Las actualizaciones al firmware de control de motores (`Codigo ESP32 MOV/.../main.cpp`) se hacen **desde la laptop** (sesión de Claude ahí), no desde aquí — ahí es donde está el cable USB al ESP32 para flashear con PlatformIO. Si necesitas un cambio de firmware, dilo en el commit/push y Luis lo coordina con esa sesión; no asumas que tú vas a flashear el ESP32 desde el RPi.
+
+## Cambios de firmware propuestos
+Los cambios al firmware que se piden desde el RPi quedan documentados en `Codigo ESP32 MOV/CAMBIOS_PENDIENTES_DESDE_RPI.md` (la sesión de la laptop los lee ahí). Hoy: reducir el sondeo RX de 5 a 1 ms (no aplicado).
