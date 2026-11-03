@@ -46,8 +46,50 @@ Parcial ≈ 8–9 ms. El umbral tolerable lo da la simulación (tiempo real vs I
 6. Respuesta de Dante Elías y confirmación de la asesora (sin novedad).
 
 ## 5. Simulación de control en tiempo real vs ILC (sin hardware)
-Todo lo de control quedó en `control/` (índice `control/README.md`). Detalle y advertencias en `control/simulacion/NOTAS.md`; figura `control/simulacion/rt_vs_ilc_latencia.png`.
-- Modelo **con supuestos** (no identificado): no decide RT vs ILC por sí solo.
-- Límite de latencia por estabilidad (margen de fase 45°): Kp=10 → 60 ms, Kp=20 → 23 ms, Kp=40 → 6 ms. La latencia limita el ancho de banda de lazo que se puede pedir.
-- Con la latencia parcial medida (~8–9 ms) el error de RT solo-realimentación (~9 %BW a Kp=10) lo domina el ancho de banda, no la latencia; ILC llega a ~0.3 %BW en ~10 ciclos y es poco sensible a T hasta ~100 ms.
-- Falta para cerrarlo: τ del servo, rigidez de contacto, impacto de talón, y la latencia restante (AMTI manual, cómputo RPi, ESP32).
+**Figura:** [`control/simulacion/rt_vs_ilc_latencia.png`](../control/simulacion/rt_vs_ilc_latencia.png) · código: `control/simulacion/rt_vs_ilc_latencia.py` · números: `control/simulacion/salida_consola.txt` · índice de la carpeta: `control/README.md`.
+
+![Simulación RT vs ILC](../control/simulacion/rt_vs_ilc_latencia.png)
+
+### 5.1 Por qué se hizo
+Hay que decidir si el control de fuerza (Fz, Fy) se hace **en tiempo real** (corregir en cada instante con lo que mide el AMTI) o con **ILC** (aprender de un ciclo de marcha a otro). Lo que inclina la decisión es la **latencia**: el tiempo entre que la fuerza real cambia y el motor recibe una orden basada en esa medición. Ya medí parte de esa latencia (sección 2 y 4). Esta simulación responde: **¿cuánta latencia aguanta cada estrategia y qué error de fuerza deja?** Así se sabe qué falta medir antes de decidir.
+
+### 5.2 Qué se usó (todo es un MODELO con supuestos, no el simulador real)
+| Elemento | Valor | Origen |
+|---|---|---|
+| Latencia total T | se barre de 0 a 160 ms | **es la variable**; medido hasta ahora ≈ 8–9 ms (parcial) |
+| Ciclo de apoyo | 4 s | supuesto (≈ 0.67 s reales × 6, velocidad x6) |
+| Servo del eje | respuesta de 1.er orden, 20 ms | **supuesto, sin medir** |
+| Rigidez de contacto | real = 0.8 de la que "cree" el modelo | **supuesto** (en la realidad cambia con cada prótesis) |
+| Fuerza objetivo | doble pico, 97.4 y 102.5 %BW al 19 % y 45 % | picos de la curva propia del simulador (conferencia, Fig. 5c); **la forma entre picos es inventada** |
+| Perturbación (panel d) | pulso de 3 %BW, 0.1 s, aleatorio | supuesto; **no incluye impacto de talón** |
+Lo único medido de verdad es la latencia. El resto hay que identificarlo en el simulador (ver 5.5).
+
+### 5.3 Términos (en simple)
+- **%BW**: fuerza como porcentaje del peso corporal. Un error de 10 %BW es un error del 10 % del peso.
+- **Error RMS**: tamaño "típico" de la diferencia entre la fuerza pedida y la lograda a lo largo de todo el ciclo. Menor = mejor.
+- **RT (tiempo real)**: el controlador mira la fuerza medida y corrige al instante, con una ganancia Kp (qué tan fuerte corrige).
+- **RT+FF**: igual, pero además se le "adelanta" la pendiente de la curva objetivo (prealimentación); depende de conocer bien la rigidez.
+- **ILC**: el mismo control, más una corrección que se **aprende al terminar cada ciclo** y se aplica en el siguiente.
+- **Margen de fase / T máx (línea punteada gris)**: cuánto retardo aguanta el lazo antes de volverse oscilante o inestable. Aquí se pide un margen de 45°, que es un criterio de diseño usual.
+
+### 5.4 Cómo leer cada panel y qué se observa
+- **(a) Forma de la fuerza con T = 10 ms.** La línea negra punteada es lo que queremos. **ILC (verde) y RT+FF (naranja) la tapan casi por completo**: la siguen bien. **RT solo (rojo) llega tarde** y se ve corrido a la derecha, sobre todo en la subida: es el atraso típico de un control que solo reacciona. Esta es la imagen para explicar el problema en una frase.
+- **(b) Error RMS vs latencia** (eje vertical en escala logarítmica: cada raya es 10 veces más). Qué mirar: (1) la verde (ILC) está ~30 veces más abajo que la roja (RT) mientras T sea moderado; (2) la verde casi no cambia hasta ~100 ms y luego **se dispara** (sale del gráfico: lazo inestable, no una curva "mala"); (3) la línea gris en 60 ms marca el límite de estabilidad para esta ganancia; (4) **cuidado con la roja**: baja al subir la latencia. No significa que el retardo ayude: es una compensación casual del modelo (el retardo "adelanta" la fuerza real y tapa el atraso) mientras el lazo se acerca a la inestabilidad. Lo mismo explica el mínimo de la naranja en 20 ms.
+- **(c) Aprendizaje del ILC.** Cada punto es un ciclo de marcha. El error baja de ≈ 9 %BW en el ciclo 1 a ≈ 0.3 %BW hacia el ciclo 10 (T = 10 ms). Con T = 60 ms baja más rápido al inicio pero **se estanca en ≈ 0.5 %BW**: más latencia deja un error final mayor. Mensaje: ILC necesita ~10 ciclos para "aprender", y lo aprendido solo sirve si el ciclo se repite igual.
+- **(d) Con una perturbación que no se repite.** ILC (verde) sube un poco (0.5–1.5 %BW) pero sigue mejor que RT (≈ 9 %BW) con este pulso pequeño. **No es una prueba de que ILC sea mejor ante perturbaciones reales**: ILC no puede "aprender" algo que cambia cada ciclo, y aquí solo se probó un pulso chico.
+
+### 5.5 Qué se puede y qué no se puede decir
+**Se puede decir (bajo estos supuestos):**
+- La latencia pone un **techo al ancho de banda** del control en tiempo real: con T máx de 60 ms se puede usar Kp=10, con 23 ms solo Kp=20 y con 6 ms Kp=40 (cuanto más rápido se quiere corregir, menos retardo se tolera).
+- Con la latencia medida hasta ahora (≈ 8–9 ms parcial), a Kp=10 **la latencia no es lo que domina el error**; lo domina el ancho de banda del lazo (Kp=5: 17 %BW, Kp=10: 9.2, Kp=20: 4.4).
+- ILC reduce el error repetible a ≈ 0.3 %BW en ~10 ciclos y tolera bien la latencia.
+
+**NO se puede decir todavía:**
+- Que ILC sea mejor que tiempo real: faltan los parámetros reales del simulador (constante del servo, rigidez de contacto por prótesis), el impacto de talón y la fricción/holguras del husillo.
+- Que 60 ms (o cualquier cifra) sea el límite del simulador real: sale de los supuestos.
+- Una latencia total: faltan el amplificador del AMTI (manual), el cómputo del RPi y la ejecución del ESP32.
+
+**Para cerrarlo:** identificar el servo vertical y la rigidez de contacto (escalón de velocidad + AMTI + sensor de posición), medir la latencia restante, y repetir esta simulación con esos valores.
+
+### 5.6 Cómo explicarlo en 30 segundos
+"Simulé un lazo de fuerza con la latencia como variable. El control en tiempo real llega tarde a la curva porque solo reacciona; el ILC la sigue casi exacto después de unos 10 ciclos y aguanta mucho más retardo. Con la latencia que medí hasta ahora (unos 8–9 ms), el retardo no es el problema principal sino el ancho de banda. Todo esto es con un modelo supuesto; lo siguiente es medir el servo y la rigidez reales para confirmar."

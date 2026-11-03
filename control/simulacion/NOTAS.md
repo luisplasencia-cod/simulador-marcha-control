@@ -1,5 +1,7 @@
 # Simulación RT vs ILC con latencia — notas (2026-11-03)
 
+Cómo leer la figura panel por panel: ver reporte `reportes/2026-11-03_reporte_dia.md` § 5.
+
 Script: `rt_vs_ilc_latencia.py` · figura: `rt_vs_ilc_latencia.png` · salida numérica: `salida_consola.txt`.
 
 ## ⚠️ Qué es y qué NO es

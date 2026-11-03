@@ -113,18 +113,18 @@ if __name__ == "__main__":
     for met, c in (("RT", "tab:red"), ("RT+FF", "tab:orange"), ("ILC", "tab:green")):
         r, F, ref = simular(met, 0.010, NC if met == "ILC" else 3)
         ax[0, 0].plot(p, F, c, label=met)
-    ax[0, 0].plot(p, ref, "k--", label="objetivo"); ax[0, 0].set_title("Fz con T = 10 ms (ultimo ciclo)")
+    ax[0, 0].plot(p, ref, "k--", label="objetivo"); ax[0, 0].set_title("(a) Fz con T = 10 ms (ultimo ciclo)")
     ax[0, 0].set_xlabel("% del ciclo"); ax[0, 0].set_ylabel("%BW"); ax[0, 0].legend()
     for k, c, ls in (("RT", "tab:red", "-"), ("RT+FF", "tab:orange", "-"), ("ILC", "tab:green", "-")):
         ax[0, 1].plot(Ts * 1e3, res[k], c, ls=ls, marker="o", label=k)
     ax[0, 1].axvline(tmax * 1e3, color="gray", ls=":"); ax[0, 1].text(tmax * 1e3, 60, " T max (PM 45°)", fontsize=8)
-    ax[0, 1].set_yscale("log"); ax[0, 1].set_ylim(0.1, 100); ax[0, 1].set_title("Error RMS vs latencia (sin perturbacion)")
+    ax[0, 1].set_yscale("log"); ax[0, 1].set_ylim(0.1, 100); ax[0, 1].set_title("(b) Error RMS vs latencia (sin perturbacion)")
     ax[0, 1].set_xlabel("latencia total T [ms]"); ax[0, 1].set_ylabel("RMS [%BW]"); ax[0, 1].legend()
     for T, c in ((0.010, "tab:green"), (0.060, "tab:purple")):
         ax[1, 0].plot(range(1, NC + 1), simular("ILC", T, NC)[0], c, marker="o", label=f"ILC, T={T*1e3:.0f} ms")
-    ax[1, 0].set_yscale("log"); ax[1, 0].set_title("Aprendizaje ILC: error por ciclo"); ax[1, 0].set_xlabel("ciclo"); ax[1, 0].set_ylabel("RMS [%BW]"); ax[1, 0].legend()
+    ax[1, 0].set_yscale("log"); ax[1, 0].set_title("(c) Aprendizaje ILC: error por ciclo"); ax[1, 0].set_xlabel("ciclo"); ax[1, 0].set_ylabel("RMS [%BW]"); ax[1, 0].legend()
     for k, c in (("RT+pert", "tab:red"), ("ILC+pert", "tab:green")):
         ax[1, 1].plot(Ts * 1e3, res[k], c, marker="o", label=k.replace("+pert", ""))
-    ax[1, 1].set_yscale("log"); ax[1, 1].set_ylim(0.1, 100); ax[1, 1].set_title("Con perturbacion no repetible (pulso 3 %BW)"); ax[1, 1].set_xlabel("latencia total T [ms]"); ax[1, 1].set_ylabel("RMS [%BW]"); ax[1, 1].legend()
+    ax[1, 1].set_yscale("log"); ax[1, 1].set_ylim(0.1, 100); ax[1, 1].set_title("(d) Con perturbacion no repetible (pulso 3 %BW)"); ax[1, 1].set_xlabel("latencia total T [ms]"); ax[1, 1].set_ylabel("RMS [%BW]"); ax[1, 1].legend()
     fig.suptitle("Modelo con SUPUESTOS (tau_a=20 ms, Kp=10 1/s, k real = 0.8 k modelo, ciclo 4 s)", fontsize=10)
     fig.tight_layout(); fig.savefig("control/simulacion/rt_vs_ilc_latencia.png", dpi=130)
