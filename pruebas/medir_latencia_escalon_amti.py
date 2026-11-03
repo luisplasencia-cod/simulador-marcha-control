@@ -46,8 +46,8 @@ def main():
     arriba = False
     try:
         while len(eventos) < a.n_eventos:
-            t = time.time()
             f = volts_a_newtons(adc.leer_volts()) - offset
+            t = time.time()  # DESPUES de leer: antes sesgaba hasta 1 ms (espera de DRDY)
             cruzo_arriba = f > a.umbral_n
             if cruzo_arriba and not arriba:
                 print(f"[SUBIDA]  t={t:.6f}  Fz={f:.1f} N")
