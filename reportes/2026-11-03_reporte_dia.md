@@ -90,6 +90,19 @@ Modelo de un eje (Fz): servo de 1.er orden → contacto con rigidez efectiva →
 | Margen de fase 45° para T máx | | **elección de diseño propia**; no tomada de una fuente verificada |
 Los parámetros NO MEDIDOS se barren y se reporta la sensibilidad; **no se afirma su valor**.
 
+### 7.2b Diagrama de bloques del lazo simulado
+Archivos en `control/diagramas/salida/`: `diagrama.png/.svg`, `leyenda_variables.png/.svg`, `ecuaciones.png/.svg` (generados con `control/diagramas/diagrama_lazo_hibrido.py`, estilo del skill `diagrama-bloques-control`). Representa **exactamente** lo que simula `rt_vs_ilc_latencia.py`.
+
+![Diagrama de bloques](../control/diagramas/salida/diagrama.png)
+
+*Figura 7.1. Lazo de fuerza vertical simulado. El círculo es una suma con los signos indicados; el punto negro es una derivación; el recuadro punteado agrupa la planta simulada; las líneas punteadas del ILC indican que actúa **entre ciclos**, no dentro del ciclo; `(n)` indica la ecuación del controlador y `(Mn)` la del modelo de la planta, con el mismo número en la tabla de ecuaciones.*
+
+![Leyenda de variables](../control/diagramas/salida/leyenda_variables.png)
+
+![Ecuaciones](../control/diagramas/salida/ecuaciones.png)
+
+**Cómo leerlo.** Camino de adelante: el objetivo `r` (curva de §5) se corrige con lo que aprendió el ILC (`δ`), se compara con la fuerza medida y retrasada (`F_med`), el controlador proporcional produce una orden de velocidad `u`, el servo la sigue con retardo (`τ_a`), el movimiento cambia la fuerza según la rigidez (`k`) y la perturbación `d`, y el integrador da la fuerza `F`. La medida vuelve por abajo con el retardo `T`. Lo numerado `(1)–(4)` es controlador (se puede cambiar); `(M1)–(M4)` es el **modelo de la planta, sin medir** (se supone y se barre). **Limitación:** el ILC usa `ε = r − F` con la fuerza real (equivalente a la medida desplazada `T`, posible porque corrige entre ciclos); no está dibujado el caso RT+FF.
+
 ### 7.3 Términos
 - **%BW**: fuerza como % del peso corporal (10 %BW de error = 10 % del peso).
 - **Error RMS**: tamaño típico de la diferencia entre fuerza pedida y lograda en todo el apoyo.
