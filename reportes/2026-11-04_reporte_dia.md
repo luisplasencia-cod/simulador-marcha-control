@@ -91,7 +91,7 @@ Etapa de control del simulador de marcha (Luis Plasencia). Sesión en la laptop,
 
 **Resultado:** "Z=vertical" ya es la convención establecida en `CLAUDE.md` (sección de energía, "sagital y=avance, z=vertical") — no es un error nuevo ni de Luis ni de esta sesión. Lo que sigue sin confirmar es **distinto**: a cuál de los ejes `X`/`Y` del firmware del ESP32 (que usa esos nombres genéricos, no "Z") está cableado físicamente el motor vertical. Son dos preguntas separadas; la primera está resuelta, la segunda no.
 
-**Pendiente:** confirmar físicamente (mirando el simulador) cuál motor (X o Y del firmware) es el vertical, antes de usar `control/ilc/fz_ilc.py` o el parche `SET_VEL` contra hardware real. **Pista de Luis (2026-11-04, "me parece", no confirmado): Y = vertical, X = horizontal.**
+**CONFIRMADO (2026-11-04), verificado en el código fuente, no solo recuerdo de Luis:** `hardware_config.h` comenta `X_DIR_SETUP_US` como *"Required by the horizontal motor driver datasheet"* y `Y_DIR_SETUP_US` como *"Required by the vertical motor driver datasheet"*. **Y = vertical (Fz), X = horizontal (Fy), K = sagital.** No hay eje "Z" en el firmware.
 
 ## Mapa de lo producido hoy
 
