@@ -18,7 +18,7 @@ esa decisión de firmware se mantenga.
 
 ## Lo que falta para correrlo de verdad (no inventado, pendiente de hardware)
 
-1. **Qué eje del firmware (X o Y) es el vertical (Fz) físico** — el firmware usa nombres genéricos X/Y/K; no hay dato en este repo para distinguirlos sin mirar el simulador. Verificar antes de cablear `fz_ilc.py` al eje real.
+1. **Qué eje del firmware (X o Y) es el vertical (Fz) físico** — el firmware usa nombres genéricos X/Y/K. **(2026-11-04) Según recuerda Luis: Y = vertical, X = horizontal — "me parece", NO confirmado físicamente todavía.** Verificar mirando el simulador real antes de cablear `fz_ilc.py` (o el parche `SET_VEL`) al eje real; no usar este dato como definitivo hasta esa verificación.
 2. **`pasos_por_n`**: la ganancia fuerza→pasos del eje vertical. Depende de la rigidez de contacto (no medida — `../identificacion/PROTOCOLO.md`, no ejecutado) y de los pasos/mm del husillo vertical (no verificados en este repo). Sin esto, `fz_ilc.py` se niega a correr (no hay valor por defecto a propósito).
 3. **Probar `protocolo_subida_esp32.py` contra el ESP32 real** antes de confiar en él — se escribió leyendo el código del firmware, no se ejecutó contra hardware.
 
