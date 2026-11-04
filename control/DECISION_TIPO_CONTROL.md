@@ -1,9 +1,11 @@
-# Tipo de control para Fz y Fy — propuesta PROVISIONAL (2026-11-03)
+# Tipo de control para Fz y Fy — CERRADA para Fz (2026-11-04)
 
-**Estado: propuesta con respaldo parcial, NO decisión cerrada.** Metodología, datos (verificados vs. no medidos) y resultados completos en `reportes/2026-11-03_reporte_dia.md` §§ 4–8. Pendiente de Luis y de la asesora. Se apoya en la simulación (`simulacion/NOTAS.md`; objetivo = curva real de Gutenberg, planta con supuestos que se barren) y en la latencia medida. Lo marcado *(razonamiento)* es argumento propio, no resultado de la simulación ni de literatura leída.
+**Decisión cerrada para Fz: ILC ciclo a ciclo, sin realimentación en tiempo real dentro del ciclo.** No es una decisión de desempeño/latencia — es consecuencia de que el firmware del ESP32 no se toca (decisión de Luis, 2026-11-03) y no tiene comando de velocidad/posición continuo, solo trayectorias precargadas (`RUN`, ≤500 puntos). Mientras esa decisión de firmware se mantenga, la realimentación en tiempo real dentro del ciclo **no es implementable**, sin importar qué tan baja sea la latencia medida/calculada. Implementación: `control/ilc/` (núcleo `ilc_core.py` + `fz_ilc.py`, ambos con autoprueba en planta sintética; cliente serial `protocolo_subida_esp32.py` sin probar en hardware). Metodología/datos previos que llevaron aquí: `reportes/2026-11-03_reporte_dia.md` §§ 4–8.
 
-## Propuesta
-**Control híbrido por eje (Fz vertical, Fy horizontal): lazo de realimentación de fuerza en tiempo real (RPi, AMTI) como base + ILC que aprende ciclo a ciclo encima.** No ILC solo, no tiempo real solo.
+**Retardo del amplificador AMTI, dato usado para la latencia total (no para esta decisión, que no depende de la latencia): se buscó en internet (2026-11-04) un número publicado por AMTI y no existe públicamente — se confirmó con búsqueda web, no es que no se buscó. Se usa un número SUPUESTO por analogía (NO verificado con AMTI, NO es un dato de internet específico del Gen 5): cota calculada de los filtros analógicos (0.79 ms, `pruebas/calcular_retardo_amti_manual.py`) + ~1.5 ms supuesto por analogía con el retardo de un ADC de instrumentación sobremuestreado a una tasa similar (el propio ADS1256 midió 1.6–2.4 ms a 1000 SPS) para el sobremuestreo/DSP interno del Gen 5 (2000 Hz máx, no especificado en el manual). Total AMTI ≈ 2–3 ms, SUPUESTO. Si se necesita el número real: preguntar a soporte AMTI o medirlo con referencia física — ninguna de las dos se hizo.**
+
+## Propuesta original (2026-11-03, superada para Fz por lo de arriba — se deja para Fy, que aún no se decide)
+**Control híbrido por eje (Fz vertical, Fy horizontal): lazo de realimentación de fuerza en tiempo real (RPi, AMTI) como base + ILC que aprende ciclo a ciclo encima.** No ILC solo, no tiempo real solo. Para Fz, la parte "en tiempo real" de esta propuesta queda fuera de alcance por la restricción de firmware (ver arriba); para Fy sigue abierta hasta que se decida con el mismo criterio.
 
 ## Por qué (evidencia y límites)
 | # | Argumento | Respaldo |

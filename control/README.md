@@ -9,7 +9,8 @@
 | `simulacion/` | Simulación control en tiempo real vs ILC con la latencia como variable (modelo con supuestos) | hecha 2026-11-03, ver `simulacion/NOTAS.md` |
 | `../pruebas/2026-11-02_latencia_amti_rpi_esp32.md` | Plan y resultados de latencia (Paso 1 y 2 medidos; Paso 3 pendiente) | parcial |
 | `../pruebas/latencia_*.csv/.png` | Datos crudos de latencia | medido |
-| `DECISION_TIPO_CONTROL.md` | Tipo de control propuesto y su justificación | provisional |
+| `DECISION_TIPO_CONTROL.md` | Tipo de control: **Fz cerrado (ILC ciclo a ciclo)**, Fy abierto | Fz cerrado 2026-11-04 |
+| `ilc/` | Implementación del ILC para Fz (núcleo genérico + Fz + subida al ESP32) | núcleo y Fz probados en planta sintética; subida al ESP32 sin probar en hardware |
 | `firmware/` | Parche propuesto para reducir el sondeo RX del ESP32 | no aplicado |
 | `../reportes/` | Reportes diarios | al día |
 
