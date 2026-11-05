@@ -1,0 +1,460 @@
+Nov 05 14:45:39 gaitsim-control kernel: usb 1-2: new full-speed USB device number 3 using xhci-hcd
+Nov 05 14:45:39 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 14:45:39 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 14:45:39 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 14:45:39 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 14:45:39 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 14:45:39 gaitsim-control kernel: usbcore: registered new interface driver cp210x
+Nov 05 14:45:39 gaitsim-control kernel: usbserial: USB Serial support registered for cp210x
+Nov 05 14:45:39 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 14:45:39 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB0
+Nov 05 15:43:46 gaitsim-control kernel: usb 1-2: USB disconnect, device number 3
+Nov 05 15:43:46 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x7 status: -19
+Nov 05 15:43:46 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x12 status: -19
+Nov 05 15:43:46 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x0 status: -19
+Nov 05 15:43:46 gaitsim-control kernel: cp210x ttyUSB0: cp210x converter now disconnected from ttyUSB0
+Nov 05 15:43:46 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:43:46 gaitsim-control kernel: usb 1-2: new full-speed USB device number 4 using xhci-hcd
+Nov 05 15:43:46 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:43:46 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:43:46 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:43:46 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:43:46 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:43:46 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:43:46 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB1
+Nov 05 15:46:24 gaitsim-control kernel: usb 1-2: USB disconnect, device number 4
+Nov 05 15:46:24 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x7 status: -19
+Nov 05 15:46:24 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x12 status: -19
+Nov 05 15:46:24 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x0 status: -19
+Nov 05 15:46:24 gaitsim-control kernel: cp210x ttyUSB1: cp210x converter now disconnected from ttyUSB1
+Nov 05 15:46:24 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:46:24 gaitsim-control kernel: usb 1-2: new full-speed USB device number 5 using xhci-hcd
+Nov 05 15:46:24 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:46:24 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:46:24 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:46:24 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:46:24 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:46:24 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:46:24 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB0
+Nov 05 15:46:34 gaitsim-control kernel: usb 1-2: USB disconnect, device number 5
+Nov 05 15:46:34 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x7 status: -19
+Nov 05 15:46:34 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x12 status: -19
+Nov 05 15:46:34 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x0 status: -19
+Nov 05 15:46:34 gaitsim-control kernel: cp210x ttyUSB0: cp210x converter now disconnected from ttyUSB0
+Nov 05 15:46:34 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:46:34 gaitsim-control kernel: usb 1-2: new full-speed USB device number 6 using xhci-hcd
+Nov 05 15:46:34 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:46:34 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:46:34 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:46:34 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:46:34 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:46:34 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:46:34 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB1
+Nov 05 15:46:37 gaitsim-control kernel: usb 1-2: USB disconnect, device number 6
+Nov 05 15:46:37 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x7 status: -19
+Nov 05 15:46:37 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x12 status: -19
+Nov 05 15:46:37 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x0 status: -19
+Nov 05 15:46:37 gaitsim-control kernel: cp210x ttyUSB1: cp210x converter now disconnected from ttyUSB1
+Nov 05 15:46:37 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:46:37 gaitsim-control kernel: usb 1-2: new full-speed USB device number 7 using xhci-hcd
+Nov 05 15:46:37 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:46:37 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:46:37 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:46:37 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:46:37 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:46:37 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:46:37 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB0
+Nov 05 15:46:40 gaitsim-control kernel: usb 1-2: USB disconnect, device number 7
+Nov 05 15:46:40 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x7 status: -19
+Nov 05 15:46:40 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x12 status: -19
+Nov 05 15:46:40 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x0 status: -19
+Nov 05 15:46:40 gaitsim-control kernel: cp210x ttyUSB0: cp210x converter now disconnected from ttyUSB0
+Nov 05 15:46:40 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:46:40 gaitsim-control kernel: usb 1-2: new full-speed USB device number 8 using xhci-hcd
+Nov 05 15:46:41 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:46:41 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:46:41 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:46:41 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:46:41 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:46:41 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:46:41 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB1
+Nov 05 15:46:44 gaitsim-control kernel: usb 1-2: USB disconnect, device number 8
+Nov 05 15:46:44 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x7 status: -19
+Nov 05 15:46:44 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x12 status: -19
+Nov 05 15:46:44 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x0 status: -19
+Nov 05 15:46:44 gaitsim-control kernel: cp210x ttyUSB1: cp210x converter now disconnected from ttyUSB1
+Nov 05 15:46:44 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:46:44 gaitsim-control kernel: usb 1-2: new full-speed USB device number 9 using xhci-hcd
+Nov 05 15:46:44 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:46:44 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:46:44 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:46:44 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:46:44 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:46:44 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:46:44 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB0
+Nov 05 15:46:46 gaitsim-control kernel: usb 1-2: USB disconnect, device number 9
+Nov 05 15:46:46 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x7 status: -71
+Nov 05 15:46:46 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x7 status: -19
+Nov 05 15:46:46 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x12 status: -19
+Nov 05 15:46:46 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x0 status: -19
+Nov 05 15:46:46 gaitsim-control kernel: cp210x ttyUSB0: cp210x converter now disconnected from ttyUSB0
+Nov 05 15:46:46 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:46:46 gaitsim-control kernel: usb 1-2: new full-speed USB device number 10 using xhci-hcd
+Nov 05 15:46:46 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:46:46 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:46:46 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:46:46 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:46:46 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:46:46 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:46:46 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB0
+Nov 05 15:46:47 gaitsim-control kernel: usb 1-2: USB disconnect, device number 10
+Nov 05 15:46:47 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x7 status: -19
+Nov 05 15:46:47 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x12 status: -19
+Nov 05 15:46:47 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x0 status: -19
+Nov 05 15:46:47 gaitsim-control kernel: cp210x ttyUSB0: cp210x converter now disconnected from ttyUSB0
+Nov 05 15:46:47 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:46:47 gaitsim-control kernel: usb 1-2: new full-speed USB device number 11 using xhci-hcd
+Nov 05 15:46:47 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:46:47 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:46:47 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:46:47 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:46:47 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:46:47 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:46:47 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB1
+Nov 05 15:46:50 gaitsim-control kernel: usb 1-2: USB disconnect, device number 11
+Nov 05 15:46:50 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x7 status: -19
+Nov 05 15:46:50 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x12 status: -19
+Nov 05 15:46:50 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x0 status: -19
+Nov 05 15:46:50 gaitsim-control kernel: cp210x ttyUSB1: cp210x converter now disconnected from ttyUSB1
+Nov 05 15:46:50 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:46:50 gaitsim-control kernel: usb 1-2: new full-speed USB device number 12 using xhci-hcd
+Nov 05 15:46:51 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:46:51 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:46:51 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:46:51 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:46:51 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:46:51 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:46:51 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB0
+Nov 05 15:46:53 gaitsim-control kernel: usb 1-2: USB disconnect, device number 12
+Nov 05 15:46:53 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x7 status: -19
+Nov 05 15:46:53 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x12 status: -19
+Nov 05 15:46:53 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x0 status: -19
+Nov 05 15:46:53 gaitsim-control kernel: cp210x ttyUSB0: cp210x converter now disconnected from ttyUSB0
+Nov 05 15:46:53 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:46:53 gaitsim-control kernel: usb 1-2: new full-speed USB device number 13 using xhci-hcd
+Nov 05 15:46:53 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:46:53 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:46:53 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:46:53 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:46:53 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:46:54 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:46:54 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB1
+Nov 05 15:46:57 gaitsim-control kernel: usb 1-2: USB disconnect, device number 13
+Nov 05 15:46:57 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x7 status: -19
+Nov 05 15:46:57 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x12 status: -19
+Nov 05 15:46:57 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x0 status: -19
+Nov 05 15:46:57 gaitsim-control kernel: cp210x ttyUSB1: cp210x converter now disconnected from ttyUSB1
+Nov 05 15:46:57 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:46:58 gaitsim-control kernel: usb 1-2: new full-speed USB device number 14 using xhci-hcd
+Nov 05 15:46:58 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:46:58 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:46:58 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:46:58 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:46:58 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:46:58 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:46:58 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB0
+Nov 05 15:47:00 gaitsim-control kernel: usb 1-2: USB disconnect, device number 14
+Nov 05 15:47:00 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x7 status: -19
+Nov 05 15:47:00 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x12 status: -19
+Nov 05 15:47:00 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x0 status: -19
+Nov 05 15:47:00 gaitsim-control kernel: cp210x ttyUSB0: cp210x converter now disconnected from ttyUSB0
+Nov 05 15:47:00 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:47:00 gaitsim-control kernel: usb 1-2: new full-speed USB device number 15 using xhci-hcd
+Nov 05 15:47:00 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:47:00 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:47:00 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:47:00 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:47:00 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:47:00 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:47:00 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB1
+Nov 05 15:47:04 gaitsim-control kernel: usb 1-2: USB disconnect, device number 15
+Nov 05 15:47:04 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x7 status: -19
+Nov 05 15:47:04 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x12 status: -19
+Nov 05 15:47:04 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x0 status: -19
+Nov 05 15:47:04 gaitsim-control kernel: cp210x ttyUSB1: cp210x converter now disconnected from ttyUSB1
+Nov 05 15:47:04 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:47:04 gaitsim-control kernel: usb 1-2: new full-speed USB device number 16 using xhci-hcd
+Nov 05 15:47:04 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:47:04 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:47:04 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:47:04 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:47:04 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:47:04 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:47:04 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB0
+Nov 05 15:47:06 gaitsim-control kernel: usb 1-2: USB disconnect, device number 16
+Nov 05 15:47:06 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x7 status: -19
+Nov 05 15:47:06 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x12 status: -19
+Nov 05 15:47:06 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x0 status: -19
+Nov 05 15:47:06 gaitsim-control kernel: cp210x ttyUSB0: cp210x converter now disconnected from ttyUSB0
+Nov 05 15:47:06 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:47:06 gaitsim-control kernel: usb 1-2: new full-speed USB device number 17 using xhci-hcd
+Nov 05 15:47:06 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:47:06 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:47:06 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:47:06 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:47:06 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:47:06 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:47:06 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB1
+Nov 05 15:47:09 gaitsim-control kernel: usb 1-2: USB disconnect, device number 17
+Nov 05 15:47:09 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x7 status: -19
+Nov 05 15:47:09 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x12 status: -19
+Nov 05 15:47:09 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x0 status: -19
+Nov 05 15:47:09 gaitsim-control kernel: cp210x ttyUSB1: cp210x converter now disconnected from ttyUSB1
+Nov 05 15:47:09 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:47:09 gaitsim-control kernel: usb 1-2: new full-speed USB device number 18 using xhci-hcd
+Nov 05 15:47:09 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:47:09 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:47:09 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:47:09 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:47:09 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:47:09 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:47:09 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB0
+Nov 05 15:47:13 gaitsim-control kernel: usb 1-2: USB disconnect, device number 18
+Nov 05 15:47:13 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x7 status: -19
+Nov 05 15:47:13 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x12 status: -19
+Nov 05 15:47:13 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x0 status: -19
+Nov 05 15:47:13 gaitsim-control kernel: cp210x ttyUSB0: cp210x converter now disconnected from ttyUSB0
+Nov 05 15:47:13 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:47:13 gaitsim-control kernel: usb 1-2: new full-speed USB device number 19 using xhci-hcd
+Nov 05 15:47:13 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:47:13 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:47:13 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:47:13 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:47:13 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:47:13 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:47:13 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB1
+Nov 05 15:47:15 gaitsim-control kernel: usb 1-2: USB disconnect, device number 19
+Nov 05 15:47:15 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x7 status: -19
+Nov 05 15:47:15 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x12 status: -19
+Nov 05 15:47:15 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x0 status: -19
+Nov 05 15:47:15 gaitsim-control kernel: cp210x ttyUSB1: cp210x converter now disconnected from ttyUSB1
+Nov 05 15:47:15 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:47:15 gaitsim-control kernel: usb 1-2: new full-speed USB device number 20 using xhci-hcd
+Nov 05 15:47:15 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:47:15 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:47:15 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:47:15 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:47:15 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:47:15 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:47:15 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB0
+Nov 05 15:47:17 gaitsim-control kernel: usb 1-2: USB disconnect, device number 20
+Nov 05 15:47:17 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x7 status: -19
+Nov 05 15:47:17 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x12 status: -19
+Nov 05 15:47:17 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x0 status: -19
+Nov 05 15:47:17 gaitsim-control kernel: cp210x ttyUSB0: cp210x converter now disconnected from ttyUSB0
+Nov 05 15:47:17 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:47:17 gaitsim-control kernel: usb 1-2: new full-speed USB device number 21 using xhci-hcd
+Nov 05 15:47:18 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:47:18 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:47:18 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:47:18 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:47:18 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:47:18 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:47:18 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB1
+Nov 05 15:47:21 gaitsim-control kernel: usb 1-2: USB disconnect, device number 21
+Nov 05 15:47:21 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x7 status: -19
+Nov 05 15:47:21 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x12 status: -19
+Nov 05 15:47:21 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x0 status: -19
+Nov 05 15:47:21 gaitsim-control kernel: cp210x ttyUSB1: cp210x converter now disconnected from ttyUSB1
+Nov 05 15:47:21 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:47:21 gaitsim-control kernel: usb 1-2: new full-speed USB device number 22 using xhci-hcd
+Nov 05 15:47:21 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:47:21 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:47:21 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:47:21 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:47:21 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:47:21 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:47:21 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB0
+Nov 05 15:47:24 gaitsim-control kernel: usb 1-2: USB disconnect, device number 22
+Nov 05 15:47:24 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x7 status: -19
+Nov 05 15:47:24 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x12 status: -19
+Nov 05 15:47:24 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x0 status: -19
+Nov 05 15:47:24 gaitsim-control kernel: cp210x ttyUSB0: cp210x converter now disconnected from ttyUSB0
+Nov 05 15:47:24 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:47:24 gaitsim-control kernel: usb 1-2: new full-speed USB device number 23 using xhci-hcd
+Nov 05 15:47:24 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:47:24 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:47:24 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:47:24 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:47:24 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:47:24 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:47:24 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB1
+Nov 05 15:47:27 gaitsim-control kernel: usb 1-2: USB disconnect, device number 23
+Nov 05 15:47:27 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x7 status: -19
+Nov 05 15:47:27 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x12 status: -19
+Nov 05 15:47:27 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x0 status: -19
+Nov 05 15:47:27 gaitsim-control kernel: cp210x ttyUSB1: cp210x converter now disconnected from ttyUSB1
+Nov 05 15:47:27 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:47:28 gaitsim-control kernel: usb 1-2: new full-speed USB device number 24 using xhci-hcd
+Nov 05 15:47:28 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:47:28 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:47:28 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:47:28 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:47:28 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:47:28 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:47:28 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB0
+Nov 05 15:47:29 gaitsim-control kernel: usb 1-2: USB disconnect, device number 24
+Nov 05 15:47:29 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x7 status: -19
+Nov 05 15:47:29 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x12 status: -19
+Nov 05 15:47:29 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x0 status: -19
+Nov 05 15:47:29 gaitsim-control kernel: cp210x ttyUSB0: cp210x converter now disconnected from ttyUSB0
+Nov 05 15:47:29 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:47:30 gaitsim-control kernel: usb 1-2: new full-speed USB device number 25 using xhci-hcd
+Nov 05 15:47:30 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:47:30 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:47:30 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:47:30 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:47:30 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:47:30 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:47:30 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB1
+Nov 05 15:47:32 gaitsim-control kernel: usb 1-2: USB disconnect, device number 25
+Nov 05 15:47:32 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x7 status: -19
+Nov 05 15:47:32 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x12 status: -19
+Nov 05 15:47:32 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x0 status: -19
+Nov 05 15:47:32 gaitsim-control kernel: cp210x ttyUSB1: cp210x converter now disconnected from ttyUSB1
+Nov 05 15:47:32 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:47:32 gaitsim-control kernel: usb 1-2: new full-speed USB device number 26 using xhci-hcd
+Nov 05 15:47:33 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:47:33 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:47:33 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:47:33 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:47:33 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:47:33 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:47:33 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB0
+Nov 05 15:47:36 gaitsim-control kernel: usb 1-2: USB disconnect, device number 26
+Nov 05 15:47:36 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x7 status: -19
+Nov 05 15:47:36 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x12 status: -19
+Nov 05 15:47:36 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x0 status: -19
+Nov 05 15:47:36 gaitsim-control kernel: cp210x ttyUSB0: cp210x converter now disconnected from ttyUSB0
+Nov 05 15:47:36 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:47:36 gaitsim-control kernel: usb 1-2: new full-speed USB device number 27 using xhci-hcd
+Nov 05 15:47:36 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:47:36 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:47:36 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:47:36 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:47:36 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:47:36 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:47:36 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB1
+Nov 05 15:47:40 gaitsim-control kernel: usb 1-2: USB disconnect, device number 27
+Nov 05 15:47:40 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x7 status: -19
+Nov 05 15:47:40 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x12 status: -19
+Nov 05 15:47:40 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x0 status: -19
+Nov 05 15:47:40 gaitsim-control kernel: cp210x ttyUSB1: cp210x converter now disconnected from ttyUSB1
+Nov 05 15:47:40 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:47:40 gaitsim-control kernel: usb 1-2: new full-speed USB device number 28 using xhci-hcd
+Nov 05 15:47:40 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:47:40 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:47:40 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:47:40 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:47:40 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:47:40 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:47:40 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB0
+Nov 05 15:47:42 gaitsim-control kernel: usb 1-2: USB disconnect, device number 28
+Nov 05 15:47:42 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x7 status: -19
+Nov 05 15:47:42 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x12 status: -19
+Nov 05 15:47:42 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x0 status: -19
+Nov 05 15:47:42 gaitsim-control kernel: cp210x ttyUSB0: cp210x converter now disconnected from ttyUSB0
+Nov 05 15:47:42 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:47:42 gaitsim-control kernel: usb 1-2: new full-speed USB device number 29 using xhci-hcd
+Nov 05 15:47:42 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:47:42 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:47:42 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:47:42 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:47:42 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:47:42 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:47:42 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB1
+Nov 05 15:47:45 gaitsim-control kernel: usb 1-2: USB disconnect, device number 29
+Nov 05 15:47:45 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x7 status: -19
+Nov 05 15:47:45 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x12 status: -19
+Nov 05 15:47:45 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x0 status: -19
+Nov 05 15:47:45 gaitsim-control kernel: cp210x ttyUSB1: cp210x converter now disconnected from ttyUSB1
+Nov 05 15:47:45 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:47:45 gaitsim-control kernel: usb 1-2: new full-speed USB device number 30 using xhci-hcd
+Nov 05 15:47:45 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:47:45 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:47:45 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:47:45 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:47:45 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:47:45 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:47:45 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB0
+Nov 05 15:47:48 gaitsim-control kernel: usb 1-2: USB disconnect, device number 30
+Nov 05 15:47:48 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x7 status: -19
+Nov 05 15:47:48 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x12 status: -19
+Nov 05 15:47:48 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x0 status: -19
+Nov 05 15:47:48 gaitsim-control kernel: cp210x ttyUSB0: cp210x converter now disconnected from ttyUSB0
+Nov 05 15:47:48 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:47:48 gaitsim-control kernel: usb 1-2: new full-speed USB device number 31 using xhci-hcd
+Nov 05 15:47:48 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:47:48 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:47:48 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:47:48 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:47:48 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:47:48 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:47:48 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB1
+Nov 05 15:47:50 gaitsim-control kernel: usb 1-2: USB disconnect, device number 31
+Nov 05 15:47:50 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x7 status: -71
+Nov 05 15:47:50 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x7 status: -19
+Nov 05 15:47:50 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x12 status: -19
+Nov 05 15:47:50 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x0 status: -19
+Nov 05 15:47:50 gaitsim-control kernel: cp210x ttyUSB1: cp210x converter now disconnected from ttyUSB1
+Nov 05 15:47:50 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:47:51 gaitsim-control kernel: usb 1-2: new full-speed USB device number 32 using xhci-hcd
+Nov 05 15:47:51 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:47:51 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:47:51 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:47:51 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:47:51 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:47:51 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:47:51 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB1
+Nov 05 15:47:52 gaitsim-control kernel: usb 1-2: USB disconnect, device number 32
+Nov 05 15:47:52 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x7 status: -19
+Nov 05 15:47:52 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x12 status: -19
+Nov 05 15:47:52 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x0 status: -19
+Nov 05 15:47:52 gaitsim-control kernel: cp210x ttyUSB1: cp210x converter now disconnected from ttyUSB1
+Nov 05 15:47:52 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:47:52 gaitsim-control kernel: usb 1-2: new full-speed USB device number 33 using xhci-hcd
+Nov 05 15:47:52 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:47:52 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:47:52 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:47:52 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:47:52 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:47:52 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:47:52 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB0
+Nov 05 15:47:55 gaitsim-control kernel: usb 1-2: USB disconnect, device number 33
+Nov 05 15:47:55 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x7 status: -19
+Nov 05 15:47:55 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x12 status: -19
+Nov 05 15:47:55 gaitsim-control kernel: cp210x ttyUSB0: failed set request 0x0 status: -19
+Nov 05 15:47:55 gaitsim-control kernel: cp210x ttyUSB0: cp210x converter now disconnected from ttyUSB0
+Nov 05 15:47:55 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:47:55 gaitsim-control kernel: usb 1-2: new full-speed USB device number 34 using xhci-hcd
+Nov 05 15:47:55 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:47:55 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:47:55 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:47:55 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:47:55 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:47:55 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:47:55 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB1
+Nov 05 15:47:59 gaitsim-control kernel: usb 1-2: USB disconnect, device number 34
+Nov 05 15:47:59 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x7 status: -19
+Nov 05 15:47:59 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x12 status: -19
+Nov 05 15:47:59 gaitsim-control kernel: cp210x ttyUSB1: failed set request 0x0 status: -19
+Nov 05 15:47:59 gaitsim-control kernel: cp210x ttyUSB1: cp210x converter now disconnected from ttyUSB1
+Nov 05 15:47:59 gaitsim-control kernel: cp210x 1-2:1.0: device disconnected
+Nov 05 15:47:59 gaitsim-control kernel: usb 1-2: new full-speed USB device number 35 using xhci-hcd
+Nov 05 15:48:00 gaitsim-control kernel: usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60, bcdDevice= 1.00
+Nov 05 15:48:00 gaitsim-control kernel: usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Nov 05 15:48:00 gaitsim-control kernel: usb 1-2: Product: CP2102 USB to UART Bridge Controller
+Nov 05 15:48:00 gaitsim-control kernel: usb 1-2: Manufacturer: Silicon Labs
+Nov 05 15:48:00 gaitsim-control kernel: usb 1-2: SerialNumber: 0001
+Nov 05 15:48:00 gaitsim-control kernel: cp210x 1-2:1.0: cp210x converter detected
+Nov 05 15:48:00 gaitsim-control kernel: usb 1-2: cp210x converter now attached to ttyUSB0

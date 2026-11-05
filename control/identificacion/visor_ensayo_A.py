@@ -30,17 +30,17 @@ def leer():
     return t, fase, mm, F, tit
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5), facecolor="white")
-COL = {"aprox": "tab:gray", "fino": "tab:blue", "sube": "tab:red", "sube2": "tab:red"}
+COL = {"aprox": "tab:gray", "medio": "tab:green", "fino": "tab:blue", "sube": "tab:red", "sube2": "tab:red"}
 def dibujar(_=None):
     t, fase, mm, F, tit = leer()
     ax1.clear(); ax2.clear()
     if t:
         t1 = t[-1]; i0 = next((i for i, x in enumerate(t) if x >= t1 - a.ventana_s), 0) if not a.png else 0
         ax1.plot(t[i0:], F[i0:], lw=1, color="k"); ax1.set_xlim(t[i0], max(t1, t[i0] + 1))
-        for nom in ("aprox", "fino", "sube"):
+        for nom in ("aprox", "medio", "fino", "sube"):
             xs = [m for m, f in zip(mm, fase) if f.startswith(nom)]; ys = [v for v, f in zip(F, fase) if f.startswith(nom)]
-            if xs: ax2.plot(xs, ys, ".", ms=3, color=COL[nom], label={"aprox": "aproximacion", "fino": "bajada fina", "sube": "subida"}[nom])
-        fx = [m for m, f in zip(mm, fase) if f.startswith("fino") or f.startswith("sube")]
+            if xs: ax2.plot(xs, ys, ".", ms=3, color=COL[nom], label={"aprox": "aproximacion", "medio": "tramo medio (1 mm)", "fino": "bajada fina", "sube": "subida"}[nom])
+        fx = [m for m, f in zip(mm, fase) if f.startswith("fino") or f.startswith("sube") or f.startswith("medio")]
         if fx: ax2.set_xlim(min(fx) - 1, max(fx) + 1)   # zoom a la zona de contacto
         ax2.legend(loc="upper left", fontsize=8)
         ax1.set_title(f"Fz ahora = {F[-1]:.1f} N   |   bajado = {mm[-1]:.1f} mm", fontsize=10)

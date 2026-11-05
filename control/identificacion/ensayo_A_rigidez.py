@@ -17,7 +17,7 @@ from ajuste_k import k_por_bandas
 
 PASOS_MM = 80
 ap = argparse.ArgumentParser()
-ap.add_argument("--puerto", default="/dev/ttyUSB0")
+ap.add_argument("--puerto", default="/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0")
 ap.add_argument("--paso_pasos", type=int, default=16, help="16 pasos = 0.2 mm por escalon")
 ap.add_argument("--umbral_contacto_n", type=float, default=8.0)
 ap.add_argument("--fmax_n", type=float, default=150.0)
@@ -25,9 +25,11 @@ ap.add_argument("--salto_max_n", type=float, default=60.0)
 ap.add_argument("--hueco_mm", type=float, required=True, help="hueco medido suela-plataforma")
 ap.add_argument("--angulo_deg", type=float, required=True, help="angulo sagital FIJO del pie (k depende de el)")
 ap.add_argument("--etiqueta", default="", help="ej. talon / planta / dedos")
+ap.add_argument("--paso_medio_pasos", type=int, default=80, help="80 pasos = 1 mm, tramo medio")
+ap.add_argument("--cambio_n", type=float, default=3.0, help="primer cambio de Fz (N) que activa los escalones finos")
 ap.add_argument("--aprox_margen_mm", type=float, default=30.0)
 ap.add_argument("--max_extra_mm", type=float, default=20.0)
-ap.add_argument("--asentar_s", type=float, default=0.5)
+ap.add_argument("--asentar_s", type=float, default=0.3)
 ap.add_argument("--salida", default=None)
 ap.add_argument("--en_vivo", default="logs/ensayo_A_en_vivo.csv")
 ap.add_argument("--ejecutar", action="store_true")
@@ -67,7 +69,17 @@ def fz(n=50, intentos=6):
             time.sleep(0.3); adc = abrir_adc()
     raise RuntimeError("ADC irrecuperable")
 
-ser = serial.Serial(a.puerto, 115200, timeout=2.0); time.sleep(2.0); ser.reset_input_buffer()
+def conectar():
+    global ser
+    try: ser.close()
+    except Exception: pass
+    for i in range(10):  # tras una caida del USB el dispositivo reaparece con otro ttyUSB; by-id lo sigue
+        try:
+            ser = serial.Serial(a.puerto, 115200, timeout=2.0); time.sleep(2.0); ser.reset_input_buffer(); return
+        except Exception as e:
+            print(f"  puerto no disponible ({e}); reintento {i+1}/10", flush=True); time.sleep(1.0)
+    raise RuntimeError("puerto serie irrecuperable")
+ser = None; conectar()
 def abrir_adc(intentos=6):
     """El init verifica por lectura de vuelta; un error de bit SPI puntual lo hace fallar -> reintentar."""
     for i in range(intentos):
@@ -95,8 +107,17 @@ try:
         mover(-4000, "aprox"); f = fz(20) - f0; reg("aprox", bajados / PASOS_MM, f)
         print(f"[aprox] {bajados/PASOS_MM:6.1f} mm  F = {f:6.2f} N", flush=True)
         if f > a.umbral_contacto_n: raise RuntimeError("contacto ANTES de lo esperado en la aproximacion")
-    previa = None
-    while True:
+    # MEDIO: pasos de 1 mm vigilando Fz hasta el PRIMER cambio (lejos del contacto no hace falta ir fino)
+    previa = None; en_contacto = False
+    while not en_contacto:
+        if bajados / PASOS_MM >= a.hueco_mm + a.max_extra_mm: motivo = "sin contacto en descenso maximo"; break
+        mover(-a.paso_medio_pasos, "medio"); f = fz(30) - f0; reg("medio", bajados / PASOS_MM, f)
+        print(f"[medio] {bajados/PASOS_MM:6.1f} mm  F = {f:6.2f} N", flush=True)
+        if f > a.fmax_n or f < -30 or (previa is not None and f - previa > a.salto_max_n):
+            motivo = "fuerza/salto fuera de limite en tramo medio"; break
+        en_contacto = f > a.cambio_n; previa = f
+    # FINO: escalones de 0.2 mm desde el primer cambio, para la curva F(x)
+    while en_contacto:
         if bajados / PASOS_MM >= a.hueco_mm + a.max_extra_mm: motivo = "sin contacto en descenso maximo"; break
         mover(-a.paso_pasos, "fino"); f = fz() - f0; reg("fino", bajados / PASOS_MM, f)
         print(f"bajado {bajados/PASOS_MM:6.2f} mm  F = {f:7.2f} N", flush=True)
@@ -123,7 +144,9 @@ finally:
                 bajados -= paso; time.sleep(paso / 1600 + 0.3)
             break
         except BaseException as e:
-            print("ERROR subida gruesa:", repr(e)); time.sleep(1.0)
+            print("ERROR subida gruesa:", repr(e), "-> reconectando", flush=True)
+            try: conectar()
+            except BaseException as e2: print("no se pudo reconectar:", repr(e2))
     print("pasos pendientes de subir:", bajados)
     vivo.write(f"# fin motivo={motivo} pendientes={bajados}\n"); vivo.close(); adc.cerrar(); ser.close()
 
