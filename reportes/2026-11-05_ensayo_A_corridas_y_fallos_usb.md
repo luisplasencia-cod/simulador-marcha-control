@@ -127,3 +127,6 @@ Diferencia de k total: **14 % de la media (cociente 1.15)**; en el tramo 40–10
 
 ## 16:32 — X avanzado 6 cm antes de la punta (pedido de Luis)
 `MANUAL:0:+800` ×3 = **+2400 pasos = 6.0 cm** (gaitsim: 400 pasos/cm en X), 3/3 `OK`, 0 caídas del USB. **Sentido:** paso positivo = avance (en las trayectorias de gaitsim la X crece a lo largo del apoyo; el sentido físico NO se verificó con el rig, a confirmar por Luis). **Limitaciones:** el ESP32 pierde su contador al abrir el puerto y no se ha hecho HOME, así que no se conoce la X absoluta ni la distancia al final de carrera; 6 cm es un desplazamiento pequeño y el firmware rechaza mover hacia un final de carrera ya presionado (no verificado moviendo). El hueco vertical a la plataforma puede cambiar si la plataforma o el pie no están a la misma cota en esa X: **medir de nuevo antes de bajar**.
+
+## 16:33 — X avanzado otros 6 cm (pedido de Luis): total +12 cm antes de la punta
+Segundo avance de +2400 pasos (6.0 cm) por `MANUAL:0`, 3/3 `OK`; **X acumulado desde el inicio de esta sesión del pie en punta: +4800 pasos = 12.0 cm**. Mismas limitaciones que el avance anterior (sentido físico sin verificar, sin HOME, X absoluta desconocida). El hueco vertical debe medirse de nuevo.
