@@ -23,9 +23,20 @@ NO RESUELTO, pendiente de hardware (marcado explicitamente, no se adivina):
    un valor (evita inventar un numero). Se puede estimar groseramente a partir
    de la curva fuerza-deformacion informal si Luis la tiene, o medirla con el
    protocolo de identificacion cuando haya hardware.
-3. Pasos/mm del eje vertical: tampoco esta en este repo (revisar husillo/motor
-   real). Necesario junto con (2) para ir de N a pasos.
+   SI SE CONOCE LA RIGIDEZ (N/mm), pasar `rigidez_n_por_mm=` en vez de
+   `pasos_por_n=`: el constructor ya sabe convertir, usando (3).
+3. Pasos/mm del eje vertical: CONFIRMADO (2026-11-05, Luis paso el script real
+   de generacion de trayectorias del firmware, generador_trayectoria.py --
+   no versionado en este repo, Luis lo tiene aparte): Y_STEPS_PER_REV=400,
+   LEADSCREW_Y_MM_PER_REV=5 mm/rev -> PASOS_POR_MM_Y = 400/5 = 80 pasos/mm
+   (antes de mecanismos adicionales; el eje vertical es husillo+motor
+   directo, sin reductor aparte segun ese script). Cruzado contra
+   `Codigo ESP32 MOV/.../configurable_motion_data.h` (comentario de
+   HOMING_SPEED_Y_STEPS_PER_SEC: "3 rev/s => 15 mm/s" => 1200 steps/s /
+   15 mm/s = 80 pasos/mm, coincide exacto). Ya NO es un dato faltante --
+   solo falta (2), la rigidez.
 """
+PASOS_POR_MM_Y = 80.0  # CONFIRMADO 2026-11-05 (ver nota 3 arriba) -- NO inventado
 import os
 import sys
 import numpy as np
@@ -51,19 +62,22 @@ def curva_objetivo_fz(referencia="gutenberg", n_puntos=200):
 class ControlFzILC:
     """Une el nucleo ILC con la curva objetivo y la conversion a pasos del eje
     vertical. Uso por ciclo:
-        ctrl = ControlFzILC(peso_sujeto_n=..., pasos_por_n=..., duracion_s=...)
+        ctrl = ControlFzILC(peso_sujeto_n=..., duracion_s=..., rigidez_n_por_mm=...)  # o pasos_por_n=...
         puntos = ctrl.siguiente_trayectoria()      # para subir al ESP32
         ... correr el ciclo real, medir Fz con el AMTI/ADS1256 ...
         ctrl.registrar_medicion(t_medido_s, fz_medido_n)   # actualiza el ILC
     """
 
-    def __init__(self, peso_sujeto_n, pasos_por_n, duracion_s, referencia="gutenberg",
-                 n_puntos=200, gamma=0.5, dt_min_ms=5):
+    def __init__(self, peso_sujeto_n, duracion_s, pasos_por_n=None, rigidez_n_por_mm=None,
+                 referencia="gutenberg", n_puntos=200, gamma=0.5, dt_min_ms=5):
+        if pasos_por_n is None and rigidez_n_por_mm is not None:
+            # pasos/N = (pasos/mm) / (N/mm) -- PASOS_POR_MM_Y confirmado (ver modulo), rigidez NO
+            pasos_por_n = PASOS_POR_MM_Y / rigidez_n_por_mm
         if pasos_por_n is None:
             raise ValueError(
-                "pasos_por_n es obligatorio y NO tiene valor por defecto: depende de la rigidez de "
-                "contacto (no medida, ver control/identificacion/PROTOCOLO.md) y de los pasos/mm del "
-                "eje vertical (no verificados en este repo). No se inventa este numero.")
+                "Dar pasos_por_n, o rigidez_n_por_mm (N/mm, medida con control/identificacion/"
+                "PROTOCOLO.md -- el script ya sabe convertir con PASOS_POR_MM_Y=80, confirmado). "
+                "Ninguno tiene valor por defecto: no se inventa la rigidez de contacto.")
         self.peso_n = peso_sujeto_n
         self.pasos_por_n = pasos_por_n
         self.duracion_s = duracion_s
@@ -103,7 +117,7 @@ if __name__ == "__main__":
     # Autoprueba SOLO del cableado (curva real + nucleo + conversion a pasos),
     # con una planta sintetica (ganancia pura) -- NO valida pasos_por_n real.
     peso_n, pasos_por_n, duracion_s = 850.0, 50.0, 3.69  # pasos_por_n de EJEMPLO, no medido
-    ctrl = ControlFzILC(peso_n, pasos_por_n, duracion_s, n_puntos=200)
+    ctrl = ControlFzILC(peso_n, duracion_s, pasos_por_n=pasos_por_n, n_puntos=200)
     t_malla = np.linspace(0, duracion_s, 200, endpoint=False)
     for ciclo in range(5):
         dt, dz = ctrl.siguiente_trayectoria()

@@ -19,7 +19,7 @@ esa decisión de firmware se mantenga.
 ## Lo que falta para correrlo de verdad (no inventado, pendiente de hardware)
 
 1. ~~Qué eje del firmware (X o Y) es el vertical (Fz) físico~~ — **CONFIRMADO (2026-11-04), verificado en el código fuente, no es solo recuerdo de Luis:** `hardware_config.h` comenta `X_DIR_SETUP_US` como *"Required by the horizontal motor driver datasheet"* y `Y_DIR_SETUP_US` como *"Required by the vertical motor driver datasheet"*. **Y = vertical (Fz), X = horizontal (Fy), K = sagital.** No hay eje "Z" en el firmware.
-2. **`pasos_por_n`**: la ganancia fuerza→pasos del eje vertical. Depende de la rigidez de contacto (no medida — `../identificacion/PROTOCOLO.md`, no ejecutado) y de los pasos/mm del husillo vertical (no verificados en este repo). Sin esto, `fz_ilc.py` se niega a correr (no hay valor por defecto a propósito).
+2. **`pasos_por_n`**: la ganancia fuerza→pasos del eje vertical. Se reduce a UN solo dato faltante ahora: **pasos/mm del eje vertical YA CONFIRMADO (2026-11-05): 80 pasos/mm** (`Y_STEPS_PER_REV=400`, `LEADSCREW_Y_MM_PER_REV=5`, del script real de generación de trayectorias del firmware que Luis usa — cruzado contra el comentario de `HOMING_SPEED_Y_STEPS_PER_SEC` en `configurable_motion_data.h`, coincide exacto). Solo falta la **rigidez de contacto** (N/mm, no medida — `../identificacion/PROTOCOLO.md`, no ejecutado). `fz_ilc.py` ahora acepta `rigidez_n_por_mm=` directo y convierte solo con eso (`PASOS_POR_MM_Y` ya en el módulo) — sigue sin valor por defecto para la rigidez, a propósito.
 3. **Probar `protocolo_subida_esp32.py` contra el ESP32 real** antes de confiar en él — se escribió leyendo el código del firmware, no se ejecutó contra hardware.
 
 ## Cómo sigue (una vez que Fz funcione)
