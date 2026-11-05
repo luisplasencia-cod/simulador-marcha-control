@@ -9,7 +9,9 @@ from ajuste_k import k_por_bandas, BANDAS
 ap = argparse.ArgumentParser(); ap.add_argument("rutas", nargs="*", default=["control/identificacion/resultados"]); ap.add_argument("--png", default=None)
 a = ap.parse_args()
 archivos = []
-for r in a.rutas: archivos += sorted(glob.glob(str(Path(r) / "ensayo_A_ang*.csv"))) if Path(r).is_dir() else [r]
+for r in a.rutas:
+    if Path(r).is_dir(): archivos += sorted(glob.glob(str(Path(r) / "ensayo_A_ang*.csv")) + glob.glob(str(Path(r) / "RAW_en_vivo_*.csv")))
+    else: archivos.append(r)
 def leer(f):
     cab, mm, F, fase = "", [], [], []
     for l in open(f):
@@ -43,11 +45,26 @@ for nom, cab, ks, baj, sub, h in datos:
     print(f"  {nom[:51]:<52}", f"bajada={h[0]:.0f}  subida={h[1]:.0f}  diferencia={h[0]-h[1]:.0f} mJ" if h else "n/d (sin subida registrada)")
 if a.png:
     import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-    fig, ax = plt.subplots(figsize=(8, 5), facecolor="white")
-    for nom, cab, ks, baj, sub, h in datos:
-        etq = cab.split("hueco")[0].strip() or nom
-        l, = ax.plot([p[0] for p in baj], [p[1] for p in baj], ".-", ms=3, label=etq)
-        if sub: ax.plot([p[0] for p in sub], [p[1] for p in sub], "--", color=l.get_color(), lw=1)
-    ax.set_xlabel("descenso acumulado [mm] (hueco distinto por corrida)"); ax.set_ylabel("Fz [N]"); ax.grid(alpha=.3); ax.legend(fontsize=8)
-    ax.set_title("Ensayo A: F vs descenso (continuo = bajada, discontinuo = subida)", fontsize=10)
-    fig.savefig(a.png, dpi=110, facecolor="white"); print("guardado", a.png)
+    def etiqueta(cab, nom):
+        d = dict(t.split("=", 1) for t in cab.split() if "=" in t)
+        return f"{d.get('etiqueta') or 'sin etiqueta'} ({float(d['angulo_sagital_deg']):+.1f}\u00b0)" if "angulo_sagital_deg" in d else nom
+    fig, (ax, bx) = plt.subplots(1, 2, figsize=(13, 5.2), facecolor="white", gridspec_kw={"width_ratios": [1.6, 1]})
+    col = ["#1f77b4", "#d62728", "#2ca02c", "#9467bd", "#ff7f0e"]
+    nombres, kglob = [], []
+    for j, (nom, cab, ks, baj, sub, h) in enumerate([d for d in datos if len(d[3]) >= 3]):
+        pts = sorted(p for p in baj if p[1] >= 0)
+        c0 = next((m for m, v in pts if v >= 3.0), pts[0][0] if pts else 0)   # punto de contacto (primer F>=3 N)
+        et = etiqueta(cab, nom); k = ks["todo >=8 N"][0]
+        ax.plot([m - c0 for m, v in pts], [v for m, v in pts], "o-", ms=3.5, lw=1.4, color=col[j % 5], label=f"{et}: k = {k:.1f} N/mm" if k else et)
+        if sub:
+            ss = sorted(sub); ax.plot([m - c0 for m, v in ss], [v for m, v in ss], "--", lw=1, color=col[j % 5])
+        nombres.append(et); kglob.append(k or 0)
+    ax.set_xlabel("penetracion desde el contacto [mm] (desplazamiento ORDENADO, no medido)"); ax.set_ylabel("Fz [N]")
+    ax.grid(alpha=.3); ax.legend(fontsize=9, loc="upper left"); ax.set_title("Curva fuerza-penetracion por condicion del pie\n(continuo = bajada, discontinuo = subida)", fontsize=10)
+    bx.bar(range(len(kglob)), kglob, color=[col[j % 5] for j in range(len(kglob))])
+    for j, v in enumerate(kglob): bx.text(j, v, f"{v:.1f}", ha="center", va="bottom", fontsize=10)
+    bx.set_xticks(range(len(nombres))); bx.set_xticklabels([n.replace(" (", "\n(") for n in nombres], fontsize=9)
+    bx.set_ylabel("k [N/mm] (ajuste lineal, F>=8 N)"); bx.set_title("Rigidez de contacto k", fontsize=10); bx.grid(alpha=.3, axis="y")
+    if len(kglob) >= 2 and min(kglob) > 0: bx.set_xlabel(f"max/min = {max(kglob)/min(kglob):.2f}x   ({100*(max(kglob)-min(kglob))/(sum(kglob)/len(kglob)):.0f} % de la media)", fontsize=9)
+    fig.suptitle("Ensayo A - rigidez del pie segun el angulo sagital (prototipo, una pasada por condicion)", fontsize=11)
+    fig.tight_layout(); fig.savefig(a.png, dpi=120, facecolor="white"); print("guardado", a.png)
