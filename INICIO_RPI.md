@@ -17,6 +17,9 @@ modificar el firmware el 2026-11-04, revierte la decisión anterior de no tocarl
 está diseñado y documentado pero **nada probado en hardware real** — sin RPi en las sesiones del
 2026-11-04/05. Ver `control/DECISION_TIPO_CONTROL.md` para la justificación completa.
 
+## Al retomar tras el reinicio del RPi (2026-11-05 ~11:15) — si Luis dice "continuar"
+Lee en `CLAUDE.md` las dos entradas del 2026-11-05 ~11:15 (ADC caído + estado). Orden: verificar el ADC (`pruebas/leer_ads1256_fz.py --diagnostico`, monitor cerrado) → probar la subida de trayectoria al ESP32 → investigar el reinicio del ESP32 → ver el filtro en el monitor → capturas de ruido. Pasos/mm (checklist 1) ya está hecho.
+
 ## Qué hacer, en orden (checklist para esta sesión del RPi)
 
 1. **Verificar `pasos_por_mm` del eje vertical (barato, primero, sin prótesis).**
