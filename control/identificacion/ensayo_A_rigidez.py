@@ -176,6 +176,10 @@ fino = [r for r in filas if r[1] == "fino"]
 print("k por tramos de fuerza (bajada):")
 for nom, (k, n) in k_por_bandas([r[2] for r in fino], [r[3] for r in fino]).items():
     print(f"  {nom:<11} k = {'%.2f N/mm' % k if k is not None else 'n/d':<14} (n={n})")
+import shutil
+continuo = salida.replace(".csv", "_continuo.csv")
+try: shutil.copyfile(a.en_vivo, continuo); print("CONTINUO (Fz a ~50-100 Hz, TODO el registro de inicio a fin):", continuo)
+except Exception as e: print("no se pudo guardar el continuo:", e)
 print("CSV:", salida)
 import subprocess
 png = salida.replace(".csv", ".png")
