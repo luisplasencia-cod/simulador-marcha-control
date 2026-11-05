@@ -33,3 +33,6 @@
 1. Luis: qué se hizo a las 14:48:20; medir 5 V de la placa y verificar GND común fuente–RPi–placa.
 2. Desconectar el USB del ESP32 y reiniciar el RPi: ¿el ADC vuelve? (descarta/confirma la correlación).
 3. Con el ADC sano: correr `pruebas/medir_latencia_lazo_total.py` y reabrir el monitor con `--con-esp32`.
+
+## Actualización 14:50 — causa de la caída de las 14:48:20
+Luis informó que el ADC "se había desconectado" (un cable) y lo reconectó. Verificado: el monitor reabierto a las 14:49 (`logs/monitor_20261105_144923.log`) vuelve a leer Fz ≈ −2.5 N, plato vacío; un pico de −188.7 N a las 14:50:04 coincide con manipulación (no verificado). **Esto sustituye la sospecha de correlación con el USB del ESP32** (§1) como explicación de esta caída. No se sabe qué cable fue. Pendiente: asegurar el conexionado (tercera caída con síntomas de contacto) y decidir si la fuente externa es necesaria probando sin ella con cableado firme. Nota de proceso: mi script falló con 'GPIO busy' porque el monitor (PID 3371, reabierto 14:49) tenía el GPIO17; cerrar el monitor por PID antes de medir.
