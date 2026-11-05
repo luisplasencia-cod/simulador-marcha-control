@@ -29,7 +29,12 @@ def leer():
     except FileNotFoundError: pass
     return t, fase, mm, F, tit
 
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5), facecolor="white")
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 7), facecolor="white")
+if not a.png:
+    try:
+        w = fig.canvas.manager.window
+        w.attributes("-topmost", True); w.attributes("-zoomed", True)   # grande y siempre arriba (visible en la pantalla de la Pi)
+    except Exception: pass
 COL = {"aprox": "tab:gray", "medio": "tab:green", "fino": "tab:blue", "sube": "tab:red", "sube2": "tab:red"}
 def dibujar(_=None):
     t, fase, mm, F, tit = leer()
@@ -43,10 +48,12 @@ def dibujar(_=None):
         fx = [m for m, f in zip(mm, fase) if f.startswith("fino") or f.startswith("sube") or f.startswith("medio")]
         if fx: ax2.set_xlim(min(fx) - 1, max(fx) + 1)   # zoom a la zona de contacto
         ax2.legend(loc="upper left", fontsize=8)
-        ax1.set_title(f"Fz ahora = {F[-1]:.1f} N   |   bajado = {mm[-1]:.1f} mm", fontsize=10)
+        ult = fase[-1].replace("_mov", " (moviendo)")
+        ax1.set_title(f"Fz = {F[-1]:.1f} N", fontsize=26, color="#b00020" if F[-1] > 50 else "black")
+        ax2.set_title(f"DESCENSO ACUMULADO = {mm[-1]:.1f} mm   |   fase: {ult}", fontsize=20)
     ax1.set_xlabel("t [s]"); ax1.set_ylabel("Fz [N] (tara previa al ensayo)"); ax1.grid(alpha=.3)
     ax2.set_xlabel("descenso acumulado [mm]"); ax2.set_ylabel("Fz [N]"); ax2.grid(alpha=.3)
-    fig.suptitle(tit or "Ensayo A: esperando datos...", fontsize=9)
+    fig.suptitle(tit or "Ensayo A: esperando datos...", fontsize=11)
 if a.png:
     dibujar(); fig.savefig(a.png, dpi=110, facecolor="white"); print("guardado", a.png)
 else:

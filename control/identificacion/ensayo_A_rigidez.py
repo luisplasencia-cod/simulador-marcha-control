@@ -72,14 +72,21 @@ def fz(n=50, intentos=6):
     raise RuntimeError("ADC irrecuperable")
 
 def conectar():
+    """Reconexion CON CALMA: cada apertura del puerto reinicia el ESP32 (y su freno vertical: brake_init LOCKED -> release),
+    asi que durante una caida del USB NO se golpea el puerto: se espera a que el enlace by-id exista y este estable."""
     global ser
     try: ser.close()
     except Exception: pass
-    for i in range(10):  # tras una caida del USB el dispositivo reaparece con otro ttyUSB; by-id lo sigue
+    import os
+    for i in range(10):
+        if not os.path.exists(a.puerto):
+            print(f"  esperando que el USB reaparezca ({i+1}/10)", flush=True); time.sleep(5.0); continue
+        time.sleep(4.0)                                   # estable 4 s antes de abrir
+        if not os.path.exists(a.puerto): continue
         try:
             ser = serial.Serial(a.puerto, 115200, timeout=2.0); time.sleep(2.0); ser.reset_input_buffer(); return
         except Exception as e:
-            print(f"  puerto no disponible ({e}); reintento {i+1}/10", flush=True); time.sleep(1.0)
+            print(f"  puerto no disponible ({str(e)[:60]}); espero 8 s ({i+1}/10)", flush=True); time.sleep(8.0)
     raise RuntimeError("puerto serie irrecuperable")
 ser = None; conectar()
 def abrir_adc(intentos=6):
