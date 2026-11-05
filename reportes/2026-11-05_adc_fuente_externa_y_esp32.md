@@ -36,3 +36,15 @@
 
 ## Actualización 14:50 — causa de la caída de las 14:48:20
 Luis informó que el ADC "se había desconectado" (un cable) y lo reconectó. Verificado: el monitor reabierto a las 14:49 (`logs/monitor_20261105_144923.log`) vuelve a leer Fz ≈ −2.5 N, plato vacío; un pico de −188.7 N a las 14:50:04 coincide con manipulación (no verificado). **Esto sustituye la sospecha de correlación con el USB del ESP32** (§1) como explicación de esta caída. No se sabe qué cable fue. Pendiente: asegurar el conexionado (tercera caída con síntomas de contacto) y decidir si la fuente externa es necesaria probando sin ella con cableado firme. Nota de proceso: mi script falló con 'GPIO busy' porque el monitor (PID 3371, reabierto 14:49) tenía el GPIO17; cerrar el monitor por PID antes de medir.
+
+## Resultado 14:55 — latencia total del lazo MEDIDA (hasta el ack del ESP32)
+**Objetivo:** latencia flanco eléctrico → ADC → RPi → comando al ESP32 → ack, con un solo reloj. **Metodología:** `pruebas/medir_latencia_lazo_total.py --n 30` (GPIO27 → divisor → AIN1; detección al 50 % del escalón; `<MANUAL:2:±40>` al sagital K, alternando signo; 1 s entre eventos). Niveles: bajo 52.8 mV, alto 1617.7 mV. **Resultado (n=30, 30/30 con `OK`, sin otras respuestas):**
+
+| Tramo | media | σ | mín | p95 | máx |
+|---|---|---|---|---|---|
+| adquisición (flanco→detección) | 1.619 ms | 0.288 | 1.139 | 2.056 | 2.106 |
+| comando (detección→ack OK) | 6.325 ms | 1.794 | 3.258 | 8.973 | 9.846 |
+| **TOTAL (flanco→ack)** | **7.945 ms** | 1.791 | 4.398 | 10.478 | 11.535 |
+
+CSV: `pruebas/resultados/latencia_lazo_total.csv`. El tramo de adquisición coincide con el 1.61 ms (50 %) medido el 11-03. El tramo de comando tiene más σ que el PING/PONG (0.042 ms): incluye el ack de `MANUAL` (el firmware lo responde tras procesarlo) además del sondeo de 5 ms; no se separó cuánto es cada cosa. **Movimiento realizado (autorizado por Luis):** sagital K ±40 pasos × 30 eventos, alternando → neto 0 pasos; el ESP32 se reinicia al abrir el puerto, así que su contador parte de 0 (no se leyó la posición).
+**Limitaciones:** (1) el ack no es el instante en que el motor empieza a girar (sin sensor para medirlo); (2) no incluye el retardo del amplificador AMTI (SUPUESTO 2–3 ms, no medido) ni el cómputo de un controlador real (aquí es ~0); (3) escalón eléctrico de 3.3 V, no una señal de fuerza; (4) MANUAL del firmware original, no `SET_VEL` (que no está flasheado); (5) n=30, una sola sesión; (6) un lazo real mandaría en continuo, no con 1 s de pausa. **Lectura:** total medido 7.9 ms (p95 10.5, máx 11.5) + AMTI supuesto 2–3 ms → ≈ 10–14 ms hasta el ack; sigue muy por debajo del techo de ~130 ms donde la simulación mostró inestabilidad del híbrido, **pero esa comparación hereda los supuestos de la simulación**.
