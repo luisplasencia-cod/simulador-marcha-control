@@ -1,0 +1,10 @@
+# angulo_sagital_deg=0.0 etiqueta=plana hueco_mm=230.0 fmax_n=150.0 paso_pasos=16 inicio=20261105_161120 motivo=excepcion: error(5, 'Input/output error') pendientes=0
+t_s,fase,mm,F_N
+6.325,base,0.0,0.0
+11.653,aprox,100.0,0.07
+13.233,aprox,125.0,-0.36
+14.818,aprox,150.0,0.81
+16.403,aprox,175.0,-0.54
+16.937,aprox,179.0,-1.02
+17.473,aprox,183.0,0.75
+18.001,aprox,187.0,-0.25

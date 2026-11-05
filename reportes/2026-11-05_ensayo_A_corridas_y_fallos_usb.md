@@ -76,3 +76,19 @@ Medido a las 15:56: init del ADS1256 falla 6/6 (registros 0/0/0); **DRDY (GPIO17
 ![Ensayo A 5 deg parcial, k=28 N/mm](figuras/2026-11-05_ensayo_A_5deg_parcial_k28.png)
 
 **Estado de la comparación (plana / talón / punta):** solo hay talón (completo) y ≈5° (parcial). La figura comparativa (curvas alineadas en el contacto + barras de k) se genera con `control/identificacion/comparar_k_por_angulo.py --png ...` y se completará cuando estén plana y punta. Archivos de datos: `control/identificacion/resultados/` (CSV con encabezado de ángulo/hueco/motivo + PNG de cada corrida).
+
+---
+## 16:14 — RESULTADO: Ensayo A en PLANA (0°) — `ensayo_A_ang0_plana_20261105_161228.{csv,png}` (bajada completa hasta 112 N; sin subida)
+**Objetivo / método:** igual que el talón, con el sagital girado a 0° (−1238 pasos desde +11.14°, 3/3 `OK`), hueco declarado 23 cm (Luis: "dale con confianza"), tope 150 N, pausa de 1.0 s entre comandos (antes 0.3 s: prueba de la hipótesis de Luis de que se mandaba muy rápido).
+**Resultado:** el contacto apareció a **≈215 mm de descenso, 15 mm antes del hueco declarado (230 mm)**, dentro de un tramo de 4 mm (F: 0.6 N → 43.5 N en un solo paso); la lógica de aproximación lo detectó y pasó a escalones finos sin pasar el tope. Bajada fina de 215.2 a 217.8 mm hasta **112 N**; **k = 23.2 N/mm** (todo ≥8 N, n = 14); tramo 40–100 N: **24.4 N/mm** (n = 11); >100 N: 14.4 N/mm (n = 3, no interpretable). La banda 8–40 N no tiene puntos (el primer dato ya estaba en 43.5 N). En la curva F(t) se ve un **diente de sierra**: tras cada escalón de 0.2 mm la fuerza baja unos 3–5 N durante la espera (relajación/viscoelasticidad del pie o de la estructura) — la lectura estática depende del tiempo de espera.
+**Falla:** el USB se cayó UNA vez a las 16:13:13 (reaparece como ttyUSB1) con el pie a 112 N / 217.8 mm; el script esperó a que el enlace volviera, reconectó y **subió los 217.8 mm sin pendientes (0)**; no se registró la subida (histéresis sin dato). La corrida anterior de plana (16:11, `..._161120`) cayó a 187 mm sin contacto, también recuperada (0 pendientes) y sin k. **La pausa de 1 s NO evitó la caída** (con 0.3 s: corrida 16:11 cayó; con 1.0 s: cayó al final): no hay evidencia de que la cadencia de comandos sea la causa.
+**Limitaciones:** una pasada; bajada solo hasta 112 N; sin subida; el primer punto a 43 N (se pierde la zona de contacto inicial, donde el pie puede ser más blando); desplazamiento ORDENADO, no medido; el hueco declarado (230 mm) se equivocó en +15 mm → el hueco dicho de memoria no es confiable (talón: error de 3.5 mm; plana: 15 mm); ruido y diente de sierra ±3–5 N.
+![Ensayo A plana 0 deg, k=23.2 N/mm](figuras/2026-11-05_ensayo_A_plana_0deg_k23.2.png)
+
+### Comparación PARCIAL talón vs plana (bajada, mismas bandas de fuerza)
+| Condición | ángulo | k (todo ≥8 N) | k 40–100 N | puntos | F máx |
+|---|---|---|---|---|---|
+| Talón | +11.14° | 26.4 N/mm | 26.3 N/mm | 17 | 105 N |
+| Plana | 0° | 23.2 N/mm | 24.4 N/mm | 14 | 112 N |
+Diferencia ≈ 12 % en k total y ≈ 7 % en la banda 40–100 N, con una sola pasada por condición, ruido de ±3–5 N y un diente de sierra del mismo orden: **no se puede afirmar que la rigidez dependa del ángulo en el rango 0–11°**; falta repetibilidad (mismo ángulo, varias pasadas) para saber si 7–12 % excede la variación entre corridas. Punta (−37.3°) aún no medida.
+![Comparación parcial k](figuras/2026-11-05_comparacion_k_talon_plana_parcial.png)
