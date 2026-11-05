@@ -1,43 +1,95 @@
 # Punto de entrada para Claude en el Raspberry Pi
 
-Si acabas de clonar este repo en el RPi y es tu primera vez aquí: lee esto completo antes de hacer nada.
+Si acabas de llegar a este repo en el RPi (primera vez o retomando): lee esto completo antes de
+hacer nada. **Todo lo de abajo es sobre Fz (eje vertical) — no se toca Fy ni sagital hasta que Fz
+quede probado funcionando de verdad en el simulador real** (regla de Luis).
 
 ## Qué es este repo
-Tesis de control del simulador de marcha (Luis Plasencia, PUCP). Contexto completo del proyecto en `CLAUDE.md` (léelo primero, siempre). Detalle de auditorías/búsquedas pasadas en `HISTORIAL.md`.
+Tesis de control del simulador de marcha (Luis Plasencia, PUCP). Contexto completo y SIEMPRE
+actualizado del proyecto: `CLAUDE.md` (léelo primero, siempre — tiene fecha en cada entrada, la más
+reciente es la vigente). Detalle de auditorías/búsquedas pasadas: `HISTORIAL.md`. Reportes diarios
+completos (Objetivo→Metodología→Resultado→Limitaciones→Fuentes): `reportes/`, los más recientes son
+`2026-11-04_reporte_dia.md` y `2026-11-05_reporte_dia.md` — léelos antes de los de fechas anteriores.
 
-## Estado físico ahora mismo (2026-11-03)
-- **Un solo ESP32 con este RPi: el de control de motores** (`Codigo ESP32 MOV/platformIO_control_trayectoria_v1/`, `PING`→`PONG`, serial 115200, `/dev/ttyUSB0`). Se edita/flashea desde la laptop.
-- **ADC: el RPi lee el ADS1256 directo por SPI0** (AMTI Fz → AIN0 vs AINCOM; detalle en `esquemas/amti_ads1256_rpi/CONFIGURACION_ACTUAL.md`). `Codigo ESP32 ADS1256/` es una prueba aislada de otro montaje: solo referencia de la secuencia de init, no está conectado aquí.
-- **ADC YA VALIDADO contra el AMTI real (2026-11-03):** se comparó una grabación directa del AMTI (software NetForce, `.bsf`→`.txt`) contra `lecturas_fz_20261102_175759.csv` del ADS1256 — RMSE 1.89 N, error pico a pico 4.03% (picos ~400 N), correlación r=0.9999. Ver `pruebas/comparar_amti_vs_ads1256.py` y el PNG. **Ya no hace falta repetir la validación de escala/signo del Paso 3 del plan de latencia — está hecha.**
-- 1000 muestras/s confirmado, Fz en reposo ≈21.5 N de offset estable (hay que tarar — botón "Poner a cero" en el monitor), ruido σ≈0.85 N.
+## Estado al cierre de la sesión de laptop del 2026-11-05 — léelo primero
+**Decisión de control para Fz: híbrido RT (tiempo real) + ILC**, no ILC solo (Luis autorizó
+modificar el firmware el 2026-11-04, revierte la decisión anterior de no tocarlo). Todo lo de abajo
+está diseñado y documentado pero **nada probado en hardware real** — sin RPi en las sesiones del
+2026-11-04/05. Ver `control/DECISION_TIPO_CONTROL.md` para la justificación completa.
 
-## Qué hacer, en orden — PRIORIDAD: Paso 2 del plan de latencia
-Luis ya está sentado con el AMTI y puede aplicar cargas físicas. **Lo único que falta para decidir tiempo real vs. ILC es la latencia de adquisición AMTI→RPi (Paso 2) y la latencia total del lazo (Paso 3)** — el Paso 1 (comunicación RPi↔ESP32, RTT 5.97 ms) ya está medido y documentado en `pruebas/2026-11-02_latencia_amti_rpi_esp32.md`.
+## Qué hacer, en orden (checklist para esta sesión del RPi)
 
-1. Entorno: `source .venv/bin/activate` (tiene pyserial, spidev, RPi.GPIO, ttkbootstrap).
-2. **Paso 2 — latencia de adquisición, script nuevo:** `python pruebas/medir_latencia_escalon_amti.py --umbral_n 30 --n_eventos 10` mientras Luis aplica y retira carga sobre el AMTI repetidamente. **Lee el aviso al inicio del script antes de correrlo**: el script solo registra el instante en que el RPi DETECTA el cambio (reloj de pared); no mide la latencia absoluta por sí solo porque no hay un disparador físico independiente conectado al AMTI. Para la latencia real hace falta una referencia externa (ej. video del instante de pisar + pantalla con la hora del sistema visible, o un golpe audible). Si no se consigue esa referencia en esta sesión, documenta el log de cruces igual (sirve para ver consistencia/jitter) pero **no inventes un número de latencia sin esa referencia**.
-3. **Llenar el Paso 2 del plan** en `pruebas/2026-11-02_latencia_amti_rpi_esp32.md` con lo que salga (reales, no estimados).
-4. **Paso 3 — latencia total del lazo:** solo si el Paso 2 ya tiene un número real. Total = Paso 1 + Paso 2 + cómputo RPi + ejecución ESP32 (ver método en el plan).
+1. **Verificar `pasos_por_mm` del eje vertical (barato, primero, sin prótesis).**
+   `control/identificacion/PROTOCOLO.md`, "Ensayo 0": mandar un número conocido de pasos al eje
+   vertical (`MANUAL`/`GOTO`, firmware actual sin cambios) y medir el desplazamiento real con una
+   regla. Debe dar 80 pasos/mm (`control/ilc/fz_ilc.py`, `PASOS_POR_MM_Y`). Si no coincide, **parar
+   y avisar** — todo lo de abajo depende de este número.
 
-## ESTADO AL CIERRE DEL 2026-11-03 (lee esto primero)
-Latencia de adquisición RPi+ADS1256 ya MEDIDA (1.61/2.40 ms) y ESP32 probado en solo lectura; el plan de abajo (Pasos 2-3 originales) quedó superado: ver `reportes/2026-11-03_reporte_dia.md` (resumen al inicio) y el bloque de estado de `CLAUDE.md`. **El firmware del ESP32 NO se modifica.** El divisor GPIO27→AIN1 es una conexión TEMPORAL. Pendiente aquí: revisar AIN0 inestable con el plato vacío.
+2. **Aplicar y probar el parche de firmware `SET_VEL` (tiempo real).**
+   `control/firmware/control_velocidad_continua.patch` (ya verificado con `git apply --check`, NO
+   aplicado). El protocolo de 5 pasos está en `control/firmware/README.md` — **no saltarse pasos**:
+   compilar solo → flashear con motores desconectados (osciloscopio/LED en STEP) → probar el
+   watchdog (80 ms) → motores conectados, velocidad baja, supervisado → recién ahí integrar con
+   `control/ilc/fz_ilc.py`. El firmware se flashea **desde la laptop** (PlatformIO, cable USB ahí) —
+   si hace falta un cambio, documentarlo aquí para que la sesión de la laptop lo aplique, no asumir
+   que se puede flashear desde el RPi.
 
-## (Histórico) Retomar tras el reinicio del 2026-11-03
-1. Se cambió la sesión a Wayland (`rpd-labwc`) para recuperar el modo táctil. **Verifica:** `echo $XDG_SESSION_TYPE`, que no haya cursor de mouse y que `squeekboard` aparezca. Abre el monitor (`herramientas/monitor_gaitsim.py`) y confirma que funciona; si no, revierte `/etc/lightdm/lightdm.conf` a `rpd-x`.
-2. Luis NO puede grabar video → el Paso 2 se hace con **escalón eléctrico GPIO→ADS1256** (ver `CLAUDE.md`, entrada 2026-11-03). Falta que Luis confirme AIN1/AINCOM y GPIO libre (propuesto GPIO27) en la etiqueta física. Luego escribir `pruebas/medir_latencia_gpio_adc.py` (revisar antes cómo `leer_ads1256_fz.py` elige canal). **No inventar** el retardo del amplificador del AMTI: sale del manual.
-3. AIN0 estaba en −29 mV con 58 mV p-p (ayer +38.9 mV estable): Luis estaba conectando el AMTI; re-verificar con `python pruebas/leer_ads1256_fz.py --diagnostico`.
-4. Si se usa `medir_latencia_escalon_amti.py`, mover `t = time.time()` a después de `leer_volts()`.
+3. **Medir la rigidez de contacto `k` (N/mm) con al menos una prótesis.**
+   `control/identificacion/PROTOCOLO.md`, "Ensayo A" (necesita el Ensayo 0 ya confirmado). Esto es
+   lo único que falta para que `fz_ilc.py` pueda correr con un `rigidez_n_por_mm=` real en vez de
+   negarse a generar una trayectoria.
+
+4. **Probar `control/ilc/protocolo_subida_esp32.py` contra el ESP32 real** (nunca probado, se
+   escribió leyendo el código del firmware).
+
+5. **Escribir el script del lazo real en el RPi** (no existe todavía — es el siguiente bloque que
+   falta). Debe: leer el ADS1256 (ya validado contra el AMTI real, RMSE 1.89 N, r=0.9999 — no repetir
+   esa validación), calcular `Kp·e(t)` + la corrección ILC de `fz_ilc.py`, mandar `SET_VEL` por
+   `protocolo_subida_esp32.py`, y **loguear cada muestra con el formato de
+   `control/telemetria/formato_log.md`** para que el visor funcione sin cambios.
+
+6. **Ver el lazo correr con `control/telemetria/visor_en_vivo.py`** (probado solo con datos
+   sintéticos hasta ahora — `python visor_en_vivo.py --ultimo` con pantalla, o `--guardar` sin
+   pantalla). Si aparece el salto pequeño y repetible en cada frontera de ciclo que se vio con datos
+   sintéticos, no es necesariamente un bug del RPi — ver la nota en `control/telemetria/README.md`.
+
+7. **Validar el híbrido RT+ILC contra el lazo abierto actual** (RMSE/correlación, como en el
+   artículo de conferencia) — el cierre real de la Etapa 3 para Fz.
+
+**Solo después de que 1-7 funcionen de verdad (no solo en simulación) se pasa a Fy y sagital** —
+misma arquitectura, otra instancia de `ilc_core.py`, su propia `k` y `pasos_por_mm`.
+
+## Arquitectura física (para no perderse)
+AMTI → ADS1256 (SPI0 del RPi) → RPi (corre todo el cálculo) → USB serie 115200 baud (`SET_VEL`,
+nuevo) → ESP32 (`Codigo ESP32 MOV/platformIO_control_trayectoria_v1/`) → driver A6-750RS → servomotor
+vertical **A6M80-750H2B1-M17, con freno integrado** (no A1 — ese es el horizontal, sin freno).
+Diagrama completo con pines reales: `control/diagramas/implementacion/`. Mapeo de ejes del firmware
+**confirmado**: `Y` = vertical = Fz, `X` = horizontal = Fy, `K` = sagital — no hay eje "Z".
+
+## Estado del hardware de medición (ya resuelto, no repetir)
+- **ADS1256 ya validado contra el AMTI real** (2026-11-03): RMSE 1.89 N, correlación r=0.9999 contra
+  grabación directa del AMTI (software NetForce). Ver `pruebas/comparar_amti_vs_ads1256.py`.
+- 1000 muestras/s confirmado; Fz en reposo ≈21.5 N de offset (tarar); ruido σ≈0.85 N.
+- Pines AMTI→ADS1256→RPi: `esquemas/amti_ads1256_rpi/CONFIGURACION_ACTUAL.md`.
+- Latencia parcial medida: RPi↔ESP32 RTT 5.97 ms, ADS1256+SPI 1.6-2.4 ms. Falta: amplificador AMTI
+  (SUPUESTO ≈2-3 ms, ver `CLAUDE.md`) y ejecución ESP32. Sigue muy por debajo del techo de ~130 ms
+  donde el híbrido se desestabiliza (simulación) — no es lo que bloquea avanzar.
 
 ## Reglas del proyecto (no te las saltes)
-- Verificar datos de hardware contra fuente real (datasheet, etiqueta física, medición) — nunca de memoria. Ya hay precedente de esto en el repo, sigue el mismo estándar.
-- No redactar síntesis/texto de tesis salvo pedido explícito — Luis decide el enfoque, tú organizas/ejecutas lo técnico.
-- Git: commitear y hacer `git push` cuando termines algo con sentido (no cada línea), para que la laptop de Luis vea el avance.
-
-## Skill de diagramas de control (2026-11-03)
-Se agregó `.claude/skills/diagrama-bloques-control/` al repo — dibuja diagramas de bloques de control (lazo cerrado, PID, etc.) en estilo libro de texto con ecuaciones en LaTeX, para cuando se diseñe/documente el controlador RT/ILC. Es una skill de proyecto (Claude Code la detecta sola al estar en `.claude/skills/` dentro del repo); no hace falta instalar nada aparte.
+- Verificar datos de hardware contra fuente real (datasheet, etiqueta física, medición, código
+  fuente) — nunca de memoria. Si algo no se puede verificar, decirlo explícito, no inventar.
+- No redactar síntesis/texto de tesis salvo pedido explícito — Luis decide el enfoque, tú organizas/
+  ejecutas lo técnico.
+- Reportes: Objetivo → Metodología → Resultado → Limitaciones → Fuentes, uno por sesión en `reportes/`.
+- Toda decisión cerrada se escribe en `CLAUDE.md` en el mismo turno en que se cierra.
+- Git: `git fetch`/`git log origin/master` antes de cada commit; commitear y `git push` cuando
+  termines algo con sentido (no cada línea), para que la laptop de Luis vea el avance.
+- Ningún ensayo que mueva motores o cargue el simulador sin el OK explícito de Luis y el simulador
+  despejado — ver "Seguridad" en `control/identificacion/PROTOCOLO.md` y el protocolo de prueba en
+  `control/firmware/README.md`.
+- Nunca `pkill -f`/`pgrep -f` con el patrón en la propia línea de comando: matar por PID.
 
 ## Firmware del ESP32 — importante
-Las actualizaciones al firmware de control de motores (`Codigo ESP32 MOV/.../main.cpp`) se hacen **desde la laptop** (sesión de Claude ahí), no desde aquí — ahí es donde está el cable USB al ESP32 para flashear con PlatformIO. Si necesitas un cambio de firmware, dilo en el commit/push y Luis lo coordina con esa sesión; no asumas que tú vas a flashear el ESP32 desde el RPi.
-
-## Cambios de firmware propuestos
-Los cambios al firmware que se piden desde el RPi quedan documentados en `Codigo ESP32 MOV/CAMBIOS_PENDIENTES_DESDE_RPI.md` (la sesión de la laptop los lee ahí). Hoy: reducir el sondeo RX de 5 a 1 ms (no aplicado).
+El firmware se edita/flashea **desde la laptop** (PlatformIO, cable USB ahí), no desde el RPi. Si
+necesitas un cambio, documéntalo en el commit/push (o en `Codigo ESP32 MOV/CAMBIOS_PENDIENTES_DESDE_RPI.md`
+si es puntual) y Luis lo coordina con esa sesión — no asumas que vas a flashear el ESP32 desde aquí.
