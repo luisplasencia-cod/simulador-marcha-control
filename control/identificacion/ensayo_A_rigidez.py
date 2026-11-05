@@ -52,11 +52,30 @@ def reg(fase, mm, F, guardar=True):
     t = round(time.monotonic() - T0, 3); vivo.write(f"{t},{fase},{mm:.3f},{F:.2f}\n")
     if guardar: filas.append([t, fase, round(mm, 3), round(F, 2)])
 
-def fz(adc, n=50):
-    return st.median(volts_a_newtons(adc.leer_volts()) for _ in range(n))
+adc = None
+def fz(n=50, intentos=6):
+    """Mediana de n muestras. Si el ADC se cuelga (TimeoutError DRDY / init) lo reinicializa y reintenta."""
+    global adc
+    for i in range(intentos):
+        try:
+            return st.median(volts_a_newtons(adc.leer_volts()) for _ in range(n))
+        except (TimeoutError, RuntimeError, OSError) as e:
+            print(f"  ADC fallo ({type(e).__name__}); recuperando {i+1}/{intentos}", flush=True)
+            reg("adc_recupera", bajados / PASOS_MM, 0.0, guardar=False)
+            try: adc.cerrar()
+            except Exception: pass
+            time.sleep(0.3); adc = abrir_adc()
+    raise RuntimeError("ADC irrecuperable")
 
 ser = serial.Serial(a.puerto, 115200, timeout=2.0); time.sleep(2.0); ser.reset_input_buffer()
-adc = ADS1256(); f0 = 0.0; bajados = 0; motivo = "?"
+def abrir_adc(intentos=6):
+    """El init verifica por lectura de vuelta; un error de bit SPI puntual lo hace fallar -> reintentar."""
+    for i in range(intentos):
+        try: return ADS1256()
+        except RuntimeError as e:
+            print(f"  init ADC intento {i+1}/{intentos} fallo: {e}"); time.sleep(0.5)
+    sys.exit("ADC no inicializa tras reintentos: abortado SIN mover nada.")
+adc = abrir_adc(); f0 = 0.0; bajados = 0; motivo = "?"  # adc global usado por fz()
 def mover(p, fase):
     """Manda MANUAL y mientras se mueve registra Fz continua (~50 Hz) para el visor en vivo."""
     global bajados
@@ -66,20 +85,20 @@ def mover(p, fase):
     bajados -= p  # p negativo = baja
     fin = time.monotonic() + abs(p) / 1600 + a.asentar_s
     while time.monotonic() < fin:
-        reg(fase + "_mov", bajados / PASOS_MM, fz(adc, 10) - f0, guardar=False)
+        reg(fase + "_mov", bajados / PASOS_MM, fz(10) - f0, guardar=False)
 
 try:
-    f0 = fz(adc, 200); print(f"Fz base = {f0:.2f} N; angulo {a.angulo_deg} deg; hueco {a.hueco_mm} mm; archivo: {salida}")
+    f0 = fz(200); print(f"Fz base = {f0:.2f} N; angulo {a.angulo_deg} deg; hueco {a.hueco_mm} mm; archivo: {salida}")
     reg("base", 0.0, 0.0)
     hueco_pasos = int((a.hueco_mm - a.aprox_margen_mm) * PASOS_MM)
     while bajados + 4000 <= hueco_pasos:
-        mover(-4000, "aprox"); f = fz(adc, 20) - f0; reg("aprox", bajados / PASOS_MM, f)
+        mover(-4000, "aprox"); f = fz(20) - f0; reg("aprox", bajados / PASOS_MM, f)
         print(f"[aprox] {bajados/PASOS_MM:6.1f} mm  F = {f:6.2f} N", flush=True)
         if f > a.umbral_contacto_n: raise RuntimeError("contacto ANTES de lo esperado en la aproximacion")
     previa = None
     while True:
         if bajados / PASOS_MM >= a.hueco_mm + a.max_extra_mm: motivo = "sin contacto en descenso maximo"; break
-        mover(-a.paso_pasos, "fino"); f = fz(adc) - f0; reg("fino", bajados / PASOS_MM, f)
+        mover(-a.paso_pasos, "fino"); f = fz() - f0; reg("fino", bajados / PASOS_MM, f)
         print(f"bajado {bajados/PASOS_MM:6.2f} mm  F = {f:7.2f} N", flush=True)
         if f > a.fmax_n: motivo = "fmax alcanzada (OK)"; break
         if previa is not None and f - previa > a.salto_max_n: motivo = "salto de fuerza excesivo"; break
@@ -89,14 +108,22 @@ except BaseException as e:
     motivo = f"excepcion: {e!r}"
 finally:
     print("Motivo de parada:", motivo, "-> subiendo", bajados / PASOS_MM, "mm")
-    try:
-        f = fz(adc, 20) - f0
-        while bajados > 0 and f > a.umbral_contacto_n / 2:   # subida fina mientras haya contacto (histeresis)
-            mover(a.paso_pasos, "sube"); f = fz(adc, 20) - f0; reg("sube", bajados / PASOS_MM, f)
-        while bajados > 0:
-            mover(min(bajados, 800), "sube2")
+    try:   # subida FINA con fuerza (histeresis) solo mientras el ADC sirva; si falla, se pasa a la subida sin ADC
+        f = fz(20) - f0
+        while bajados > 0 and f > a.umbral_contacto_n / 2:
+            mover(a.paso_pasos, "sube"); f = fz(20) - f0; reg("sube", bajados / PASOS_MM, f)
     except BaseException as e:
-        print("ERROR al subir:", repr(e))
+        print("subida fina interrumpida:", repr(e))
+    for intento in range(3):   # subida GRUESA: solo serial, NO depende del ADC
+        try:
+            while bajados > 0:
+                paso = min(bajados, 800); ser.reset_input_buffer(); ser.write(f"<MANUAL:1:{paso}>".encode())
+                r = ser.readline().decode(errors="replace").strip()
+                if not r.startswith("OK"): raise RuntimeError(f"ack {r!r}")
+                bajados -= paso; time.sleep(paso / 1600 + 0.3)
+            break
+        except BaseException as e:
+            print("ERROR subida gruesa:", repr(e)); time.sleep(1.0)
     print("pasos pendientes de subir:", bajados)
     vivo.write(f"# fin motivo={motivo} pendientes={bajados}\n"); vivo.close(); adc.cerrar(); ser.close()
 
@@ -108,3 +135,7 @@ print("k por tramos de fuerza (bajada):")
 for nom, (k, n) in k_por_bandas([r[2] for r in fino], [r[3] for r in fino]).items():
     print(f"  {nom:<11} k = {'%.2f N/mm' % k if k is not None else 'n/d':<14} (n={n})")
 print("CSV:", salida)
+import subprocess
+png = salida.replace(".csv", ".png")
+subprocess.run([sys.executable, str(Path(__file__).resolve().parent / "visor_ensayo_A.py"), a.en_vivo, "--png", png])
+print("PNG:", png)
