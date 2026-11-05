@@ -78,10 +78,13 @@ def hilo_adc():
         adc_estado.update(msg=f"ADC no disponible: {e}", ok=False)
         return
     adc_estado.update(msg="ADC OK", ok=True)
+    ult3 = deque(maxlen=3)  # mediana causal de 3: quita errores de bit SPI AISLADOS (retardo 1 ms)
     try:
         while not adc_stop.is_set():
             try:
-                v = adc.leer_volts()
+                v_crudo = adc.leer_volts()
+                ult3.append(v_crudo)
+                v = sorted(ult3)[len(ult3) // 2] if len(ult3) == 3 else v_crudo
             except TimeoutError as e:
                 adc_estado.update(msg=str(e), ok=False)
                 time.sleep(0.2)
