@@ -6,6 +6,7 @@ Esquema: `salida/esquema_amti_ads1256_rpi.png` (generado por `esquema_amti_ads12
 - Conectado hoy: solo el canal **Fz** del AMTI.
 - AMTI entrega salida single-ended: 1 cable de señal + 1 cable de referencia.
 - Escala (Luis, 2026-11-02): **1.7665 mV/N** (AMTI OPT SC serie 4306, ganancia Fz 2000), máximo **2000 N → 3.53 V** (antes 1.7 mV/N; la diferencia es 3.9 %). A verificar con pesas conocidas.
+- **(2026-11-05) Configuración del amplificador en NetForce (Luis): Fz excitación 10 V, ganancia 2000, zero setpoint 0 → NetForce muestra *analog scale factor* = 1.7665 mV/N** (coincide con la constante del monitor, `N_PER_1000N`). Incidente del día: el amplificador tenía otra configuración y el monitor leía ≈8–9× de más (200–220 N con 2.5 kg ≈ 24.5 N; NetForce marcaba ≈25 N). Tras fijar 10 V / 2000 y tarar en ambos lados, con 2.5 kg Luis ve monitor ≈ NetForce (comparación visual, **sin ajuste lineal con varias masas todavía**). **La escala solo vale con esta configuración: si alguien cambia excitación o ganancia en NetForce, hay que recalcular.**
 - ADC: **ADS1256** (8 canales, 24 bit). Modelo exacto de la placa breakout: **por confirmar**.
 
 ## Conexión analógica (pines leídos de la etiqueta física de la placa, por Luis, 2026-11-02)
