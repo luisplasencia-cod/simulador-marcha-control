@@ -1,0 +1,25 @@
+=== intento 1/4 ===
+  fmax_ok=False subida_puntos=0 pendientes=0 csv=control/identificacion/resultados/ensayo_A_ang-37.3_punta_20261105_163544.csv
+  8-40 N      k = 1.81 N/mm      (n=33)
+  40-100 N    k = n/d            (n=0)
+  >100 N      k = n/d            (n=0)
+  todo >=8 N  k = 1.81 N/mm      (n=33)
+=== intento 2/4 ===
+  fmax_ok=False subida_puntos=0 pendientes=0 csv=control/identificacion/resultados/ensayo_A_ang-37.3_punta_20261105_163727.csv
+  8-40 N      k = 2.01 N/mm      (n=62)
+  40-100 N    k = n/d            (n=0)
+  >100 N      k = n/d            (n=0)
+  todo >=8 N  k = 2.01 N/mm      (n=62)
+=== intento 3/4 ===
+  fmax_ok=False subida_puntos=0 pendientes=0 csv=control/identificacion/resultados/ensayo_A_ang-37.3_punta_20261105_163930.csv
+  8-40 N      k = 2.01 N/mm      (n=79)
+  40-100 N    k = 0.25 N/mm      (n=3)
+  >100 N      k = n/d            (n=0)
+  todo >=8 N  k = 2.03 N/mm      (n=82)
+=== intento 4/4 ===
+  fmax_ok=False subida_puntos=0 pendientes=0 csv=control/identificacion/resultados/ensayo_A_ang-37.3_punta_20261105_164147.csv
+  8-40 N      k = 1.51 N/mm      (n=18)
+  40-100 N    k = n/d            (n=0)
+  >100 N      k = n/d            (n=0)
+  todo >=8 N  k = 1.51 N/mm      (n=18)
+No se logro una corrida completa en los intentos permitidos.

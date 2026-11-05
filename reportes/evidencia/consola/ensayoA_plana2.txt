@@ -1,0 +1,42 @@
+Fz base = -1.05 N; angulo 0.0 deg; hueco 230.0 mm; archivo: control/identificacion/resultados/ensayo_A_ang0_plana_20261105_161228.csv
+[aprox 100 mm]  100.0 mm  F =  -0.75 N
+[aprox 25 mm]  125.0 mm  F =  -0.50 N
+[aprox 25 mm]  150.0 mm  F =   0.96 N
+[aprox 25 mm]  175.0 mm  F =  -0.36 N
+[aprox 4 mm]  179.0 mm  F =  -0.45 N
+[aprox 4 mm]  183.0 mm  F =   0.38 N
+[aprox 4 mm]  187.0 mm  F =   0.80 N
+[aprox 4 mm]  191.0 mm  F =   0.41 N
+[aprox 4 mm]  195.0 mm  F =   1.11 N
+[aprox 4 mm]  199.0 mm  F =   0.79 N
+[aprox 4 mm]  203.0 mm  F =   1.01 N
+[aprox 4 mm]  207.0 mm  F =   1.35 N
+[aprox 4 mm]  211.0 mm  F =   0.58 N
+[aprox 4 mm]  215.0 mm  F =  43.51 N
+[aprox] CONTACTO a 215.0 mm (hueco declarado 230.0): F = 43.5 N
+bajado 215.20 mm  F =   50.04 N
+bajado 215.40 mm  F =   56.45 N
+bajado 215.60 mm  F =   61.78 N
+bajado 215.80 mm  F =   68.98 N
+bajado 216.00 mm  F =   72.39 N
+bajado 216.20 mm  F =   78.88 N
+bajado 216.40 mm  F =   84.43 N
+bajado 216.60 mm  F =   88.27 N
+bajado 216.80 mm  F =   91.60 N
+bajado 217.00 mm  F =   93.72 N
+bajado 217.20 mm  F =   99.74 N
+bajado 217.40 mm  F =  106.34 N
+bajado 217.60 mm  F =  105.80 N
+bajado 217.80 mm  F =  112.10 N
+Motivo de parada: excepcion: error(5, 'Input/output error') -> subiendo 217.8 mm
+subida fina interrumpida: error(5, 'Input/output error')
+ERROR subida gruesa: error(5, 'Input/output error') -> reconectando
+guardado control/identificacion/resultados/ensayo_A_ang0_plana_20261105_161228.png
+pasos pendientes de subir: 0
+k por tramos de fuerza (bajada):
+  8-40 N      k = n/d            (n=0)
+  40-100 N    k = 24.44 N/mm     (n=11)
+  >100 N      k = 14.40 N/mm     (n=3)
+  todo >=8 N  k = 23.24 N/mm     (n=14)
+CSV: control/identificacion/resultados/ensayo_A_ang0_plana_20261105_161228.csv
+PNG: control/identificacion/resultados/ensayo_A_ang0_plana_20261105_161228.png

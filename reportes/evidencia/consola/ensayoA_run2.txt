@@ -1,0 +1,61 @@
+Fz base = -2.32 N; angulo 5.0 deg; hueco 230.0 mm; archivo: control/identificacion/resultados/ensayo_A_ang5_actual_5deg_a_ojo_20261105_154305.csv
+[aprox]   50.0 mm  F =  -0.07 N
+[aprox]  100.0 mm  F =   0.02 N
+[aprox]  150.0 mm  F =  -0.10 N
+[aprox]  200.0 mm  F =   0.60 N
+bajado 200.20 mm  F =    0.72 N
+bajado 200.40 mm  F =    1.40 N
+bajado 200.60 mm  F =    0.84 N
+bajado 200.80 mm  F =    0.60 N
+bajado 201.00 mm  F =    0.45 N
+bajado 201.20 mm  F =    0.63 N
+bajado 201.40 mm  F =    1.12 N
+bajado 201.60 mm  F =    1.28 N
+bajado 201.80 mm  F =    0.78 N
+bajado 202.00 mm  F =    0.51 N
+bajado 202.20 mm  F =    0.75 N
+bajado 202.40 mm  F =    0.73 N
+bajado 202.60 mm  F =    0.91 N
+bajado 202.80 mm  F =    0.64 N
+bajado 203.00 mm  F =    0.78 N
+bajado 203.20 mm  F =    1.14 N
+bajado 203.40 mm  F =    1.42 N
+bajado 203.60 mm  F =    0.87 N
+bajado 203.80 mm  F =    0.73 N
+bajado 204.00 mm  F =    0.57 N
+bajado 204.20 mm  F =    0.63 N
+bajado 204.40 mm  F =    1.45 N
+bajado 204.60 mm  F =    0.73 N
+bajado 204.80 mm  F =    0.69 N
+bajado 205.00 mm  F =    0.63 N
+bajado 205.20 mm  F =    0.14 N
+bajado 205.40 mm  F =    1.20 N
+bajado 205.60 mm  F =    1.22 N
+bajado 205.80 mm  F =    0.65 N
+bajado 206.00 mm  F =    0.20 N
+bajado 206.20 mm  F =    0.56 N
+bajado 206.40 mm  F =    1.09 N
+bajado 206.60 mm  F =    0.56 N
+bajado 206.80 mm  F =    0.72 N
+bajado 207.00 mm  F =    0.57 N
+bajado 207.20 mm  F =    0.94 N
+bajado 207.40 mm  F =    1.54 N
+bajado 207.60 mm  F =    0.51 N
+bajado 207.80 mm  F =    0.76 N
+bajado 208.00 mm  F =    0.75 N
+bajado 208.20 mm  F =    1.01 N
+bajado 208.40 mm  F =    0.96 N
+bajado 208.60 mm  F =    0.71 N
+guardado control/identificacion/resultados/ensayo_A_ang5_actual_5deg_a_ojo_20261105_154305.png
+Motivo de parada: excepcion: error(5, 'Input/output error') -> subiendo 208.6 mm
+ERROR subida gruesa: error(5, 'Input/output error')
+ERROR subida gruesa: error(5, 'Input/output error')
+ERROR subida gruesa: error(5, 'Input/output error')
+pasos pendientes de subir: 16688
+k por tramos de fuerza (bajada):
+  8-40 N      k = n/d            (n=0)
+  40-100 N    k = n/d            (n=0)
+  >100 N      k = n/d            (n=0)
+  todo >=8 N  k = n/d            (n=0)
+CSV: control/identificacion/resultados/ensayo_A_ang5_actual_5deg_a_ojo_20261105_154305.csv
+PNG: control/identificacion/resultados/ensayo_A_ang5_actual_5deg_a_ojo_20261105_154305.png

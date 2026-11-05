@@ -1,0 +1,20 @@
+Fz base = -1.35 N; angulo 0.0 deg; hueco 230.0 mm; archivo: control/identificacion/resultados/ensayo_A_ang0_plana_20261105_161120.csv
+[aprox 100 mm]  100.0 mm  F =   0.07 N
+[aprox 25 mm]  125.0 mm  F =  -0.36 N
+[aprox 25 mm]  150.0 mm  F =   0.81 N
+[aprox 25 mm]  175.0 mm  F =  -0.54 N
+[aprox 4 mm]  179.0 mm  F =  -1.02 N
+[aprox 4 mm]  183.0 mm  F =   0.75 N
+[aprox 4 mm]  187.0 mm  F =  -0.25 N
+Motivo de parada: excepcion: error(5, 'Input/output error') -> subiendo 187.0 mm
+ERROR subida gruesa: error(5, 'Input/output error') -> reconectando
+  esperando que el USB reaparezca (1/10)
+guardado control/identificacion/resultados/ensayo_A_ang0_plana_20261105_161120.png
+pasos pendientes de subir: 0
+k por tramos de fuerza (bajada):
+  8-40 N      k = n/d            (n=0)
+  40-100 N    k = n/d            (n=0)
+  >100 N      k = n/d            (n=0)
+  todo >=8 N  k = n/d            (n=0)
+CSV: control/identificacion/resultados/ensayo_A_ang0_plana_20261105_161120.csv
+PNG: control/identificacion/resultados/ensayo_A_ang0_plana_20261105_161120.png

@@ -1,0 +1,7 @@
+=== intento 1/5 ===
+  fmax_ok=True subida_puntos=35 pendientes=0 csv=control/identificacion/resultados/ensayo_A_ang0_plana_20261105_162448.csv
+  8-40 N      k = 15.15 N/mm     (n=9)
+  40-100 N    k = 26.99 N/mm     (n=11)
+  >100 N      k = 20.70 N/mm     (n=14)
+  todo >=8 N  k = 23.04 N/mm     (n=34)
+COMPLETA en el intento 1: control/identificacion/resultados/ensayo_A_ang0_plana_20261105_162448.csv

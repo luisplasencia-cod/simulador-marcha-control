@@ -1,0 +1,47 @@
+Fz base = -1.88 N; angulo 11.14 deg; hueco 220.0 mm; archivo: control/identificacion/resultados/ensayo_A_ang11.14_talon_20261105_160519.csv
+[aprox 100 mm]  100.0 mm  F =   0.71 N
+[aprox 25 mm]  125.0 mm  F =   0.73 N
+[aprox 25 mm]  150.0 mm  F =   0.68 N
+[aprox 25 mm]  175.0 mm  F =   0.45 N
+[aprox 4 mm]  179.0 mm  F =   0.14 N
+[aprox 4 mm]  183.0 mm  F =   1.02 N
+[aprox 4 mm]  187.0 mm  F =   0.69 N
+[aprox 4 mm]  191.0 mm  F =   0.55 N
+[aprox 4 mm]  195.0 mm  F =   0.55 N
+[aprox 4 mm]  199.0 mm  F =  -0.60 N
+[aprox 4 mm]  203.0 mm  F =  -0.38 N
+[aprox 4 mm]  207.0 mm  F =   0.74 N
+[medio]  208.0 mm  F =   0.30 N
+[medio]  209.0 mm  F =  -0.32 N
+[medio]  210.0 mm  F =   0.65 N
+[medio]  211.0 mm  F =   0.38 N
+[medio]  212.0 mm  F =   1.12 N
+[medio]  213.0 mm  F =   0.11 N
+[medio]  214.0 mm  F =   0.24 N
+[medio]  215.0 mm  F =   0.98 N
+[medio]  216.0 mm  F =   0.03 N
+[medio]  217.0 mm  F =   0.67 N
+[medio]  218.0 mm  F =   0.66 N
+[medio]  219.0 mm  F =   1.10 N
+[medio]  220.0 mm  F =   0.09 N
+[medio]  221.0 mm  F =   0.35 N
+[medio]  222.0 mm  F =   0.03 N
+[medio]  223.0 mm  F =   0.94 N
+[medio]  224.0 mm  F =  15.66 N
+bajado 224.20 mm  F =    2.01 N
+bajado 224.40 mm  F =    1.88 N
+Motivo de parada: excepcion: error(5, 'Input/output error') -> subiendo 224.4 mm
+ERROR subida gruesa: error(5, 'Input/output error') -> reconectando
+  puerto no disponible ([Errno 2] could not open port /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0: [Errno 2] No such file or directory: '/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0'); reintento 1/10
+  puerto no disponible ((5, 'Input/output error')); reintento 2/10
+  puerto no disponible ((5, 'Input/output error')); reintento 3/10
+  puerto no disponible ((5, 'Input/output error')); reintento 4/10
+guardado control/identificacion/resultados/ensayo_A_ang11.14_talon_20261105_160519.png
+pasos pendientes de subir: 0
+k por tramos de fuerza (bajada):
+  8-40 N      k = n/d            (n=0)
+  40-100 N    k = n/d            (n=0)
+  >100 N      k = n/d            (n=0)
+  todo >=8 N  k = n/d            (n=0)
+CSV: control/identificacion/resultados/ensayo_A_ang11.14_talon_20261105_160519.csv
+PNG: control/identificacion/resultados/ensayo_A_ang11.14_talon_20261105_160519.png

@@ -1,0 +1,71 @@
+Fz base = 0.24 N; angulo -37.3 deg; hueco 230.0 mm; archivo: control/identificacion/resultados/ensayo_A_ang-37.3_punta_20261105_163544.csv
+[aprox 100 mm]  100.0 mm  F =  -0.08 N
+[aprox 25 mm]  125.0 mm  F =   0.50 N
+[aprox 25 mm]  150.0 mm  F =   0.90 N
+[aprox 25 mm]  175.0 mm  F =  -0.03 N
+[aprox 4 mm]  179.0 mm  F =   0.55 N
+[aprox 4 mm]  183.0 mm  F =   0.55 N
+[aprox 4 mm]  187.0 mm  F =   1.55 N
+[aprox 4 mm]  191.0 mm  F =   0.54 N
+[aprox 4 mm]  195.0 mm  F =  -0.35 N
+[aprox 4 mm]  199.0 mm  F =   0.75 N
+[aprox 4 mm]  203.0 mm  F =   0.96 N
+[aprox 4 mm]  207.0 mm  F =   1.02 N
+[aprox 4 mm]  211.0 mm  F =   1.08 N
+[aprox 4 mm]  215.0 mm  F =   0.29 N
+[aprox 4 mm]  219.0 mm  F =   3.26 N
+[aprox] CONTACTO a 219.0 mm (hueco declarado 230.0): F = 3.3 N
+bajado 219.20 mm  F =    5.24 N
+bajado 219.40 mm  F =    8.22 N
+bajado 219.60 mm  F =    6.00 N
+bajado 219.80 mm  F =    7.00 N
+bajado 220.00 mm  F =    6.46 N
+bajado 220.20 mm  F =    7.80 N
+bajado 220.40 mm  F =   10.40 N
+bajado 220.60 mm  F =    6.74 N
+bajado 220.80 mm  F =    7.34 N
+bajado 221.00 mm  F =    7.82 N
+bajado 221.20 mm  F =   10.09 N
+bajado 221.40 mm  F =   12.57 N
+bajado 221.60 mm  F =   10.50 N
+bajado 221.80 mm  F =    9.44 N
+bajado 222.00 mm  F =   10.22 N
+bajado 222.20 mm  F =   11.29 N
+bajado 222.40 mm  F =   14.17 N
+bajado 222.60 mm  F =   11.06 N
+bajado 222.80 mm  F =   12.24 N
+bajado 223.00 mm  F =   12.74 N
+bajado 223.20 mm  F =   15.11 N
+bajado 223.40 mm  F =   15.81 N
+bajado 223.60 mm  F =   14.19 N
+bajado 223.80 mm  F =   13.22 N
+bajado 224.00 mm  F =   13.91 N
+bajado 224.20 mm  F =   15.05 N
+bajado 224.40 mm  F =   17.51 N
+bajado 224.60 mm  F =   14.80 N
+bajado 224.80 mm  F =   16.26 N
+bajado 225.00 mm  F =   16.95 N
+bajado 225.20 mm  F =   19.37 N
+bajado 225.40 mm  F =   19.29 N
+bajado 225.60 mm  F =   17.54 N
+bajado 225.80 mm  F =   17.20 N
+bajado 226.00 mm  F =   18.45 N
+bajado 226.20 mm  F =   19.58 N
+bajado 226.40 mm  F =   23.33 N
+bajado 226.60 mm  F =   19.80 N
+bajado 226.80 mm  F =   20.47 N
+bajado 227.00 mm  F =   20.10 N
+bajado 227.20 mm  F =   21.21 N
+Motivo de parada: excepcion: error(5, 'Input/output error') -> subiendo 227.2 mm
+subida fina interrumpida: error(5, 'Input/output error')
+ERROR subida gruesa: error(5, 'Input/output error') -> reconectando
+guardado control/identificacion/resultados/ensayo_A_ang-37.3_punta_20261105_163544.png
+pasos pendientes de subir: 0
+k por tramos de fuerza (bajada):
+  8-40 N      k = 1.81 N/mm      (n=33)
+  40-100 N    k = n/d            (n=0)
+  >100 N      k = n/d            (n=0)
+  todo >=8 N  k = 1.81 N/mm      (n=33)
+CONTINUO (Fz a ~50-100 Hz, TODO el registro de inicio a fin): control/identificacion/resultados/ensayo_A_ang-37.3_punta_20261105_163544_continuo.csv
+CSV: control/identificacion/resultados/ensayo_A_ang-37.3_punta_20261105_163544.csv
+PNG: control/identificacion/resultados/ensayo_A_ang-37.3_punta_20261105_163544.png

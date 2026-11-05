@@ -1,0 +1,108 @@
+Fz base = -1.75 N; angulo 5.0 deg; hueco 230.0 mm; archivo: control/identificacion/resultados/ensayo_A_ang5_actual_5deg_a_ojo_20261105_154553.csv
+[aprox]   50.0 mm  F =  -0.30 N
+[aprox]  100.0 mm  F =   0.22 N
+[aprox]  150.0 mm  F =  -0.52 N
+[aprox]  200.0 mm  F =   1.27 N
+[medio]  201.0 mm  F =  -0.45 N
+[medio]  202.0 mm  F =   0.03 N
+[medio]  203.0 mm  F =   0.35 N
+[medio]  204.0 mm  F =  -0.45 N
+[medio]  205.0 mm  F =   0.83 N
+[medio]  206.0 mm  F =   0.57 N
+[medio]  207.0 mm  F =  -0.66 N
+[medio]  208.0 mm  F =  -0.83 N
+[medio]  209.0 mm  F =   1.27 N
+[medio]  210.0 mm  F =   0.26 N
+[medio]  211.0 mm  F =   1.16 N
+[medio]  212.0 mm  F =   0.62 N
+[medio]  213.0 mm  F =  -0.32 N
+[medio]  214.0 mm  F =   0.15 N
+[medio]  215.0 mm  F =   0.37 N
+[medio]  216.0 mm  F =   0.84 N
+[medio]  217.0 mm  F =   0.77 N
+[medio]  218.0 mm  F =  -0.14 N
+[medio]  219.0 mm  F =   0.10 N
+[medio]  220.0 mm  F =  -0.54 N
+[medio]  221.0 mm  F =  -0.48 N
+[medio]  222.0 mm  F =  15.11 N
+bajado 222.20 mm  F =   22.08 N
+bajado 222.40 mm  F =   30.14 N
+bajado 222.60 mm  F =   37.59 N
+bajado 222.80 mm  F =   42.08 N
+bajado 223.00 mm  F =   51.06 N
+bajado 223.20 mm  F =   58.46 N
+bajado 223.40 mm  F =   66.18 N
+bajado 223.60 mm  F =   72.10 N
+bajado 223.80 mm  F =   76.35 N
+bajado 224.00 mm  F =   79.96 N
+bajado 224.20 mm  F =   86.87 N
+bajado 224.40 mm  F =   91.96 N
+bajado 224.60 mm  F =   93.97 N
+bajado 224.80 mm  F =   98.77 N
+bajado 225.00 mm  F =  102.11 N
+bajado 225.20 mm  F =  108.04 N
+bajado 225.40 mm  F =  116.02 N
+  ADC fallo (TimeoutError); recuperando 1/6
+  init ADC intento 1/6 fallo: El ADS1256 no devolvio lo escrito: leido={'ADCON': 0, 'MUX': 0, 'DRATE': 0} esperado={'ADCON': 0, 'MUX': 8, 'DRATE': 161}
+  init ADC intento 2/6 fallo: El ADS1256 no devolvio lo escrito: leido={'ADCON': 0, 'MUX': 0, 'DRATE': 0} esperado={'ADCON': 0, 'MUX': 8, 'DRATE': 161}
+  init ADC intento 3/6 fallo: El ADS1256 no devolvio lo escrito: leido={'ADCON': 0, 'MUX': 0, 'DRATE': 0} esperado={'ADCON': 0, 'MUX': 8, 'DRATE': 161}
+  init ADC intento 4/6 fallo: El ADS1256 no devolvio lo escrito: leido={'ADCON': 0, 'MUX': 0, 'DRATE': 0} esperado={'ADCON': 0, 'MUX': 8, 'DRATE': 161}
+  init ADC intento 5/6 fallo: El ADS1256 no devolvio lo escrito: leido={'ADCON': 0, 'MUX': 0, 'DRATE': 0} esperado={'ADCON': 0, 'MUX': 8, 'DRATE': 161}
+  init ADC intento 6/6 fallo: El ADS1256 no devolvio lo escrito: leido={'ADCON': 0, 'MUX': 0, 'DRATE': 0} esperado={'ADCON': 0, 'MUX': 8, 'DRATE': 161}
+Motivo de parada: excepcion: SystemExit('ADC no inicializa tras reintentos: abortado SIN mover nada.') -> subiendo 225.6 mm
+  ADC fallo (TimeoutError); recuperando 1/6
+  init ADC intento 1/6 fallo: El ADS1256 no devolvio lo escrito: leido={'ADCON': 0, 'MUX': 0, 'DRATE': 0} esperado={'ADCON': 0, 'MUX': 8, 'DRATE': 161}
+  init ADC intento 2/6 fallo: El ADS1256 no devolvio lo escrito: leido={'ADCON': 0, 'MUX': 0, 'DRATE': 0} esperado={'ADCON': 0, 'MUX': 8, 'DRATE': 161}
+  init ADC intento 3/6 fallo: El ADS1256 no devolvio lo escrito: leido={'ADCON': 0, 'MUX': 0, 'DRATE': 0} esperado={'ADCON': 0, 'MUX': 8, 'DRATE': 161}
+  init ADC intento 4/6 fallo: El ADS1256 no devolvio lo escrito: leido={'ADCON': 0, 'MUX': 0, 'DRATE': 0} esperado={'ADCON': 0, 'MUX': 8, 'DRATE': 161}
+  init ADC intento 5/6 fallo: El ADS1256 no devolvio lo escrito: leido={'ADCON': 0, 'MUX': 0, 'DRATE': 0} esperado={'ADCON': 0, 'MUX': 8, 'DRATE': 161}
+  init ADC intento 6/6 fallo: El ADS1256 no devolvio lo escrito: leido={'ADCON': 0, 'MUX': 0, 'DRATE': 0} esperado={'ADCON': 0, 'MUX': 8, 'DRATE': 161}
+subida fina interrumpida: SystemExit('ADC no inicializa tras reintentos: abortado SIN mover nada.')
+ERROR subida gruesa: error(5, 'Input/output error') -> reconectando
+  puerto no disponible ((5, 'Input/output error')); reintento 1/10
+  puerto no disponible ((5, 'Input/output error')); reintento 2/10
+  puerto no disponible ((5, 'Input/output error')); reintento 3/10
+  puerto no disponible ((5, 'Input/output error')); reintento 4/10
+  puerto no disponible (Could not configure port: (5, 'Input/output error')); reintento 5/10
+  puerto no disponible ((5, 'Input/output error')); reintento 6/10
+  puerto no disponible ((5, 'Input/output error')); reintento 7/10
+  puerto no disponible ((5, 'Input/output error')); reintento 8/10
+  puerto no disponible ((5, 'Input/output error')); reintento 9/10
+  puerto no disponible ((5, 'Input/output error')); reintento 10/10
+no se pudo reconectar: RuntimeError('puerto serie irrecuperable')
+ERROR subida gruesa: error(5, 'Input/output error') -> reconectando
+  puerto no disponible ((5, 'Input/output error')); reintento 1/10
+  puerto no disponible ((5, 'Input/output error')); reintento 2/10
+  puerto no disponible ((5, 'Input/output error')); reintento 3/10
+  puerto no disponible ((5, 'Input/output error')); reintento 4/10
+  puerto no disponible ((5, 'Input/output error')); reintento 5/10
+  puerto no disponible ((5, 'Input/output error')); reintento 6/10
+  puerto no disponible ((5, 'Input/output error')); reintento 7/10
+  puerto no disponible ((5, 'Input/output error')); reintento 8/10
+  puerto no disponible ((5, 'Input/output error')); reintento 9/10
+  puerto no disponible ((5, 'Input/output error')); reintento 10/10
+no se pudo reconectar: RuntimeError('puerto serie irrecuperable')
+ERROR subida gruesa: error(5, 'Input/output error') -> reconectando
+  puerto no disponible ((5, 'Input/output error')); reintento 1/10
+  puerto no disponible ((5, 'Input/output error')); reintento 2/10
+  puerto no disponible ((5, 'Input/output error')); reintento 3/10
+  puerto no disponible ((5, 'Input/output error')); reintento 4/10
+  puerto no disponible ((5, 'Input/output error')); reintento 5/10
+  puerto no disponible ((5, 'Input/output error')); reintento 6/10
+  puerto no disponible ([Errno 71] Protocol error); reintento 7/10
+  puerto no disponible ((5, 'Input/output error')); reintento 8/10
+  puerto no disponible ((5, 'Input/output error')); reintento 9/10
+  puerto no disponible ((5, 'Input/output error')); reintento 10/10
+no se pudo reconectar: RuntimeError('puerto serie irrecuperable')
+pasos pendientes de subir: 18048
+Traceback (most recent call last):
+  File "/home/simgaitlibra/simulador-marcha-control/control/identificacion/ensayo_A_rigidez.py", line 151, in <module>
+    vivo.write(f"# fin motivo={motivo} pendientes={bajados}\n"); vivo.close(); adc.cerrar(); ser.close()
+                                                                               ~~~~~~~~~~^^
+  File "/home/simgaitlibra/simulador-marcha-control/pruebas/leer_ads1256_fz.py", line 149, in cerrar
+    self._cmd(CMD_SDATAC)
+    ~~~~~~~~~^^^^^^^^^^^^
+  File "/home/simgaitlibra/simulador-marcha-control/pruebas/leer_ads1256_fz.py", line 76, in _cmd
+    self.spi.xfer2([c])
+    ~~~~~~~~~~~~~~^^^^^
+OSError: [Errno 9] Bad file descriptor

@@ -1,0 +1,32 @@
+  init ADC intento 1/6 fallo: El ADS1256 no devolvio lo escrito: leido={'ADCON': 0, 'MUX': 8, 'DRATE': 40} esperado={'ADCON': 0, 'MUX': 8, 'DRATE': 161}
+  init ADC intento 2/6 fallo: El ADS1256 no devolvio lo escrito: leido={'ADCON': 0, 'MUX': 8, 'DRATE': 0} esperado={'ADCON': 0, 'MUX': 8, 'DRATE': 161}
+  init ADC intento 3/6 fallo: El ADS1256 no devolvio lo escrito: leido={'ADCON': 0, 'MUX': 0, 'DRATE': 161} esperado={'ADCON': 0, 'MUX': 8, 'DRATE': 161}
+  init ADC intento 4/6 fallo: El ADS1256 no devolvio lo escrito: leido={'ADCON': 0, 'MUX': 8, 'DRATE': 160} esperado={'ADCON': 0, 'MUX': 8, 'DRATE': 161}
+  init ADC intento 5/6 fallo: El ADS1256 no devolvio lo escrito: leido={'ADCON': 0, 'MUX': 1, 'DRATE': 240} esperado={'ADCON': 0, 'MUX': 8, 'DRATE': 161}
+Fz base = -2.29 N; angulo 5.0 deg; hueco 230.0 mm; archivo: control/identificacion/resultados/ensayo_A_ang5_actual_5deg_a_ojo_20261105_154037.csv
+[aprox]   50.0 mm  F =   0.19 N
+[aprox]  100.0 mm  F =   0.12 N
+[aprox]  150.0 mm  F =  -0.05 N
+[aprox]  200.0 mm  F =   0.05 N
+bajado 200.20 mm  F =    0.21 N
+bajado 200.40 mm  F =    1.30 N
+bajado 200.60 mm  F =    1.08 N
+bajado 200.80 mm  F =    0.62 N
+bajado 201.00 mm  F =    0.03 N
+bajado 201.20 mm  F =    0.72 N
+bajado 201.40 mm  F =    0.83 N
+bajado 201.60 mm  F =    1.10 N
+bajado 201.80 mm  F =    0.76 N
+bajado 202.00 mm  F =    0.53 N
+bajado 202.20 mm  F =    1.21 N
+guardado control/identificacion/resultados/ensayo_A_ang5_actual_5deg_a_ojo_20261105_154037.png
+Motivo de parada: excepcion: TimeoutError('DRDY no bajo a tiempo - revisar cableado/VREF/CLKIN') -> subiendo 202.4 mm
+ERROR al subir: TimeoutError('DRDY no bajo a tiempo - revisar cableado/VREF/CLKIN')
+pasos pendientes de subir: 16192
+k por tramos de fuerza (bajada):
+  8-40 N      k = n/d            (n=0)
+  40-100 N    k = n/d            (n=0)
+  >100 N      k = n/d            (n=0)
+  todo >=8 N  k = n/d            (n=0)
+CSV: control/identificacion/resultados/ensayo_A_ang5_actual_5deg_a_ojo_20261105_154037.csv
+PNG: control/identificacion/resultados/ensayo_A_ang5_actual_5deg_a_ojo_20261105_154037.png

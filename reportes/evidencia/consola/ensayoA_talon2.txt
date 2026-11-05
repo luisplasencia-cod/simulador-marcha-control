@@ -1,0 +1,57 @@
+Fz base = -0.84 N; angulo 11.14 deg; hueco 220.0 mm; archivo: control/identificacion/resultados/ensayo_A_ang11.14_talon_20261105_160831.csv
+[aprox 100 mm]  100.0 mm  F =  -1.85 N
+[aprox 25 mm]  125.0 mm  F =  -0.58 N
+[aprox 25 mm]  150.0 mm  F =  -1.33 N
+[aprox 25 mm]  175.0 mm  F =  -0.60 N
+[aprox 4 mm]  179.0 mm  F =  -0.37 N
+[aprox 4 mm]  183.0 mm  F =  -0.52 N
+[aprox 4 mm]  187.0 mm  F =  -0.09 N
+[aprox 4 mm]  191.0 mm  F =  -0.69 N
+[aprox 4 mm]  195.0 mm  F =  -1.38 N
+[aprox 4 mm]  199.0 mm  F =  -1.46 N
+[aprox 4 mm]  203.0 mm  F =  -0.71 N
+[aprox 4 mm]  207.0 mm  F =  -0.84 N
+[medio]  208.0 mm  F =  -0.65 N
+[medio]  209.0 mm  F =  -0.33 N
+[medio]  210.0 mm  F =   0.18 N
+[medio]  211.0 mm  F =  -0.50 N
+[medio]  212.0 mm  F =  -0.16 N
+[medio]  213.0 mm  F =  -1.43 N
+[medio]  214.0 mm  F =  -1.05 N
+[medio]  215.0 mm  F =  -0.33 N
+[medio]  216.0 mm  F =   0.47 N
+[medio]  217.0 mm  F =  -1.26 N
+[medio]  218.0 mm  F =  -0.80 N
+[medio]  219.0 mm  F =  -1.23 N
+[medio]  220.0 mm  F =  -0.20 N
+[medio]  221.0 mm  F =  -0.34 N
+[medio]  222.0 mm  F =  -0.47 N
+[medio]  223.0 mm  F =  -0.92 N
+[medio]  224.0 mm  F =  15.06 N
+bajado 224.20 mm  F =   21.43 N
+bajado 224.40 mm  F =   27.47 N
+bajado 224.60 mm  F =   32.53 N
+bajado 224.80 mm  F =   37.07 N
+bajado 225.00 mm  F =   41.40 N
+bajado 225.20 mm  F =   46.04 N
+bajado 225.40 mm  F =   54.93 N
+bajado 225.60 mm  F =   59.83 N
+bajado 225.80 mm  F =   64.92 N
+bajado 226.00 mm  F =   73.30 N
+bajado 226.20 mm  F =   75.76 N
+bajado 226.40 mm  F =   82.26 N
+bajado 226.60 mm  F =   87.06 N
+bajado 226.80 mm  F =   90.59 N
+bajado 227.00 mm  F =   95.30 N
+bajado 227.20 mm  F =   97.77 N
+bajado 227.40 mm  F =  105.15 N
+guardado control/identificacion/resultados/ensayo_A_ang11.14_talon_20261105_160831.png
+Motivo de parada: fmax alcanzada (OK) -> subiendo 227.4 mm
+pasos pendientes de subir: 0
+k por tramos de fuerza (bajada):
+  8-40 N      k = 25.99 N/mm     (n=4)
+  40-100 N    k = 26.29 N/mm     (n=12)
+  >100 N      k = n/d            (n=1)
+  todo >=8 N  k = 26.38 N/mm     (n=17)
+CSV: control/identificacion/resultados/ensayo_A_ang11.14_talon_20261105_160831.csv
+PNG: control/identificacion/resultados/ensayo_A_ang11.14_talon_20261105_160831.png

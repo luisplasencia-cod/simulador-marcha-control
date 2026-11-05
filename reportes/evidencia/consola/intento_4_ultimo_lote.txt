@@ -1,0 +1,54 @@
+Fz base = -0.04 N; angulo -37.3 deg; hueco 230.0 mm; archivo: control/identificacion/resultados/ensayo_A_ang-37.3_punta_20261105_164147.csv
+[aprox 100 mm]  100.0 mm  F =   0.90 N
+[aprox 25 mm]  125.0 mm  F =   0.03 N
+[aprox 25 mm]  150.0 mm  F =  -0.39 N
+[aprox 25 mm]  175.0 mm  F =   1.30 N
+[aprox 4 mm]  179.0 mm  F =   0.17 N
+[aprox 4 mm]  183.0 mm  F =  -0.80 N
+[aprox 4 mm]  187.0 mm  F =  -0.89 N
+[aprox 4 mm]  191.0 mm  F =   0.65 N
+[aprox 4 mm]  195.0 mm  F =   0.98 N
+[aprox 4 mm]  199.0 mm  F =   1.32 N
+[aprox 4 mm]  203.0 mm  F =   1.74 N
+[aprox 4 mm]  207.0 mm  F =   1.71 N
+[aprox 4 mm]  211.0 mm  F =   0.81 N
+[aprox 4 mm]  215.0 mm  F =   1.23 N
+[aprox 4 mm]  219.0 mm  F =   4.82 N
+[aprox] CONTACTO a 219.0 mm (hueco declarado 230.0): F = 4.8 N
+bajado 219.20 mm  F =    6.07 N
+bajado 219.40 mm  F =    8.41 N
+bajado 219.60 mm  F =    5.59 N
+bajado 219.80 mm  F =    5.89 N
+bajado 220.00 mm  F =    5.25 N
+bajado 220.20 mm  F =    7.41 N
+bajado 220.40 mm  F =   10.28 N
+bajado 220.60 mm  F =    8.73 N
+bajado 220.80 mm  F =    9.06 N
+bajado 221.00 mm  F =    8.35 N
+bajado 221.20 mm  F =    9.81 N
+bajado 221.40 mm  F =   12.20 N
+bajado 221.60 mm  F =    8.76 N
+bajado 221.80 mm  F =    9.28 N
+bajado 222.00 mm  F =   10.57 N
+bajado 222.20 mm  F =   12.37 N
+bajado 222.40 mm  F =   14.81 N
+bajado 222.60 mm  F =   11.75 N
+bajado 222.80 mm  F =   12.38 N
+bajado 223.00 mm  F =   12.14 N
+bajado 223.20 mm  F =   13.44 N
+bajado 223.40 mm  F =   14.40 N
+bajado 223.60 mm  F =   13.70 N
+Motivo de parada: excepcion: error(5, 'Input/output error') -> subiendo 223.6 mm
+subida fina interrumpida: error(5, 'Input/output error')
+ERROR subida gruesa: error(5, 'Input/output error') -> reconectando
+  esperando que el USB reaparezca (1/10)
+guardado control/identificacion/resultados/ensayo_A_ang-37.3_punta_20261105_164147.png
+pasos pendientes de subir: 0
+k por tramos de fuerza (bajada):
+  8-40 N      k = 1.51 N/mm      (n=18)
+  40-100 N    k = n/d            (n=0)
+  >100 N      k = n/d            (n=0)
+  todo >=8 N  k = 1.51 N/mm      (n=18)
+CONTINUO (Fz a ~50-100 Hz, TODO el registro de inicio a fin): control/identificacion/resultados/ensayo_A_ang-37.3_punta_20261105_164147_continuo.csv
+CSV: control/identificacion/resultados/ensayo_A_ang-37.3_punta_20261105_164147.csv
+PNG: control/identificacion/resultados/ensayo_A_ang-37.3_punta_20261105_164147.png

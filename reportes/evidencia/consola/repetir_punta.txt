@@ -1,0 +1,18 @@
+=== intento 1/5 ===
+  fmax_ok=False subida_puntos=0 pendientes=0 csv=control/identificacion/resultados/ensayo_A_ang-37.3_punta_20261105_162939.csv
+  8-40 N      k = 1.45 N/mm      (n=13)
+  40-100 N    k = n/d            (n=0)
+  >100 N      k = n/d            (n=0)
+  todo >=8 N  k = 1.45 N/mm      (n=13)
+=== intento 2/5 ===
+  fmax_ok=False subida_puntos=102 pendientes=0 csv=control/identificacion/resultados/ensayo_A_ang-37.3_punta_20261105_163113.csv
+  8-40 N      k = 2.01 N/mm      (n=79)
+  40-100 N    k = 2.18 N/mm      (n=72)
+  >100 N      k = n/d            (n=0)
+  todo >=8 N  k = 2.08 N/mm      (n=151)
+=== intento 3/5 ===
+  fmax_ok=False subida_puntos=0 pendientes=0 csv=control/identificacion/resultados/ensayo_A_ang-37.3_punta_20261105_163502.csv
+  8-40 N      k = n/d            (n=0)
+  40-100 N    k = n/d            (n=0)
+  >100 N      k = n/d            (n=0)
+  todo >=8 N  k = n/d            (n=0)
