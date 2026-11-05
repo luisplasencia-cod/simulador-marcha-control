@@ -27,6 +27,7 @@ ap.add_argument("--angulo_deg", type=float, required=True, help="angulo sagital 
 ap.add_argument("--etiqueta", default="", help="ej. talon / planta / dedos")
 ap.add_argument("--paso_medio_pasos", type=int, default=80, help="80 pasos = 1 mm, tramo medio")
 ap.add_argument("--cambio_n", type=float, default=3.0, help="primer cambio de Fz (N) que activa los escalones finos")
+ap.add_argument("--aprox_tramo_pasos", type=int, default=320, help="tramo de aproximacion (320 = 4 mm): limita la sobrecarga si el contacto llega antes de lo previsto")
 ap.add_argument("--aprox_margen_mm", type=float, default=30.0)
 ap.add_argument("--max_extra_mm", type=float, default=20.0)
 ap.add_argument("--asentar_s", type=float, default=0.3)
@@ -103,12 +104,15 @@ try:
     f0 = fz(200); print(f"Fz base = {f0:.2f} N; angulo {a.angulo_deg} deg; hueco {a.hueco_mm} mm; archivo: {salida}")
     reg("base", 0.0, 0.0)
     hueco_pasos = int((a.hueco_mm - a.aprox_margen_mm) * PASOS_MM)
-    while bajados + 4000 <= hueco_pasos:
-        mover(-4000, "aprox"); f = fz(20) - f0; reg("aprox", bajados / PASOS_MM, f)
-        print(f"[aprox] {bajados/PASOS_MM:6.1f} mm  F = {f:6.2f} N", flush=True)
-        if f > a.umbral_contacto_n: raise RuntimeError("contacto ANTES de lo esperado en la aproximacion")
+    en_contacto = False; previa = None
+    while bajados + a.aprox_tramo_pasos <= hueco_pasos:
+        mover(-a.aprox_tramo_pasos, "aprox"); f = fz(20) - f0; reg("aprox", bajados / PASOS_MM, f)
+        if (bajados // a.aprox_tramo_pasos) % 12 == 0: print(f"[aprox] {bajados/PASOS_MM:6.1f} mm  F = {f:6.2f} N", flush=True)
+        if f > a.cambio_n:   # contacto antes de lo declarado: ya no se confia en el hueco, pasa directo a escalones finos
+            print(f"[aprox] CONTACTO a {bajados/PASOS_MM:.1f} mm (antes del hueco declarado {a.hueco_mm}): F = {f:.1f} N", flush=True)
+            en_contacto = True; previa = f; break
+        previa = f
     # MEDIO: pasos de 1 mm vigilando Fz hasta el PRIMER cambio (lejos del contacto no hace falta ir fino)
-    previa = None; en_contacto = False
     while not en_contacto:
         if bajados / PASOS_MM >= a.hueco_mm + a.max_extra_mm: motivo = "sin contacto en descenso maximo"; break
         mover(-a.paso_medio_pasos, "medio"); f = fz(30) - f0; reg("medio", bajados / PASOS_MM, f)
