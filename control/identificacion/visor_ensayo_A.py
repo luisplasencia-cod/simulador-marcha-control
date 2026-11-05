@@ -50,7 +50,7 @@ def dibujar(_=None):
         ax2.legend(loc="upper left", fontsize=8)
         ult = fase[-1].replace("_mov", " (moviendo)")
         ax1.set_title(f"Fz = {F[-1]:.1f} N", fontsize=26, color="#b00020" if F[-1] > 50 else "black")
-        ax2.set_title(f"DESCENSO ACUMULADO = {mm[-1]:.1f} mm   |   fase: {ult}", fontsize=20)
+        ax2.set_title(f"DESCENSO ACUMULADO = {mm[-1]:.1f} mm   |   fase: {ult}", fontsize=15)
     ax1.set_xlabel("t [s]"); ax1.set_ylabel("Fz [N] (tara previa al ensayo)"); ax1.grid(alpha=.3)
     ax2.set_xlabel("descenso acumulado [mm]"); ax2.set_ylabel("Fz [N]"); ax2.grid(alpha=.3)
     fig.suptitle(tit or "Ensayo A: esperando datos...", fontsize=11)
