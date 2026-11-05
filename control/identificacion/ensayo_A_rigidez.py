@@ -29,6 +29,7 @@ ap.add_argument("--max_extra_mm", type=float, default=20.0, help="descenso maxim
 ap.add_argument("--asentar_s", type=float, default=0.5)
 ap.add_argument("--salida", default="control/identificacion/resultados/ensayo_A_rigidez.csv")
 ap.add_argument("--ejecutar", action="store_true")
+ap.add_argument("--hueco_remedido", action="store_true", help="OBLIGATORIO con --ejecutar: confirma que el hueco se midio de nuevo ANTES de ESTA corrida")
 a = ap.parse_args()
 if not a.ejecutar:
     print(f"PLAN (no ejecuta): angulo {a.angulo_deg} deg; aproximacion rapida en tramos de 50 mm hasta {a.hueco_mm-a.aprox_margen_mm:.0f} mm "
@@ -38,6 +39,8 @@ if not a.ejecutar:
 def fz(adc, n=50):
     return st.median(volts_a_newtons(adc.leer_volts()) for _ in range(n))
 
+if not a.hueco_remedido:
+    sys.exit("Abortado: falta --hueco_remedido. El hueco suela-plataforma debe medirse de nuevo antes de CADA corrida (regla de Luis).")
 ser = serial.Serial(a.puerto, 115200, timeout=2.0); time.sleep(2.0); ser.reset_input_buffer()
 def mover(p):
     ser.reset_input_buffer(); ser.write(f"<MANUAL:1:{p}>".encode())
