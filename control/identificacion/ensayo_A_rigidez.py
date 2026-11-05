@@ -71,7 +71,7 @@ def fz(n=50, intentos=6):
             time.sleep(0.3); adc = abrir_adc()
     raise RuntimeError("ADC irrecuperable")
 
-def conectar():
+def conectar(rapido=False):
     """Reconexion CON CALMA: cada apertura del puerto reinicia el ESP32 (y su freno vertical: brake_init LOCKED -> release),
     asi que durante una caida del USB NO se golpea el puerto: se espera a que el enlace by-id exista y este estable."""
     global ser
@@ -84,7 +84,9 @@ def conectar():
         time.sleep(4.0)                                   # estable 4 s antes de abrir
         if not os.path.exists(a.puerto): continue
         try:
-            ser = serial.Serial(a.puerto, 115200, timeout=2.0); time.sleep(2.0); ser.reset_input_buffer(); return
+            ser = serial.Serial(a.puerto, 115200, timeout=2.0)
+            if not rapido: time.sleep(2.0); ser.reset_input_buffer()   # en reconexion RAPIDA no se espera: el USB se cae ~1-2 s tras abrir con el eje cargado
+            return
         except Exception as e:
             print(f"  puerto no disponible ({str(e)[:60]}); espero 8 s ({i+1}/10)", flush=True); time.sleep(8.0)
     raise RuntimeError("puerto serie irrecuperable")
@@ -162,7 +164,7 @@ finally:
             break
         except BaseException as e:
             print("ERROR subida gruesa:", repr(e), "-> reconectando", flush=True)
-            try: conectar()
+            try: conectar(rapido=True)
             except BaseException as e2: print("no se pudo reconectar:", repr(e2))
     print("pasos pendientes de subir:", bajados)
     vivo.write(f"# fin motivo={motivo} pendientes={bajados}\n"); vivo.close(); adc.cerrar(); ser.close()
