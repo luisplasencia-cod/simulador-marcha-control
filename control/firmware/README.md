@@ -39,3 +39,38 @@ Resultado esperado (hipótesis, por verificar): RTT de `PING` de ≈ 6 ms a ≈ 
 5. Recién después: integrar con `control/ilc/fz_ilc.py` / un lazo de realimentación real.
 
 Aplicar (desde la raíz del repo, en la laptop): `git apply control/firmware/control_velocidad_continua.patch` (ya verificado con `git apply --check`, aplica limpio contra el firmware actual).
+
+---
+
+# Análisis: ¿es `SET_VEL` lo mejor posible, o hay una arquitectura mejor? (2026-11-05)
+
+**Autorización ampliada de Luis (2026-11-05):** no solo "agregar un comando" al firmware actual
+(que solo recibe trayectorias y las ejecuta) — autoriza analizar y cambiar lo que haga falta del
+firmware/arquitectura de comunicación para lograr el mejor tiempo real posible, no quedarse en el
+parche mínimo por default. Esto se guarda acá porque es una autorización de alcance, no solo una
+decisión técnica.
+
+**Resultado del análisis: se consideraron 3 arquitecturas, se mantiene `SET_VEL` (la ya diseñada),
+con las otras dos documentadas como mejora futura SI la latencia llega a ser el problema real** (hoy
+no lo es — ver conclusión).
+
+| Opción | Cómo funciona | Ventaja | Desventaja | Fuente del dato |
+|---|---|---|---|---|
+| **A. `SET_VEL` (la diseñada, §arriba)** | RPi manda velocidad por paso/dirección cada 10-20 ms; el ESP32 solo genera el tren de pulsos; el driver A6-750RS cierra su propio lazo de posición/velocidad con su encoder interno | No requiere tocar el cableado ni reconfigurar el driver; mantiene intacta la lógica de seguridad que ya funciona (límites, freno, homing); ya diseñada, con patch verificado | Pasa por el ESP32 (≈6 ms de RTT medido RPi↔ESP32, antes de llegar al driver); discretizado al ritmo de actualización serial | `control_velocidad_continua.patch`; RTT medido en `pruebas/` |
+| **B. RS485 directo RPi→driver** | El RPi habla RS485 directo al A6-750RS en modo Velocidad (el driver lo soporta: manual confirma "Communication: Pulse/RS485/Analog", "Velocity Control Mode"); el ESP32 queda fuera del lazo de Fz, solo maneja límites/homing/freno/sagital | Elimina el salto RPi→ESP32→driver completo; el lazo de velocidad del propio driver es más rápido que generar pulsos por software | **No hay protocolo detallado a mano** — el manual que se encontró dice "refer to the detailed programming manual" para los parámetros RS485, que no se descargó; cablear RS485 nuevo (adaptador USB-RS485 en el RPi); **hay que rediseñar la seguridad**: hoy el ESP32 ve los límites de carrera antes de mover nada — si el RPi manda velocidad directo al driver, los límites tendrían que llegarle también al driver por otra vía (o duplicar la lógica), para no perder esa protección | Manual STEPPERONLINE A6, §5-6 (instalación, no el manual de parámetros) |
+| **C. Analógico (DAC) ESP32→driver** | El ESP32 deja de generar pulsos para este eje y en cambio escribe un voltaje (DAC) proporcional a la velocidad deseada al driver en modo Analógico (también soportado) | El ESP32 ya tiene 2 DAC de 8 bits integrados (GPIO25/26) — no hace falta hardware nuevo para probarlo | Sigue pasando por el mismo salto RPi→ESP32 que la opción A (no gana latencia ahí); 8 bits = 256 escalones, posiblemente muy grueso para el control de fuerza; igual exige reconfigurar el driver a modo Analógico (sin protocolo de parámetros a mano, mismo problema que B) | Specs del ESP32 (DAC de fábrica); manual STEPPERONLINE A6, §5-6 |
+
+**Conclusión (por qué se mantiene A):** la latencia que de verdad importa para la decisión de
+control es el techo de ~130 ms donde el híbrido RT+ILC se desestabiliza (`DECISION_TIPO_CONTROL.md`,
+tabla de comparación). La latencia total medida hoy (parcial, ≈10 ms: RPi↔ESP32 + ADS1256+SPI;
+faltan AMTI y ejecución ESP32) está muy por debajo de ese techo — **sobra margen**, así que no hay
+urgencia real de eliminar los ~6 ms que agrega el salto por el ESP32 (opción B) a costa de rediseñar
+la seguridad de límites de carrera sin la documentación del protocolo RS485 en mano. La opción A
+(`SET_VEL`) ya resuelve el problema real (el firmware actual no tiene NINGÚN comando de velocidad
+continua) sin ese riesgo. **Si más adelante la latencia medida completa (con AMTI y ejecución ESP32
+incluidos) se acerca al techo de 130 ms, ahí sí vale la pena retomar la opción B** — se deja
+documentada acá para no tener que redescubrirla.
+
+**Qué falta para reabrir la opción B si hace falta:** conseguir el manual de parámetros/protocolo
+RS485 del A6-750RS (STEPPERONLINE, no el manual de instalación que ya se tiene); un adaptador
+USB-RS485 para el RPi; diseñar cómo los límites de carrera siguen protegiendo sin pasar por el ESP32.
