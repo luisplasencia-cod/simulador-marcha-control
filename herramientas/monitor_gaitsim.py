@@ -11,6 +11,7 @@ Si el ADC o el ESP32 no estan disponibles la ventana igual abre y lo avisa.
 Solo un programa puede usar el SPI/serial a la vez: cierra otros antes de abrir.
 """
 import csv
+import math
 import os
 import queue
 import statistics
@@ -29,6 +30,26 @@ sys.path.insert(0, os.path.join(AQUI, "..", "pruebas"))
 SOLO_FZ = "--con-esp32" not in sys.argv  # por defecto solo el AMTI/ADS1256, a todo el ancho
 PUERTO_ESP32 = "/dev/ttyUSB0"
 VENTANA_S = 10.0
+# Filtro SOLO VISUAL (no afecta lo que se graba ni el lazo de control): IIR de 1er orden.
+# fc=10 Hz elegida por el analisis de ruido (reportes/2026-11-05_ruido_fz.md); retardo ~16 ms.
+FC_VISUAL_HZ = 10.0
+FS_NOMINAL_HZ = 1000.0
+A_VISUAL = 1 - math.exp(-2 * math.pi * FC_VISUAL_HZ / FS_NOMINAL_HZ)
+MEDIA_NUMERO_S = 0.3   # el numero grande es la media de los ultimos 0.3 s, no la ultima muestra
+SPAN_MIN_N = 20.0      # el eje Y de Fz nunca se comprime a menos de 20 N de alto (+-10 N)
+
+
+def filtrar_visual(ys):
+    """IIR 1er orden; arranca en la media de las primeras 50 muestras (evita transitorio)."""
+    if not ys:
+        return []
+    ini = ys[:50]
+    est = sum(ini) / len(ini)
+    out = []
+    for u in ys:
+        est += A_VISUAL * (u - est)
+        out.append(est)
+    return out
 
 # ---------------------------------------------------------------- ADC
 adc_estado = {"msg": "iniciando...", "ok": False}
@@ -123,7 +144,7 @@ def hilo_esp32():
 
 
 # ---------------------------------------------------------------- Graficos en Canvas
-def dibujar(canvas, pts, ymin_fijo=None, ymax_fijo=None, unidad="", color="#00bc8c"):
+def dibujar(canvas, pts, ymin_fijo=None, ymax_fijo=None, unidad="", color="#00bc8c", span_min=None):
     canvas.delete("all")
     w, h = canvas.winfo_width(), canvas.winfo_height()
     mi, md, ms_, mb = 55, 10, 10, 22
@@ -138,6 +159,9 @@ def dibujar(canvas, pts, ymin_fijo=None, ymax_fijo=None, unidad="", color="#00bc
     hi = max(ys) if ymax_fijo is None else ymax_fijo
     if hi - lo < 1e-9:
         lo, hi = lo - 1, hi + 1
+    if span_min is not None and hi - lo < span_min:
+        c = (hi + lo) / 2
+        lo, hi = c - span_min / 2, c + span_min / 2
     pad = (hi - lo) * 0.08
     lo, hi = lo - pad, hi + pad
 
@@ -323,12 +347,15 @@ class App(tb.Window):
                 self.grabando[1].writerow([f"{t:.6f}", f"{v:.6f}", f"{n:.3f}", f"{n - self.offset_n:.3f}"])
             self.ultimo_grabado = nuevos[-1][0]
         if datos:
-            n_act = datos[-1][2] - self.offset_n
+            r03 = [d[2] for d in datos if d[0] >= datos[-1][0] - MEDIA_NUMERO_S]
+            n_act = statistics.mean(r03) - self.offset_n
             self.lbl_fz.config(text=f"{n_act:8.1f} N")
             t_span = max(datos[-1][0] - datos[0][0], 1e-6)
             tasa = len(datos) / t_span
             self.lbl_adc.config(text=f"{adc_estado['msg']}  |  {datos[-1][1]:+.4f} V  |  {tasa:.0f} muestras/s")
-            dibujar(self.cv_fz, [(d[0], d[2] - self.offset_n) for d in datos], unidad="N")
+            y_f = filtrar_visual([d[2] - self.offset_n for d in datos])
+            dibujar(self.cv_fz, [(d[0], y) for d, y in zip(datos, y_f)],
+                    unidad="N (filtrado 10 Hz, visual)", span_min=SPAN_MIN_N)
             r2 = [d for d in datos if d[0] >= datos[-1][0] - 2.0]
             mn = statistics.mean(d[2] - self.offset_n for d in r2)
             mv = statistics.mean(d[1] for d in r2) * 1000

@@ -1,0 +1,18 @@
+== 1) Contenido espectral de la curva objetivo (estirada a x6), cola de ceros hasta 60 s
+  apoyo 3.69 s: f(99%) = 0.72 Hz, f(99.9%) = 1.67 Hz, f(99.99%) = 3.22 Hz; pendiente max = 373.3 %BW/s = 3149 N/s
+  apoyo 6.43 s: f(99%) = 0.42 Hz, f(99.9%) = 0.97 Hz, f(99.99%) = 1.87 Hz; pendiente max = 214.2 %BW/s = 1807 N/s
+
+== 2) Filtros causales: retardo de grupo a baja frecuencia, ruido residual, error sobre la curva (apoyo 3.69 s, el mas rapido)
+  filtro                       retardo ms sigma ruido N  dism. err pico N (sin ruido) err/pico %
+  MA 5 muestras                      2.00         0.400   2.1x                   6.30       0.63
+  MA 10 muestras                     4.50         0.283   3.0x                  14.17       1.43
+  MA 20 muestras                     9.50         0.200   4.2x                  29.92       3.01
+  IIR 1er orden fc=5 Hz             31.83         0.112   7.5x                  91.80       9.24
+  IIR 1er orden fc=10 Hz            15.92         0.159   5.3x                  48.10       4.84
+  IIR 1er orden fc=20 Hz             7.96         0.224   3.7x                  23.50       2.37
+  IIR 1er orden fc=40 Hz             3.98         0.317   2.6x                  11.02       1.11
+  Butterworth 2o fc=5 Hz            45.02         0.094   8.9x                 145.71      14.66
+  Butterworth 2o fc=10 Hz           22.51         0.133   6.3x                  71.82       7.23
+  Butterworth 2o fc=20 Hz           11.25         0.189   4.5x                  35.50       3.57
+  Butterworth 2o fc=40 Hz            5.63         0.267   3.2x                  17.69       1.78
+  (err pico = max|filtrada - curva original| incluye el retardo; MA: retardo exacto (N-1)/2 muestras; IIR1: 1/(2*pi*fc); But2: sqrt2/(2*pi*fc))
