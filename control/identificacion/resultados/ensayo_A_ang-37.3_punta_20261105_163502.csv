@@ -1,0 +1,4 @@
+# angulo_sagital_deg=-37.3 etiqueta=punta hueco_mm=230.0 fmax_n=100.0 paso_pasos=16 inicio=20261105_163502 motivo=excepcion: error(5, 'Input/output error') pendientes=0
+t_s,fase,mm,F_N
+6.325,base,0.0,0.0
+11.861,aprox,100.0,1.41

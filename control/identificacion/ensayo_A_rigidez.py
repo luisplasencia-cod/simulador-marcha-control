@@ -52,6 +52,11 @@ Path(salida).parent.mkdir(parents=True, exist_ok=True); Path(a.en_vivo).parent.m
 cab = f"# angulo_sagital_deg={a.angulo_deg} etiqueta={a.etiqueta} hueco_mm={a.hueco_mm} fmax_n={a.fmax_n} paso_pasos={a.paso_pasos} inicio={sello}\n"
 vivo = open(a.en_vivo, "w", buffering=1); vivo.write(cab); vivo.write("t_s,fase,mm,F_N\n")
 filas = []; T0 = time.monotonic()
+_evp = a.en_vivo.replace("en_vivo", "eventos"); _nuevo = (not Path(_evp).exists()) or Path(_evp).stat().st_size == 0
+EV = open(_evp, "a", buffering=1)          # se ACUMULA entre intentos (no se sobrescribe)
+if _nuevo: EV.write("epoch,evento,detalle\n")
+EV.write(f"{time.time():.3f},INICIO_CORRIDA,{a.etiqueta} {a.angulo_deg}\n")
+def ev(nombre, detalle=""): EV.write(f"{time.time():.3f},{nombre},{detalle}\n")
 def reg(fase, mm, F, guardar=True):
     t = round(time.monotonic() - T0, 3); vivo.write(f"{t},{fase},{mm:.3f},{F:.2f}\n")
     if guardar: filas.append([t, fase, round(mm, 3), round(F, 2)])
@@ -99,14 +104,35 @@ def abrir_adc(intentos=6):
             print(f"  init ADC intento {i+1}/{intentos} fallo: {e}"); time.sleep(0.5)
     sys.exit("ADC no inicializa tras reintentos: abortado SIN mover nada.")
 adc = abrir_adc(); f0 = 0.0; bajados = 0; motivo = "?"  # adc global usado por fz()
+ejecutado = [False]
 def mover(p, fase):
-    """Manda MANUAL y mientras se mueve registra Fz continua (~50 Hz) para el visor en vivo."""
+    """Manda MANUAL y mientras se mueve registra Fz continua (~50 Hz) para el visor en vivo.
+    En fase fina/subida un corte del USB NO aborta: reconecta y reintenta (la duda de posicion es <=0.2 mm, irrelevante para k).
+    En la aproximacion larga (25-100 mm) un corte SI aborta (la duda seria de decenas de mm)."""
     global bajados
-    ser.reset_input_buffer(); ser.write(f"<MANUAL:1:{p}>".encode())
-    r = ser.readline().decode(errors="replace").strip()
+    for intento in range(5):
+        ejecutado[0] = False
+        try:
+            _mover_una_vez(p, fase); return
+        except (serial.SerialException, OSError, RuntimeError) as e:
+            ev("ERROR_serial", f"{fase} {p} ejecutado={ejecutado[0]} {str(e)[:50]}")
+            if ejecutado[0] or fase not in ("fino", "sube") or intento == 4: raise   # si ya se ejecuto NO se repite (duplicaria el movimiento)
+            print(f"  corte del USB en fase {fase} ({str(e)[:40]}): reconecto y continuo ({intento+1}/5)", flush=True)
+            conectar(rapido=True)
+
+def _mover_una_vez(p, fase):
+    global bajados
+    ev("cmd", f"{fase} {p}")
+    try:
+        ser.reset_input_buffer(); ser.write(f"<MANUAL:1:{p}>".encode())
+        r = ser.readline().decode(errors="replace").strip()
+    except Exception as e:
+        ev("ERROR_serial", f"{fase} {str(e)[:50]}"); raise
+    ev("ack", r)
     if not r.startswith("OK"): raise RuntimeError(f"ack inesperado: {r!r}")
     bajados -= p  # p negativo = baja
-    fin = time.monotonic() + abs(p) / 1600 + a.asentar_s
+    ejecutado[0] = True
+    fin = time.monotonic() + abs(p) / 1600 + a.asentar_s; ev("mov_fin_previsto", f"{abs(p)/1600:.2f}s")
     while time.monotonic() < fin:
         reg(fase + "_mov", bajados / PASOS_MM, fz(10) - f0, guardar=False)
 
