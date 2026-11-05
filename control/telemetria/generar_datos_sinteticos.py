@@ -48,24 +48,27 @@ with open(salida, "w", newline="") as f:
     w = csv.writer(f)
     w.writerow(["t", "ciclo", "r", "delta", "r_corregida", "F_med", "e", "u"])
     for j in range(A.ciclos):
-        e_ciclo = np.empty(n)
+        epsilon_ciclo = np.empty(n)  # eps_j(t) = r(t) - F(t), AL REF BASE -- es lo que actualiza delta (ec. 4 del diagrama), NO e(t)
         for i in range(n):
             cola.append(F)
             Fm = cola.pop(0)
             r_corr = ref[i] + delta[i]
-            e = r_corr - Fm
+            e = r_corr - Fm       # e(t) = r*(t) - F_med(t)  (ec. 2 del diagrama) -- va al log y maneja u(t)
             u = sim.KP * e
             v += DT * (u - v) / sim.TAU_A
             F += DT * (sim.K_REAL * v)
             w.writerow([f"{t_abs:.4f}", j, f"{ref[i]:.3f}", f"{delta[i]:.3f}",
                         f"{r_corr:.3f}", f"{Fm:.3f}", f"{e:.3f}", f"{u:.3f}"])
-            e_ciclo[i] = e
+            epsilon_ciclo[i] = ref[i] - Fm
             t_abs += DT
             if A.en_vivo and i % 20 == 0:
                 f.flush()
                 time.sleep(DT * 20)
-        e_adel = np.r_[e_ciclo[m:], np.zeros(m)]
-        delta = sim.suavizar(delta + sim.GAMMA * e_adel, int(0.1 / DT))
+        # ec. (4) del diagrama: delta_{j+1} = Q[delta_j + gamma*eps_j(t+m)], eps_j = r - F (NO r* - F;
+        # usar e() ahi en vez de epsilon() produce una realimentacion positiva que diverge -- bug real
+        # encontrado y corregido el 2026-11-05, ver reportes/2026-11-05_reporte_dia.md).
+        eps_adel = np.r_[epsilon_ciclo[m:], np.zeros(m)]
+        delta = sim.suavizar(delta + sim.GAMMA * eps_adel, int(0.1 / DT))
     f.flush()
 
 print("listo.")

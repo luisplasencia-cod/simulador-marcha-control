@@ -7,7 +7,7 @@
 | `referencia_grf/` | Curva objetivo REAL de Fz y duración del apoyo (Gutenberg, 350 sanos) + scripts reproducibles | verificada |
 | `diagramas/` | Diagrama de bloques matemático del lazo simulado (+ leyenda y ecuaciones), estilo skill `diagrama-bloques-control` | hecho 2026-11-03 |
 | `diagramas/implementacion/` | Diagrama de implementación real (hardware/software): AMTI→ADS1256→RPi→`SET_VEL`→ESP32→driver→motor | hecho 2026-11-05, nada probado en hardware |
-| `diagramas/referencias/` | Fotos reales del servo A6-750RS/A6M80-750H2A1-M17 (reference para el diagrama de implementación) | 2026-11-05 |
+| `diagramas/referencias/` | Fotos reales del servo A6-750RS; freno del motor vertical (B1) confirmado en `conferencia_copy.pdf` | 2026-11-05 |
 | `simulacion/` | Simulación control en tiempo real vs ILC con la latencia como variable (modelo con supuestos) | hecha 2026-11-03, ver `simulacion/NOTAS.md` |
 | `../pruebas/2026-11-02_latencia_amti_rpi_esp32.md` | Plan y resultados de latencia (Paso 1 y 2 medidos; Paso 3 pendiente) | parcial |
 | `../pruebas/latencia_*.csv/.png` | Datos crudos de latencia | medido |

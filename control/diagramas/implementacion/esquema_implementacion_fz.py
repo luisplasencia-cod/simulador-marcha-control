@@ -164,7 +164,7 @@ d.add(elm.Line().at(esp.BRAKE).right(1.0).down(1.4).right().tox(drv.ENC))
 # ---------------- MOTOR ----------------
 MX = drv.MOT.x + 4.0
 d.add(elm.Line().at(drv.MOT).right().tox((MX, drv.MOT.y)))
-d.add(elm.Motor().right(3.0).label('A6M80-750H2A1-M17\n750 W, 3000 rpm, 2.39 Nm\n17-bit encoder absoluto\neje VERTICAL (husillo+cadena)', loc='bottom', fontsize=9, ofst=0.5))
+d.add(elm.Motor().right(3.0).label('A6M80-750H2B1-M17\n750 W, 3000 rpm, 2.39 Nm\n17-bit encoder absoluto, CON FRENO\neje VERTICAL (husillo+cadena)', loc='bottom', fontsize=9, ofst=0.5))
 
 # ---------------- TITULO ----------------
 TOP = amti.FZ.y + 4.6
@@ -186,17 +186,19 @@ text((AL, NY - 3.2),
      '• Pines Y_STEP/Y_DIR/Y_BRAKE, LIMIT_Y_*: Codigo ESP32 MOV/platformIO_control_trayectoria_v1/src/hardware_config.h (leído del código fuente).\n'
      '• Protocolo serie (PING, TRAJ_*, etc.): Codigo ESP32 MOV/.../communication.h (leído del código fuente).\n'
      '• SET_VEL, watchdog 80 ms: control/firmware/control_velocidad_continua.patch (diseño propio, NO aplicado ni probado).\n'
-     '• Modelo y specs del driver/motor (A6-750RS / A6M80-750H2A1-M17): manual STEPPERONLINE A6 Series 750W AC Servo Motor Kit (buscado en internet 2026-11-05,\n'
-     '  ver control/diagramas/referencias/README.md) -- marca STEPPERONLINE, no Panasonic (corrige una suposición informal anterior en HISTORIAL.md).\n'
+     '• Modelo y specs del driver (A6-750RS): manual STEPPERONLINE A6 Series 750W AC Servo Motor Kit (buscado en internet 2026-11-05, ver\n'
+     '  control/diagramas/referencias/README.md) -- marca STEPPERONLINE, no Panasonic (corrige una suposición informal anterior en HISTORIAL.md).\n'
+     '• Motor VERTICAL = A6M80-750H2B1-M17 "with a holding brake" (distinto del HORIZONTAL, A6M80-750H2A1-M17, sin freno): conferencia_copy.pdf,\n'
+     '  artículo de conferencia, sección de hardware -- CONFIRMADO ahí, no es el modelo que traía el manual genérico encontrado en internet (ese es el A1).\n'
      '• "Eje Y = vertical": CONFIRMADO por comentario del código fuente (ver control/ilc/README.md), no por memoria de Luis.',
      size=9)
 
 text((AL, NY - 8.0),
-     'DISCREPANCIA A VERIFICAR (no resuelta aquí): el manual del kit STEPPERONLINE A6-RS750H2A1-M17 que se encontró en internet NO menciona freno en\n'
-     'el motor A6M80-750H2A1-M17 -- pero el firmware SÍ maneja un freno por software (Y_BRAKE_PIN = GPIO18, Y_BRAKE_LOCKED/RELEASED). Puede ser que el\n'
-     'motor real instalado sea una variante con freno no listada en el manual genérico encontrado, o que el freno sea una pieza mecánica aparte controlada\n'
-     'por ese GPIO vía relé. No se puede confirmar sin ver la etiqueta física del motor del simulador -- queda pendiente de Luis.',
-     size=9, color=ORANGE)
+     'RESUELTO (2026-11-05): el freno del motor vertical SÍ está documentado -- conferencia_copy.pdf dice "A6M80-750H2B1-M17 servomotor with a\n'
+     'holding brake" para el eje vertical, y "built-in electromagnetic brake to prevent unintended displacement when the system is powered down" con\n'
+     'un "dedicated switching circuit" ya implementado. El manual STEPPERONLINE encontrado en internet era del modelo A1 (horizontal, SIN freno) --\n'
+     'confundir A1/B1 fue un error de esta sesión al buscar fotos, no una duda real del proyecto.',
+     size=9, color=GREEN)
 
 d.save(OUT + '.png', dpi=170)
 d.save(OUT + '.svg')
