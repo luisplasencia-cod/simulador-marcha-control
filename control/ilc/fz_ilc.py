@@ -15,16 +15,23 @@ NO RESUELTO, pendiente de hardware (marcado explicitamente, no se adivina):
    HOMING del firmware (son límites de búsqueda, no el recorrido). VERIFICAR
    FÍSICAMENTE antes de usar este módulo con hardware real -- se deja como
    parámetro (`EJE_VERTICAL`) para no hardcodear una suposición.
-2. GANANCIA fuerza->paso (`PASOS_POR_N`): no hay rigidez de contacto medida
-   (control/identificacion/PROTOCOLO.md, no ejecutado). Sin ella no se puede
-   convertir una correccion de Fz en N a una correccion de posicion en pasos de
-   forma correcta. Aqui se deja como parametro explicito con valor None por
-   defecto -- el script se niega a generar una trayectoria real si no se le da
-   un valor (evita inventar un numero). Se puede estimar groseramente a partir
-   de la curva fuerza-deformacion informal si Luis la tiene, o medirla con el
-   protocolo de identificacion cuando haya hardware.
+2. GANANCIA fuerza->paso (`PASOS_POR_N`): rigidez de contacto YA MEDIDA (Ensayo
+   A, 2026-11-05, una protesis, 3 condiciones): talon 26.4, plana 23.0, punta
+   2.4 N/mm (ver control/ilc/README.md). Se deja como parametro explicito, sin
+   valor por defecto -- el script se niega a generar una trayectoria real si no
+   se le da un valor (evita inventar un numero).
    SI SE CONOCE LA RIGIDEZ (N/mm), pasar `rigidez_n_por_mm=` en vez de
    `pasos_por_n=`: el constructor ya sabe convertir, usando (3).
+   IMPORTANTE (analisis 2026-11-06, ver control/ilc/README.md): el `k` elegido
+   como "conservador" para la Etapa 1 (ganancia fija, antes de tener el CoP en
+   tiempo real) debe ser el MAS RIGIDO medido (talon, 26.4 N/mm), NO el mas
+   blando (punta). Motivo: F_real/F_comandada = k_real/k_asumido. Si k_asumido
+   es mas chico que k_real (p.ej. asumir punta pero estar en talon), esa razon
+   es >1 -- el lazo aplica MAS fuerza de la pedida, mas agresivo de lo
+   diseniado, riesgo de sobre-impulso/inestabilidad. Asumiendo el k mas rigido,
+   la razon es siempre <=1 en el resto del rango -- mas lento, nunca mas
+   agresivo. Costo: respuesta ~11x mas lenta de lo disenado cerca de la punta,
+   hasta que la Etapa 2 (CoP) corrija la ganancia en tiempo real.
 3. Pasos/mm del eje vertical: CONFIRMADO (2026-11-05, Luis paso el script real
    de generacion de trayectorias del firmware, generador_trayectoria.py --
    no versionado en este repo, Luis lo tiene aparte): Y_STEPS_PER_REV=400,
