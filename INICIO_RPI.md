@@ -56,8 +56,15 @@ Lee en `CLAUDE.md` las dos entradas del 2026-11-05 ~11:15 (ADC caído + estado).
    pantalla). Si aparece el salto pequeño y repetible en cada frontera de ciclo que se vio con datos
    sintéticos, no es necesariamente un bug del RPi — ver la nota en `control/telemetria/README.md`.
 
-7. **Validar el híbrido RT+ILC contra el lazo abierto actual** (RMSE/correlación, como en el
-   artículo de conferencia) — el cierre real de la Etapa 3 para Fz.
+7. **Validar el híbrido RT+ILC — DOS comparaciones distintas, no una sola (aclarado 2026-11-06 con Luis):**
+   (a) **RMSE/correlación contra la curva de referencia PUBLICADA** (Gutenberg 2021 o Fukuchi 2018,
+   la misma que ya usa `curva_objetivo_fz()` en `control/ilc/fz_ilc.py`) — esta es la comparación
+   **publicable**, porque se mide contra datos de marcha sana reales, no contra uno mismo.
+   (b) **RMSE/correlación contra el lazo abierto actual** (como en el artículo de conferencia) — sirve
+   como referencia interna para mostrar cuánto mejoró el control nuevo respecto al anterior, pero
+   **NO es publicable por sí sola**: comparar contra el propio lazo abierto no demuestra nada frente a
+   una fuente externa, solo que se mejoró respecto a lo que había antes. Reportar ambas, nunca solo (b).
+   El cierre real de la Etapa 3 para Fz exige (a); (b) es complementaria.
 
 **Solo después de que 1-7 funcionen de verdad (no solo en simulación) se pasa a Fy y sagital** —
 misma arquitectura, otra instancia de `ilc_core.py`, su propia `k` y `pasos_por_mm`.
