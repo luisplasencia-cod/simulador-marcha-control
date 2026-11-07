@@ -44,12 +44,28 @@ NO RESUELTO, pendiente de hardware (marcado explicitamente, no se adivina):
    solo falta (2), la rigidez.
 """
 PASOS_POR_MM_Y = 80.0  # CONFIRMADO 2026-11-05 (ver nota 3 arriba) -- NO inventado
+import json
 import os
 import sys
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ilc_core import ILCController
+
+_TABLA_K = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "identificacion",
+                         "tabla_k_por_protesis.json")
+
+
+def cargar_k_asumido(nombre_protesis="pie_pasivo_1 (la unica probada hasta ahora)"):
+    """k_asumido_etapa1_n_mm (el k MAS RIGIDO medido, ver reportes/2026-11-06_analisis_ganancia_fz_conservadora.md)
+    de control/identificacion/tabla_k_por_protesis.json, para no hardcodear el valor por protesis.
+    Para una protesis nueva: correr el Ensayo A, agregar su entrada a ese JSON, sin tocar este codigo."""
+    with open(_TABLA_K, encoding="utf-8") as f:
+        tabla = json.load(f)
+    for p in tabla["protesis"]:
+        if p["nombre"] == nombre_protesis:
+            return p["k_asumido_etapa1_n_mm"]
+    raise ValueError(f"Protesis '{nombre_protesis}' no esta en {_TABLA_K} -- correr el Ensayo A primero.")
 
 _REF_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "referencia_grf")
 MAX_DATA_LENGTH = 500  # firmware: configurable_motion_data.h

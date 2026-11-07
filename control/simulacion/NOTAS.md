@@ -1,4 +1,15 @@
-# Simulación RT vs ILC con latencia — notas (actualizado 2026-11-03)
+# Simulación RT vs ILC con latencia — notas (actualizado 2026-11-07)
+
+**(2026-11-07) `k_real` ya NO es solo un barrido inventado (0.5-1.5): se agregó una tabla con el `k`
+REAL medido en el Ensayo A (talón 26.4, plana 23.0, punta 2.4 N/mm, 2026-11-05, 1 prótesis), usando
+`k_asumido` = talón (la elección conservadora de la Etapa 1, ver `reportes/2026-11-06_analisis_ganancia_fz_conservadora.md`).
+**Resultado clave:** con esa ganancia fija, ningún pie se vuelve inestable (confirma que la elección
+conservadora es correcta), pero en la punta el ILC pasa de 0.45%BW de error (talón) a **11.9%BW**
+(~26x peor) — el aprendizaje ciclo a ciclo del ILC no compensa bien un desajuste de ganancia tan
+grande (ratio 0.091). Confirma que la Etapa 2 (ganancia variable por CoP) no es un "nice to have":
+sin ella, el control es malo en la punta incluso con muchos ciclos de ILC. Ver salida completa en
+`salida_consola.txt`, sección "Con k REAL medido", y la figura `rt_vs_ilc_k_real_medido.png`
+(barras de error RMS por condición de pie, 3 valores de `tau_a` sin medir).
 
 **La metodología, los datos (verificado vs. no medido), los resultados, cómo leer cada panel y las limitaciones están en `reportes/2026-11-03_reporte_dia.md` § 7.** Este archivo solo indica qué hay en la carpeta.
 

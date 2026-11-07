@@ -6,6 +6,7 @@ Latencia maxima con margen de fase >= 45 grados (analitico, tau_a=20 ms):
    Kp= 40 1/s -> ancho de banda de lazo  5.30 Hz, T max =    5.9 ms
    Kp= 80 1/s -> ancho de banda de lazo  8.63 Hz, T max =    0.0 ms
 Kp=10.0 1/s, tau=20 ms: wgc=9.8 rad/s; T max con margen de fase 45 deg = 60 ms
+Referencia: Fz media de 350 sanos (Gutenberg, 1.40 m/s); apoyo x6 = 3.69 s
 RMS del error [%BW] (referencia pico ~100 %BW), ultimo ciclo:
 T[ms]        RT     RT+FF       ILC  ILC+pert   RT+pert
     0     12.25      2.70      0.42      0.68     12.27
@@ -33,7 +34,20 @@ SENSIBILIDAD a parametros NO medidos (T=10 ms, Kp=10): RMS ultimo ciclo [%BW] RT
         50     0.8 |     12.65      0.96
         50     1.0 |     10.47      0.79
         50     1.5 |      7.22      0.62
+
+Con k REAL medido (Ensayo A, 1 protesis; k_asumido = talon = 26.4 N/mm, decision Etapa 1):
+  (T=10 ms, Kp=10): RMS ultimo ciclo [%BW] RT / ILC
+  tau= 10 ms  talon (+11.14 deg)   ratio=1.000 |      9.20      0.45
+  tau= 10 ms  plana (0 deg)        ratio=0.871 |     10.44      0.47
+  tau= 10 ms  punta (-37.3 deg)    ratio=0.091 |     27.19     11.94
+  tau= 20 ms  talon (+11.14 deg)   ratio=1.000 |      9.46      0.29
+  tau= 20 ms  plana (0 deg)        ratio=0.871 |     10.71      0.35
+  tau= 20 ms  punta (-37.3 deg)    ratio=0.091 |     27.43     12.41
+  tau= 50 ms  talon (+11.14 deg)   ratio=1.000 |     10.47      0.79
+  tau= 50 ms  plana (0 deg)        ratio=0.871 |     11.78      0.89
+  tau= 50 ms  punta (-37.3 deg)    ratio=0.091 |     28.17     14.26
 SENSIBILIDAD a la duracion del apoyo (tau=20 ms, k=0.8, T=10 ms): RMS RT / ILC
   apoyo 2.92 s |  13.96   0.85
   apoyo 3.69 s |  11.54   0.40
   apoyo 4.76 s |   9.27   0.21
+Figura guardada: control/simulacion/rt_vs_ilc_k_real_medido.png

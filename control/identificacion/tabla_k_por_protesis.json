@@ -1,0 +1,16 @@
+{
+  "_comentario": "Tabla de rigidez de contacto k (N/mm) medida por protesis, eje vertical (Fz). Agregar una protesis nueva = repetir el Ensayo A (control/identificacion/PROTOCOLO.md) y agregar su entrada aqui, sin tocar codigo. 'k_asumido_etapa1' = el k MAS RIGIDO medido para esa protesis (ver reportes/2026-11-06_analisis_ganancia_fz_conservadora.md -- el mas rigido, no el mas blando, es el conservador).",
+  "protesis": [
+    {
+      "nombre": "pie_pasivo_1 (la unica probada hasta ahora)",
+      "fecha_ensayo": "2026-11-05",
+      "k_por_condicion_n_mm": {
+        "talon (+11.14 deg)": 26.4,
+        "plana (0 deg)": 23.0,
+        "punta (-37.3 deg)": 2.4
+      },
+      "k_asumido_etapa1_n_mm": 26.4,
+      "notas": "1 pasada por condicion, sin repetibilidad medida. Detalle: reportes/ESTADO_Y_PENDIENTES_para_retomar.md"
+    }
+  ]
+}

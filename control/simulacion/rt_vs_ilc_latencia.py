@@ -146,6 +146,23 @@ if __name__ == "__main__":
             r2 = simular("ILC", 0.010, NC, tau=tau, k_real=kr)[0][-1]
             f = lambda x: "inestable" if not np.isfinite(x) else f"{x:6.2f}"
             print(f"  {tau*1e3:8.0f}  {kr:6.1f} | {f(r1):>9} {f(r2):>9}")
+
+    # --- k_real MEDIDO de verdad (Ensayo A, 2026-11-05, 1 protesis): talon 26.4,
+    # plana 23.0, punta 2.4 N/mm. K_RATIO = k_real / k_asumido (k_asumido = talon,
+    # 26.4 N/mm, la eleccion conservadora de la Etapa 1, ver
+    # reportes/2026-11-06_analisis_ganancia_fz_conservadora.md). Reemplaza el barrido
+    # de k_real INVENTADO (0.5-1.5) de arriba por las 3 condiciones REALES de pie.
+    K_MEDIDO_N_MM = {"talon (+11.14 deg)": 26.4, "plana (0 deg)": 23.0, "punta (-37.3 deg)": 2.4}
+    K_ASUMIDO_ETAPA1 = K_MEDIDO_N_MM["talon (+11.14 deg)"]  # decision 2026-11-06
+    print("\nCon k REAL medido (Ensayo A, 1 protesis; k_asumido = talon = 26.4 N/mm, decision Etapa 1):")
+    print(f"  (T=10 ms, Kp={KP:.0f}): RMS ultimo ciclo [%BW] RT / ILC")
+    for tau in (0.01, 0.02, 0.05):
+        for nombre, k_n_mm in K_MEDIDO_N_MM.items():
+            ratio = k_n_mm / K_ASUMIDO_ETAPA1
+            r1 = simular("RT", 0.010, 3, tau=tau, k_real=ratio)[0][-1]
+            r2 = simular("ILC", 0.010, NC, tau=tau, k_real=ratio)[0][-1]
+            f = lambda x: "inestable" if not np.isfinite(x) else f"{x:6.2f}"
+            print(f"  tau={tau*1e3:3.0f} ms  {nombre:<20} ratio={ratio:5.3f} | {f(r1):>9} {f(r2):>9}")
     print("SENSIBILIDAD a la duracion del apoyo (tau=20 ms, k=0.8, T=10 ms): RMS RT / ILC")
     for tc in CFG["tc_sens"]:
         print(f"  apoyo {tc:.2f} s | {simular('RT', 0.010, 3, tc=tc)[0][-1]:6.2f} {simular('ILC', 0.010, NC, tc=tc)[0][-1]:6.2f}")
@@ -169,3 +186,24 @@ if __name__ == "__main__":
     ax[1, 1].set_yscale("log"); ax[1, 1].set_ylim(0.1, 100); ax[1, 1].set_title("(d) Con perturbacion no repetible (pulso 3 %BW)"); ax[1, 1].set_xlabel("latencia total T [ms]"); ax[1, 1].set_ylabel("RMS [%BW]"); ax[1, 1].legend()
     fig.suptitle(f"Objetivo REAL: {CFG['etiqueta']}. Planta SIN MEDIR (tau_a=20 ms, k real=0.8, valores de partida que se barren); apoyo {CFG['tc']:.2f} s (x6)", fontsize=9)
     fig.tight_layout(); fig.savefig(f"control/simulacion/rt_vs_ilc_latencia{CFG['sufijo']}.png", dpi=130)
+
+    # --- Figura con el k REAL medido (Ensayo A), reemplaza el barrido inventado ---
+    fig2, ax2 = plt.subplots(figsize=(7, 4.5))
+    x = np.arange(len(K_MEDIDO_N_MM))
+    anchos = 0.25
+    for j, tau in enumerate((0.01, 0.02, 0.05)):
+        rt_vals, ilc_vals = [], []
+        for k_n_mm in K_MEDIDO_N_MM.values():
+            ratio = k_n_mm / K_ASUMIDO_ETAPA1
+            rt_vals.append(simular("RT", 0.010, 3, tau=tau, k_real=ratio)[0][-1])
+            ilc_vals.append(simular("ILC", 0.010, NC, tau=tau, k_real=ratio)[0][-1])
+        ax2.bar(x + (j - 1) * anchos, ilc_vals, anchos, label=f"ILC, tau={tau*1e3:.0f} ms",
+                color=plt.cm.Greens(0.4 + j * 0.25))
+    ax2.set_xticks(x); ax2.set_xticklabels(K_MEDIDO_N_MM.keys())
+    ax2.set_ylabel("RMS error [%BW], ultimo ciclo"); ax2.set_yscale("log")
+    ax2.set_title(f"ILC con k REAL medido (Ensayo A, 1 protesis), k_asumido=talon={K_ASUMIDO_ETAPA1} N/mm\n"
+                   f"T=10 ms, Kp={KP:.0f} 1/s -- tau_a SIN MEDIR, se barre", fontsize=9)
+    ax2.legend(fontsize=8)
+    fig2.tight_layout()
+    fig2.savefig("control/simulacion/rt_vs_ilc_k_real_medido.png", dpi=130)
+    print("Figura guardada: control/simulacion/rt_vs_ilc_k_real_medido.png")

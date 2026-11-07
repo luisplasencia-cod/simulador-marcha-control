@@ -36,6 +36,9 @@ Valor a usar en Etapa 1: `rigidez_n_por_mm = 26.4` → `pasos_por_n = 80/26.4 �
 
 (`control/identificacion/resultados/mapa_calor_k_2026-11-06.png`, script: `control/identificacion/mapa_calor_k.py`). Los 3 puntos marcados (líneas punteadas, etiquetados con ángulo y `k`) son los ÚNICOS datos medidos; la franja de color entre ellos es una interpolación lineal puramente visual, no un dato medido — se indica así en el título de la figura.
 
+## Actualización 2026-11-07 — cuantificado con simulación
+`control/simulacion/rt_vs_ilc_latencia.py` ya incorpora los 3 `k` reales (antes usaba un barrido inventado 0.5–1.5 normalizado). Con `Kp=10`, `T=10 ms`: el ILC pasa de **0.45%BW de error** en talón (el `k` asumido) a **11.9%BW** en la punta (~26× peor) — ni el aprendizaje ciclo a ciclo del ILC compensa bien un desajuste de ganancia de 11×. Nunca se vuelve inestable (confirma que la elección del `k` conservador fue correcta), pero confirma que la Etapa 2 (CoP) no es solo una mejora de desempeño — sin ella, el control es malo en toda la fase final del apoyo. Figura: `control/simulacion/rt_vs_ilc_k_real_medido.png`. Detalle: `control/simulacion/NOTAS.md`.
+
 ## Limitaciones
 - Solo 3 puntos medidos (talón, plana, punta), todos de una sola prótesis, en ensayo estático (ángulo fijo, sin desplazamiento del punto de contacto como en marcha real). No se sabe si existe algún punto intermedio con `k` aún más rígido que 26.4 — el margen de seguridad asume que el máximo medido es representativo del máximo real.
 - El análisis es puramente de ganancia estática (relación fuerza-paso); no incluye el efecto de la dinámica del lazo completo (retardo, filtro, ganancia Kp del RT) sobre el margen de estabilidad real — eso requiere simulación o prueba en hardware.
