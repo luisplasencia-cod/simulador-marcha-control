@@ -51,3 +51,16 @@ SENSIBILIDAD a la duracion del apoyo (tau=20 ms, k=0.8, T=10 ms): RMS RT / ILC
   apoyo 3.69 s |  11.54   0.40
   apoyo 4.76 s |   9.27   0.21
 Figura guardada: control/simulacion/rt_vs_ilc_k_real_medido.png
+
+Barrido de Kp (tau_a=20 ms SIN MEDIR; k REAL del Ensayo A; T=10 ms = latencia parcial medida):
+  Kp[1/s]  T_max(PM45, tau=20ms)[ms] | RMS ult. ciclo [%BW] ILC: talon / plana / punta
+        5      137.9                |  2.31 /  2.40 / 17.16
+       10       60.3                |  0.29 /  0.35 / 12.41
+       15       35.0                |  0.20 /  0.23 /  9.30
+       20       22.8                |  0.21 /  0.22 /  6.96
+       30       11.2                |  0.22 /  0.21 /  4.01
+       40        5.9                |  0.22 /  0.21 /  2.64
+       60        1.2                |  0.22 /  0.21 /  1.45
+       80        0.0                |  3.93 /  0.22 /  0.87
+  (latencia parcial medida hoy = 10 ms; faltan computo RPi + ejecucion ESP32 sin medir)
+Figura guardada: control/simulacion/barrido_kp_2026-11-08.png

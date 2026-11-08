@@ -207,3 +207,44 @@ if __name__ == "__main__":
     fig2.tight_layout()
     fig2.savefig("control/simulacion/rt_vs_ilc_k_real_medido.png", dpi=130)
     print("Figura guardada: control/simulacion/rt_vs_ilc_k_real_medido.png")
+
+    # --- Barrido de Kp: recomendacion de partida para el banco (2026-11-08) ---
+    # Latencia parcial MEDIDA hoy (CLAUDE.md 2026-11-04/05): RPi<->ESP32 5.97 ms +
+    # ADS1256+SPI 1.6-2.4 ms + AMTI SUPUESTO 2-3 ms = suma parcial ~10 ms; faltan
+    # computo en RPi y ejecucion del ESP32 (no medidos) -> se evalua con MARGEN,
+    # no solo en el punto T=10 ms.
+    T_MEDIDO_PARCIAL = 0.010
+    KPS = (5, 10, 15, 20, 30, 40, 60, 80)
+    print("\nBarrido de Kp (tau_a=20 ms SIN MEDIR; k REAL del Ensayo A; T=10 ms = latencia parcial medida):")
+    print("  Kp[1/s]  T_max(PM45, tau=20ms)[ms] | RMS ult. ciclo [%BW] ILC: talon / plana / punta")
+    for kp in KPS:
+        tmax_kp, _ = margen_fase_Tmax(kp, tau=0.02)
+        errs = []
+        for k_n_mm in K_MEDIDO_N_MM.values():
+            ratio = k_n_mm / K_ASUMIDO_ETAPA1
+            errs.append(simular("ILC", T_MEDIDO_PARCIAL, NC, kp=kp, tau=0.02, k_real=ratio)[0][-1])
+        f = lambda x: "inestable" if not np.isfinite(x) else f"{x:5.2f}"
+        print(f"  {kp:7d}  {tmax_kp*1e3:9.1f}                | {f(errs[0])} / {f(errs[1])} / {f(errs[2])}")
+    print(f"  (latencia parcial medida hoy = {T_MEDIDO_PARCIAL*1e3:.0f} ms; faltan computo RPi + ejecucion ESP32 sin medir)")
+
+    fig3, (ax3a, ax3b) = plt.subplots(1, 2, figsize=(11, 4.5))
+    tmaxs = [margen_fase_Tmax(kp, tau=0.02)[0] * 1e3 for kp in KPS]
+    ax3a.plot(KPS, tmaxs, "o-", color="tab:blue")
+    ax3a.axhline(T_MEDIDO_PARCIAL * 1e3, color="gray", ls="--")
+    ax3a.text(KPS[-1], T_MEDIDO_PARCIAL * 1e3 * 1.15, "latencia parcial medida hoy (10 ms)", fontsize=8, ha="right", color="gray")
+    ax3a.set_yscale("log"); ax3a.set_xlabel("Kp [1/s]"); ax3a.set_ylabel("T max, margen de fase 45° [ms]")
+    ax3a.set_title("(a) Margen de estabilidad vs Kp\n(tau_a=20 ms SIN MEDIR)")
+    errs_por_kp = {"talon": [], "plana": [], "punta": []}
+    for kp in KPS:
+        for nombre_corto, k_n_mm in zip(("talon", "plana", "punta"), K_MEDIDO_N_MM.values()):
+            ratio = k_n_mm / K_ASUMIDO_ETAPA1
+            errs_por_kp[nombre_corto].append(simular("ILC", T_MEDIDO_PARCIAL, NC, kp=kp, tau=0.02, k_real=ratio)[0][-1])
+    for nombre_corto, c in (("talon", "tab:brown"), ("plana", "tab:gray"), ("punta", "tab:green")):
+        ax3b.plot(KPS, errs_por_kp[nombre_corto], "o-", color=c, label=nombre_corto)
+    ax3b.set_yscale("log"); ax3b.set_xlabel("Kp [1/s]"); ax3b.set_ylabel("RMS error ILC, ultimo ciclo [%BW]")
+    ax3b.set_title("(b) Error con k REAL medido vs Kp\n(T=10 ms, latencia parcial medida)")
+    ax3b.legend(fontsize=8)
+    fig3.suptitle("Barrido de Kp -- recomendacion de partida para el banco (2026-11-08)", fontsize=10)
+    fig3.tight_layout()
+    fig3.savefig("control/simulacion/barrido_kp_2026-11-08.png", dpi=130)
+    print("Figura guardada: control/simulacion/barrido_kp_2026-11-08.png")

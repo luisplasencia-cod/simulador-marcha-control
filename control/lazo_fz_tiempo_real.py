@@ -11,11 +11,15 @@ Escrito sin RPi/ESP32 a mano (2026-11-07), solo contra lo ya documentado:
 BLOQUEOS CONOCIDOS ANTES DE PODER CORRER ESTO DE VERDAD (no inventar, no esquivar):
   1. El parche `control/firmware/control_velocidad_continua.patch` (comando SET_VEL)
      NO esta compilado ni flasheado. Sin el, el ESP32 no entiende SET_VEL.
-  2. El formato de RESPUESTA de SET_VEL (si manda ACK o no, y que pasa si se
-     manda mas rapido que el watchdog de 80 ms) no esta confirmado contra el
-     firmware real -- `ClienteVelocidadESP32` de abajo asume "fire and forget"
-     (sin esperar respuesta) porque el objetivo es baja latencia; VERIFICAR
-     cuando el patch este flasheado y antes de confiar en esto con motores.
+  2. RESUELTO 2026-11-08 (leyendo el codigo, no probado en hardware todavia):
+     SET_VEL SI responde, igual que cualquier otro comando -- `primary_task`
+     en main.cpp es un ciclo `communication_rx -> dispatch -> communication_tx`
+     siempre bloqueante; `handle_velocity_command` llena txPacket con OK o BUSY
+     como cualquier handler. NO es fire-and-forget. `ClienteVelocidadESP32` de
+     abajo ya lee y descarta esa respuesta en cada `set_vel()`. El RTT de esto
+     es el mismo que el medido con PING/PONG (mismo mecanismo): ~6 ms (5.97 ms,
+     ver reportes/) -- ya cabe dentro de dt_control_s=10 ms, pero falta
+     confirmar en banco que no se degrada con el servo en movimiento.
   3. `KP` (ganancia proporcional, 1/s) NO esta elegida/ajustada contra el
      sistema real -- ver control/simulacion/rt_vs_ilc_latencia.py y su
      sensibilidad con el k REAL medido. Usar un valor de PARTIDA conservador
@@ -43,7 +47,10 @@ r, delta, r_corregida, F_med, e, u):
 
 Uso previsto (cuando el patch SET_VEL este flasheado y probado en banco):
     python control/lazo_fz_tiempo_real.py --peso_sujeto_n 850 --n_ciclos 10 \\
-        --kp 10 --protesis "pie_pasivo_1 (la unica probada hasta ahora)"
+        --kp 15 --protesis "pie_pasivo_1 (la unica probada hasta ahora)"
+    (--kp 15 = recomendacion de partida 2026-11-08, ver reportes/2026-11-08_avance_sin_rpi.md Sec.3;
+    re-elegir con control/simulacion/rt_vs_ilc_latencia.py cuando tau_a y la latencia completa
+    esten medidas de verdad, no supuestas.)
 """
 import argparse
 import csv
@@ -63,10 +70,16 @@ N_MEDIANA = 5  # filtro de errores de bit SPI con el servo activo (ver bloqueo 5
 
 class ClienteVelocidadESP32:
     """Cliente serial del comando SET_VEL (patch control_velocidad_continua.patch).
-    *** NO PROBADO: el patch no esta flasheado. *** Fire-and-forget (no espera
-    respuesta) para no agregar latencia al lazo -- VERIFICAR contra el firmware
-    real si en efecto no responde nada a SET_VEL, o si hay que leer/descartar
-    una linea para no llenar el buffer de entrada del puerto serie."""
+    *** NO PROBADO: el patch no esta flasheado. *** SET_VEL SI responde (OK o
+    BUSY) -- confirmado leyendo communication.h/main.cpp: primary_task es
+    siempre communication_rx -> dispatch -> communication_tx, igual que
+    cualquier otro comando (MANUAL, GOTO, etc.), handle_velocity_command no es
+    la excepcion. set_vel() lee y descarta esa respuesta (si llega BUSY, el eje
+    seguia ocupado por otro comando -- no deberia pasar en el lazo normal,
+    pero se registra un aviso si pasa). RTT esperado ~6 ms (mismo mecanismo que
+    PING/PONG, medido 5.97 ms, ver reportes/) -- VERIFICAR en banco que no se
+    degrada con el servo en movimiento antes de confiar en el presupuesto de
+    dt_control_s=10 ms."""
 
     def __init__(self, puerto="/dev/ttyUSB0", baudrate=115200, timeout=0.05):
         import serial  # import tardio: este modulo se puede inspeccionar sin pyserial instalado
@@ -76,6 +89,11 @@ class ClienteVelocidadESP32:
     def set_vel(self, eje, pasos_por_seg):
         frame = f"<SET_VEL:{eje}:{int(round(pasos_por_seg))}>\n"
         self.ser.write(frame.encode("ascii"))
+        resp = self.ser.readline().decode("ascii", errors="replace").strip()
+        if resp.startswith("BUSY"):
+            print(f"AVISO: SET_VEL eje {eje} respondio BUSY (eje ocupado por otro comando)")
+        elif not resp.startswith("OK"):
+            print(f"AVISO: SET_VEL eje {eje} respuesta inesperada: {resp!r} (timeout o desync?)")
 
     def detener(self, eje):
         self.set_vel(eje, 0)
@@ -162,7 +180,11 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--peso_sujeto_n", type=float, required=True)
     ap.add_argument("--n_ciclos", type=int, default=5)
-    ap.add_argument("--kp", type=float, required=True, help="ganancia proporcional [1/s], ver control/simulacion/")
+    ap.add_argument("--kp", type=float, default=15.0,
+                     help="ganancia proporcional [1/s]. Default 15 = recomendacion de partida "
+                          "2026-11-08 (ver reportes/2026-11-08_avance_sin_rpi.md Sec.3 y "
+                          "control/simulacion/barrido_kp_2026-11-08.png); re-elegir cuando tau_a "
+                          "y la latencia completa esten medidas, no solo supuestas.")
     ap.add_argument("--protesis", default="pie_pasivo_1 (la unica probada hasta ahora)")
     ap.add_argument("--referencia", default="gutenberg")
     ap.add_argument("--puerto_esp32", default="/dev/ttyUSB0")

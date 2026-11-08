@@ -1,4 +1,6 @@
-# Simulación RT vs ILC con latencia — notas (actualizado 2026-11-07)
+# Simulación RT vs ILC con latencia — notas (actualizado 2026-11-08)
+
+**(2026-11-08) Barrido de `Kp` → recomendación de partida: 15 1/s.** Ver `reportes/2026-11-08_avance_sin_rpi.md` §3 y figura `barrido_kp_2026-11-08.png`. `Kp=15` da 3.5× de margen de fase sobre la latencia parcial ya medida (10 ms); `Kp≥40` se queda sin margen. Re-ejecutar este barrido cuando `tau_a` y la latencia completa estén medidas (hoy ambos son supuestos).
 
 **(2026-11-07) `k_real` ya NO es solo un barrido inventado (0.5-1.5): se agregó una tabla con el `k`
 REAL medido en el Ensayo A (talón 26.4, plana 23.0, punta 2.4 N/mm, 2026-11-05, 1 prótesis), usando
