@@ -198,18 +198,21 @@
  void handle_manual_absolute_command(Packet &rxPacket, Packet &txPacket){
    int dx_steps, dy_steps, dk_steps;
  
-@@ -599,7 +730,9 @@
+@@ -599,7 +730,12 @@
    int any_limit_pressed = 0;
  
    if (strcmp(rxPacket.command, RUN) == 0){
 -    if (Traj_state != TRAJ_IDLE){
-+    if (Traj_state != TRAJ_IDLE || axis_x.continuous_mode || axis_y.continuous_mode || axis_k.continuous_mode){
-+      // el segundo caso: un eje en velocidad continua (control en tiempo
-+      // real) no se pisa con una trayectoria -- primero SET_VEL:eje:0
++    if (Traj_state != TRAJ_IDLE || axis_x.continuous_mode || axis_k.continuous_mode){
++      // NO se incluye axis_y: la arquitectura objetivo corre Y en SET_VEL
++      // (control de Fz en tiempo real) AL MISMO TIEMPO que RUN mueve X/K
++      // (trayectoria preestablecida del montaje 37) -- fix 2026-11-08,
++      // ver reportes/2026-11-08_fix_firmware_run_set_vel.md
++      // X y K si se siguen bloqueando entre si y con RUN, igual que antes.
        strncpy(txPacket.command, ERROR, MAX_COMMAND_LENGTH);
        txPacket.parameter_count = 0;
      }
-@@ -721,6 +854,10 @@
+@@ -721,6 +857,10 @@
      handle_manual_relative_command(rxPacket, txPacket);
    }
  
