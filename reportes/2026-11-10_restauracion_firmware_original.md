@@ -84,3 +84,17 @@ Datos: `pruebas/resultados/ping_pong_20261110_v3_701.csv`, `pruebas/resultados/l
 ### Repetición con cuenta regresiva (2026-11-10, ~16:25): signo CONFIRMADO por Luis
 La primera corrida (2.5 mm) Luis no la vio. Repetición: `--dur_s 1.0 --cuenta_s 10` (datos: `pruebas/resultados/set_vel_aire_20261110_rep2.json`). Contador: A **402 pasos** (≈5.03 mm; 50 comandos `OK`, RTT 5.77 ms, máx 8.67), B **32 pasos** (igual que la primera corrida: el watchdog de 80 ms), C retorno a 0 con `MANUAL:1:-434`.
 **Luis, textual: "si subio"** → `SET_VEL` con velocidad positiva SUBE el eje Y, la misma convención que `MANUAL` (+ = subir). Esto sí es observación física, pero cualitativa: Luis no dijo cuánto subió (no se midió con regla) ni que se detuviera en B, y el retorno a 0 es del contador, no medido. Limitaciones previas siguen: sin contacto, sin Fz, una sola repetición del sentido.
+
+## Lazo cerrado de Fz: revisión crítica y reescritura de `control/lazo_fz_tiempo_real.py` (2026-11-10, ~16:40) — NO probado en hardware
+**Problemas reales encontrados al revisar el script antes de usarlo con contacto (todos corregidos):**
+1. **Sin tara:** `leer_n()` daba Fz con el offset del ADC (−31 N a −49 N; deriva ≈10 N entre las 15:40 y las 16:10). El lazo lo habría tomado como fuerza. Ahora `tarar()` (mediana de 200 muestras con el eje quieto, sin contacto; aborta si p5–p95 > 15 N).
+2. **Sin aproximación:** la referencia pide fuerza desde t=0, y el lazo habría bajado saturado (20 mm/s) a ciegas hasta el contacto. Ahora: descenso rápido (20 mm/s) hasta `hueco−30 mm`, luego lento (5 mm/s) hasta F > 8 N; recién ahí empieza el lazo.
+3. **Sin tope de descenso:** ahora aborta si el descenso ordenado integrado ≥ `hueco + 20 mm`.
+4. **Lecturas anómalas:** aborta si F < −30 N o |ΔF| > 30 N entre muestras filtradas; también ante 3 respuestas seguidas ≠ `OK` a `SET_VEL`.
+5. **Espera de 2 s al abrir el puerto** → 6 s (con 2.5 s se leyó basura de arranque hoy).
+6. **`SystemExit` incondicional** → ahora sin `--ejecutar` solo imprime el plan; en real exige `--hueco_remedido` (regla de Luis: el hueco se mide de nuevo en cada corrida) y registra el ángulo (`--angulo_deg`) en un `.meta.txt` junto al log.
+7. **Retorno seguro al final** (también ante abortos): `SET_VEL 0`, lee el contador y sube con `MANUAL` en tramos de ≤800 pasos, como la subida gruesa del Ensayo A. Si falla, lo avisa en voz alta.
+Se quitó el `\n` extra del marco `<SET_VEL:…>` (la prueba que sí funcionó no lo mandaba).
+
+**Prueba SIN hardware (`--simulado`, planta sintética k=25 N/mm, contacto a 75 mm con hueco declarado 80, offset −40 N, ruido σ 0.9 N, pico ~118 N, 3 ciclos):** contacto detectado a 75.3 mm; RMS por ciclo 8.78 → 5.44 → 4.01 N; contador final 0. Valida la lógica (tara, aproximación, abortos, retorno). **No valida** la dinámica real: la planta simulada no tiene el servo, el retardo del AMTI (supuesto), la histéresis ni el acople de ruido del servo.
+**Limitaciones/pendiente:** (a) con el pie en punta (−37.3°, k≈2.4 N/mm, la última posición) `pasos_por_n` calculado con k=26.4 es 11× menor al necesario: respuesta lentísima y no llega a la fuerza; para una primera prueba conviene plana (0°, k≈23) — falta mover el sagital (movimiento: pedir a Luis); (b) hay que medir el hueco con el pie ya en su ángulo; (c) primera corrida real: escala baja (`--peso_sujeto_n 100`, pico ~118 N, ya probado hasta 163 N en el Ensayo A), `--fmax_n 150`; (d) el ADC con el servo activo sigue dando errores de bit (mediana de 5, sin verificar que alcance).
