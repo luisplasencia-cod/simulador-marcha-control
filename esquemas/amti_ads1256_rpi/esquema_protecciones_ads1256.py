@@ -91,7 +91,7 @@ yt = ads.V5.y + 9
 xv = ads.V5.x
 x0 = xv - 30
 d.add(elm.SourceV().at((x0, yt - 5.5)).to((x0, yt))); T((x0 - 1.3, yt - 2.75), '5 V ext.', size=F_COMP, ha='right', va='center'); gnd((x0, yt - 5.5))
-d.add(elm.Inductor().at((x0, yt)).to((x0 + 9, yt)).label('FB1 ferrita', fontsize=F_COMP, color=YEL, loc='top'))
+d.add(elm.Resistor().at((x0, yt)).to((x0 + 9, yt)).label('R5 1–2.2 Ω', fontsize=F_COMP, color=YEL, loc='top'))
 xn5 = x0 + 14
 L((x0 + 9, yt), (xn5, yt)); dot((xn5, yt))
 d.add(elm.Capacitor(polar=True).at((xn5, yt)).to((xn5, yt - 5))); T((xn5 - 1.3, yt - 2.5), 'C1 100 µF', size=F_COMP, color=YEL, ha='right', va='center'); gnd((xn5, yt - 5))
@@ -111,18 +111,23 @@ T((AX - 8, y0),
   '①  47 Ω en serie en SCLK, DIN y CS, cerca del RPi: amortiguan rebotes.   DOUT y DRDY van directos.\n'
   '②  PDWN: cable a 3V3 (pin 1) SOLDADO + 10 kΩ a OTRO 3V3 (pin 17) = dos caminos independientes. 100 nF a GND filtra picos.\n'
   '③  AIN0: 1 kΩ + 100 nF, fc = 1/(2π·1 kΩ·100 nF) ≈ 1.6 kHz (la marcha necesita < 100 Hz). Verificar la impedancia de salida del AMTI (no medida).\n'
-  '④  Entrada de 5 V: ferrita en serie + C1 100 µF + C2 100 nF pegados al módulo. AVDD debe estar entre 4.75 y 5.25 V (datasheet): medirlo\n'
-  '     en el pin del módulo con el servo en marcha. Elegir la ferrita por la corriente real de la placa (no medida).\n'
+  '④  Entrada de 5 V: R5 de 1–2.2 Ω en serie (reemplaza la ferrita, que no hay) + C1 100 µF + C2 100 nF pegados al módulo. fc ≈ 720 Hz con 2.2 Ω.\n'
+  '     Caída = I·R5: MEDIR la corriente de la placa (no medida). AVDD debe estar entre 4.75 y 5.25 V (datasheet): medirlo en el módulo con el servo en marcha.\n'
   '⑤  GND de fuente externa, ADC, AMTI y RPi unidos en UN solo punto (estrella). Cable del AMTI blindado (malla a GND en un solo extremo)\n'
   '     y ≥ 30 cm de separación del cable del servo y del freno.',
   size=F_NOTE, color=YEL)
-T((AX - 8, y0 - 15.5),
+T((AX - 8, y0 - 9.5),
   'ORDEN SUGERIDO:  (0) con el ADC caído, medir con multímetro: 5 V de entrada, 3.3 V del regulador (AMS1117), VREF (ADR03B, debe dar 2.5 V) y PDWN (≈3.3 V).\n'
-  '(1) ② PDWN: cable soldado + pull-up a otro 3V3.   (2) ④ C1/C2 y ferrita en la entrada de 5 V.   (3) ⑤ GND en un solo punto, cables cortos.\n'
+  '(1) ② PDWN: cable soldado + pull-up a otro 3V3.   (2) ④ R5 + C1/C2 en la entrada de 5 V.   (3) ⑤ GND en un solo punto, cables cortos.\n'
   '(4) ① resistencias en serie y ③ filtro RC en AIN0.   (5) Si persiste el error con el servo en marcha: alimentación AISLADA (DC-DC aislado) y/o aislador digital en SPI.',
   size=F_NOTE, color=GREEN)
-T((AX - 8, y0 - 23.5),
+T((AX - 8, y0 - 15.5),
   'CORRECCIÓN a lo dicho antes: un pull-up de PDWN al MISMO cable de 3V3 no protege si ese cable se suelta; por eso va a otro pin de 3V3 (pin 17).',
   size=F_NOTE, color=RED)
+T((AX - 8, y0 - 19.5),
+  'LISTA DE COMPRAS (criterio propio, ninguna fuente lo confirma):  1) 100 µF, 100 nF, resistencias 1 Ω, 2.2 Ω, 10 kΩ, 47 Ω.   2) OTRA placa ADS1256 igual (separa placa dañada de causa externa).\n'
+  '3) Fuente de 5 V externa (aislada si se puede) para el ADC: funcionó el 2026-11-05.   4) Cable de par trenzado apantallado para AIN0.\n'
+  '5) Solo si lo anterior falla: aislador SPI de 4 canales y aislador/hub USB alimentado para el ESP32.   NO comprar otro ADC (ADS1261/1263): la falla es cuelgue, no ruido.',
+  size=F_NOTE, color=GREEN)
 d.save(OUT + '.png', dpi=100, transparent=False); d.save(OUT + '.svg', transparent=False)
 print("guardado", OUT + ".png")
