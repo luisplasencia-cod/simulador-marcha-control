@@ -63,7 +63,7 @@ from datetime import datetime
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "ilc"))
 from fz_ilc import ControlFzILC, PASOS_POR_MM_Y, cargar_k_asumido  # noqa: E402
 
-EJE_VERTICAL = "Y"  # CONFIRMADO (ver control/ilc/README.md): Y = vertical = Fz
+EJE_VERTICAL = 1  # ENTERO: eje 0=X, 1=Y (vertical), 2=K. NO usar texto: el firmware hace atoi("Y")=0 -> movia X (error 2026-11-10)
 DT_CONTROL_S = 0.010  # 10 ms -- bien menor al watchdog de 80 ms del firmware; AJUSTAR si hace falta
 N_MEDIANA = 5  # filtro de errores de bit SPI con el servo activo (ver bloqueo 5 arriba)
 # SIGNO (2026-11-10): en el firmware, SET_VEL usa la misma convencion que MANUAL:
@@ -106,6 +106,8 @@ class ClienteVelocidadESP32:
         return self.ser.readline().decode("ascii", errors="replace").strip()
 
     def set_vel(self, eje, pasos_por_seg):
+        if not isinstance(eje, int) or eje not in (0, 1, 2):
+            raise ValueError(f"eje debe ser el ENTERO 0, 1 o 2 (recibido {eje!r}): el firmware hace atoi() y un texto cae en el eje 0 (X)")
         resp = self._cmd(f"SET_VEL:{eje}:{int(round(pasos_por_seg))}")
         if resp.startswith("OK"):
             self.fallos = 0
@@ -117,6 +119,8 @@ class ClienteVelocidadESP32:
         return resp
 
     def detener(self, eje):
+        if not isinstance(eje, int) or eje not in (0, 1, 2):
+            raise ValueError(f"eje invalido {eje!r}")
         return self._cmd(f"SET_VEL:{eje}:0")
 
     def pos_y(self):
