@@ -1,0 +1,316 @@
+{
+ "vel": 400,
+ "dur_s": 1.0,
+ "eventos": [
+  {
+   "cmd": "PING",
+   "resp": "PONG",
+   "ms": 2.84
+  },
+  {
+   "cmd": "GET_POSITION",
+   "resp": "POSITION:0:0:0",
+   "ms": 7.92
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 5.38
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 4.34
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 3.22
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 8.3
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 7.08
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 6.0
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 4.94
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 3.92
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 2.81
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 7.75
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 6.69
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 5.63
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 4.57
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 3.56
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 8.46
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 7.38
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 6.3
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 5.17
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 4.11
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 3.09
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 8.03
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 6.92
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 5.86
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 4.79
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 3.73
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 8.67
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 7.61
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 6.53
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 5.54
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 4.4
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 3.34
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 8.36
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 7.22
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 6.12
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 5.06
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 4.0
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 2.95
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 7.89
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 6.81
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 5.71
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 4.66
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 8.66
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 7.49
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 6.44
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 5.24
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 4.16
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 3.13
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 7.99
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 6.83
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 5.69
+  },
+  {
+   "cmd": "SET_VEL:1:0",
+   "resp": "OK",
+   "ms": 4.65
+  },
+  {
+   "cmd": "GET_POSITION",
+   "resp": "POSITION:0:402:0",
+   "ms": 8.02
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 7.71
+  },
+  {
+   "cmd": "GET_POSITION",
+   "resp": "POSITION:0:434:0",
+   "ms": 8.07
+  },
+  {
+   "cmd": "SET_VEL:1:0",
+   "resp": "OK",
+   "ms": 5.71
+  },
+  {
+   "cmd": "MANUAL:1:-434",
+   "resp": "OK",
+   "ms": 6.93
+  },
+  {
+   "cmd": "GET_POSITION",
+   "resp": "POSITION:0:0:0",
+   "ms": 5.36
+  }
+ ],
+ "A": {
+  "n": 50,
+  "rtt_medio_ms": 5.770474300006754,
+  "rtt_max_ms": 8.670743000038783,
+  "pasos": 402
+ },
+ "B": {
+  "resp": "OK",
+  "pasos": 32
+ },
+ "C": {
+  "neto": 434,
+  "pos_final": 0,
+  "pos_inicial": 0
+ }
+}

@@ -22,6 +22,7 @@ ap.add_argument("--puerto", default="/dev/ttyUSB0")
 ap.add_argument("--vel", type=int, default=400, help="pasos/s (80 pasos/mm: 400 = 5 mm/s)")
 ap.add_argument("--dur_s", type=float, default=0.5)
 ap.add_argument("--periodo_s", type=float, default=0.02)
+ap.add_argument("--cuenta_s", type=int, default=0, help="cuenta regresiva antes de mover, para que Luis mire")
 ap.add_argument("--salida", default="pruebas/resultados/set_vel_aire_20261110.json")
 a = ap.parse_args()
 assert 0 < a.vel <= 800 and a.dur_s <= 1.0, "limites de seguridad de la prueba"
@@ -68,6 +69,10 @@ print("posicion inicial Y (contador):", p0)
 if p0 is None:
     abortar("GET_POSITION ilegible")
 
+if a.cuenta_s:
+    for i in range(a.cuenta_s, 0, -1):
+        print(f"    el eje Y se mueve en {i} s ... MIRA EL EJE", flush=True)
+        time.sleep(1.0)
 # ---- A) velocidad continua con reenvio ----
 print(f">>> A) SET_VEL +{a.vel} pasos/s durante {a.dur_s} s (mira hacia donde se mueve el eje)")
 t_ini = time.perf_counter()

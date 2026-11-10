@@ -80,3 +80,7 @@ Datos: `pruebas/resultados/ping_pong_20261110_v3_701.csv`, `pruebas/resultados/l
 | B: pasos tras un solo `SET_VEL` | **32** | ≈32 (400 pasos/s × 80 ms) → el watchdog de 80 ms detuvo el eje |
 | C: contador final | **0** (tras `MANUAL:1:-234`) | 0 |
 **Limitaciones:** el contador cuenta pasos ordenados; que el eje se haya movido de verdad 2.5 mm y en qué sentido físico NO está medido (falta lo que observó Luis); una sola corrida; sin carga ni contacto; el parche v3 sigue sin probarse junto a `RUN`; los pasos de B coinciden con el cálculo teórico, pero no se midió el instante de parada con osciloscopio.
+
+### Repetición con cuenta regresiva (2026-11-10, ~16:25): signo CONFIRMADO por Luis
+La primera corrida (2.5 mm) Luis no la vio. Repetición: `--dur_s 1.0 --cuenta_s 10` (datos: `pruebas/resultados/set_vel_aire_20261110_rep2.json`). Contador: A **402 pasos** (≈5.03 mm; 50 comandos `OK`, RTT 5.77 ms, máx 8.67), B **32 pasos** (igual que la primera corrida: el watchdog de 80 ms), C retorno a 0 con `MANUAL:1:-434`.
+**Luis, textual: "si subio"** → `SET_VEL` con velocidad positiva SUBE el eje Y, la misma convención que `MANUAL` (+ = subir). Esto sí es observación física, pero cualitativa: Luis no dijo cuánto subió (no se midió con regla) ni que se detuviera en B, y el retorno a 0 es del contador, no medido. Limitaciones previas siguen: sin contacto, sin Fz, una sola repetición del sentido.
