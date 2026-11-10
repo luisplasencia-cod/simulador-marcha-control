@@ -44,3 +44,10 @@ Contexto: en la Pi flasheé firmware al ESP32 SIN respaldar el binario original;
    máquina (2026-11-02 14:44), que es cuando se generó ese build — coincide con la fecha de la
    última sesión de laptop documentada en `CLAUDE.md` (2026-11-02). No confirmado si ESE build
    específico llegó a flashearse al ESP32 ese día o si es solo el último `.pio/build` cacheado.
+
+4. **(2026-11-10, 14:52) Luis autoriza: la Pi NO tiene que esperar a que la laptop termine de
+   reproducir la versión exacta.** Sigue con lo que necesites instalar/compilar en la Pi (tu
+   `espressif32@6.5.0`/core 2.0.14 ya instalado ahí está bien como punto de partida); la laptop
+   sigue en paralelo intentando reproducir el IDF v4.4.7 del binario original para explicar por qué
+   tu recompilación del original dio 82/100 en vez de 100/100 — se actualiza este archivo cuando
+   haya resultado, no es bloqueante para que avances en banco.
