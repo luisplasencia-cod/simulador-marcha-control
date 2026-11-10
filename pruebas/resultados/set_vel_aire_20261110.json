@@ -1,0 +1,191 @@
+{
+ "vel": 400,
+ "dur_s": 0.5,
+ "eventos": [
+  {
+   "cmd": "PING",
+   "resp": "PONG",
+   "ms": 5.73
+  },
+  {
+   "cmd": "GET_POSITION",
+   "resp": "POSITION:0:0:0",
+   "ms": 6.94
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 5.87
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 4.84
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 9.71
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 8.61
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 7.54
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 6.48
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 5.41
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 4.43
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 9.25
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 8.15
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 7.09
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 6.01
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 4.98
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 3.88
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 8.75
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 7.67
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 6.61
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 5.54
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 4.5
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 3.44
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 8.27
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 7.15
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 6.07
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 5.08
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 3.92
+  },
+  {
+   "cmd": "SET_VEL:1:0",
+   "resp": "OK",
+   "ms": 8.84
+  },
+  {
+   "cmd": "GET_POSITION",
+   "resp": "POSITION:0:202:0",
+   "ms": 8.04
+  },
+  {
+   "cmd": "SET_VEL:1:400",
+   "resp": "OK",
+   "ms": 7.67
+  },
+  {
+   "cmd": "GET_POSITION",
+   "resp": "POSITION:0:234:0",
+   "ms": 7.91
+  },
+  {
+   "cmd": "SET_VEL:1:0",
+   "resp": "OK",
+   "ms": 5.87
+  },
+  {
+   "cmd": "MANUAL:1:-234",
+   "resp": "OK",
+   "ms": 6.94
+  },
+  {
+   "cmd": "GET_POSITION",
+   "resp": "POSITION:0:0:0",
+   "ms": 5.95
+  }
+ ],
+ "A": {
+  "n": 25,
+  "rtt_medio_ms": 6.3702860396006145,
+  "rtt_max_ms": 9.70906600014132,
+  "pasos": 202
+ },
+ "B": {
+  "resp": "OK",
+  "pasos": 32
+ },
+ "C": {
+  "neto": 234,
+  "pos_final": 0,
+  "pos_inicial": 0
+ }
+}

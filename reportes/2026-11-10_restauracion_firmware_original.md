@@ -68,3 +68,15 @@ Incidente menor: la primera corrida de regresión, lanzada a los pocos segundos 
 Datos: `pruebas/resultados/ping_pong_20261110_v3_701.csv`, `pruebas/resultados/latencia_comandos_20261110_v3_701.csv`.
 
 **Limitaciones:** (a) en la corrida de `medir_latencia_comandos.py` PING dio 98/100 válidos con un máximo de 107.9 ms; probablemente las primeras respuestas durante el arranque tras abrir el puerto, NO verificado (la corrida de 200 PING no perdió ninguno). (b) Como tras restaurar, la primera apertura del puerto tras flashear lee basura; hace falta repetir tras ≥5 s. (c) `SET_VEL` con velocidad distinta de 0, el watchdog (80 ms) y el comportamiento real del motor NO están probados: requieren mover Y. (d) Que el eje responda en el sentido correcto (signo) sigue sin medir.
+
+## Primer movimiento con SET_VEL en el eje Y real, EN EL AIRE (2026-11-10, ~16:15)
+**Objetivo:** comprobar con hardware real que `SET_VEL` mueve Y, que el watchdog de 80 ms lo detiene y que el contador vuelve a cero. Script: `control/firmware/prueba_set_vel_aire.py` (sin HOME, sin Fz; datos en `pruebas/resultados/set_vel_aire_20261110.json`).
+**Condiciones:** Luis junto al paro de emergencia, pie montado y sin tocar la plataforma (el hueco NO se remidió esta vez: Y no se había movido desde el Ensayo A, que terminó con el eje arriba y sin carga). Comprobación previa con el ADC poco fiable: AIN0 −73.3 mV (−55.7 mV a las 15:40, ≈10 N de diferencia) y DRATE leído 0x00 en vez de 0xA1 (error de lectura SPI); no sirvió para descartar contacto.
+**Metodología:** A) `SET_VEL:1:400` (5 mm/s) reenviado cada 20 ms durante 0.5 s, luego `SET_VEL:1:0`. B) un solo `SET_VEL:1:400` y silencio 0.6 s. C) regreso con `MANUAL:1:-neto`.
+**Resultado (contador de pasos ORDENADOS, no medido físicamente):**
+| Fase | Medido | Esperado |
+|---|---|---|
+| A: pasos | **202** (≈2.52 mm); 25 comandos, RTT 6.37 ms (máx 9.71), todos `OK` | ≈200 (400 pasos/s × 0.5 s) |
+| B: pasos tras un solo `SET_VEL` | **32** | ≈32 (400 pasos/s × 80 ms) → el watchdog de 80 ms detuvo el eje |
+| C: contador final | **0** (tras `MANUAL:1:-234`) | 0 |
+**Limitaciones:** el contador cuenta pasos ordenados; que el eje se haya movido de verdad 2.5 mm y en qué sentido físico NO está medido (falta lo que observó Luis); una sola corrida; sin carga ni contacto; el parche v3 sigue sin probarse junto a `RUN`; los pasos de B coinciden con el cálculo teórico, pero no se midió el instante de parada con osciloscopio.
