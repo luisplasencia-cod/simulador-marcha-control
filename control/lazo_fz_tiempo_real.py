@@ -151,9 +151,12 @@ class LectorFzFiltrado:
 
     def tarar(self, n=200):
         """Offset del ADC con el eje QUIETO y sin contacto (deriva ~10 N entre corridas: se tara en cada una)."""
-        muestras = sorted(self._volts_a_newtons(self.adc.leer_volts()) for _ in range(n))
-        self.f0 = muestras[len(muestras) // 2]
-        return self.f0, muestras[len(muestras) // 20], muestras[-len(muestras) // 20]
+        crudas = [self._volts_a_newtons(self.adc.leer_volts()) for _ in range(n)]
+        s = sorted(crudas)
+        self.f0 = s[len(s) // 2]
+        # dispersion sobre la senal que USA el lazo (mediana causal de N_MEDIANA), no sobre la cruda
+        filt = sorted(sorted(crudas[i - N_MEDIANA + 1:i + 1])[N_MEDIANA // 2] for i in range(N_MEDIANA - 1, len(crudas)))
+        return self.f0, filt[len(filt) // 20], filt[-len(filt) // 20]
 
     def leer_n(self):
         n = self._volts_a_newtons(self.adc.leer_volts())
@@ -235,6 +238,18 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referen
         esp32, lector = ClienteVelocidadESP32(puerto_esp32), LectorFzFiltrado()
 
     descenso_mm = 0.0   # integral de la velocidad ORDENADA (no medida) desde el inicio
+    ultimo_chk = [time.monotonic()]
+
+    def verificar_contador(forzar=False):
+        """Contrasta lo ORDENADO (integral) con el contador de pasos del ESP32 cada 0.5 s: si el eje no sigue lo
+        ordenado (no se mueve, ESP32 reiniciado, comandos ignorados) aborta. Detecta la discrepancia vista el 2026-11-10."""
+        if not forzar and time.monotonic() - ultimo_chk[0] < 0.5:
+            return
+        esperado = -descenso_mm * PASOS_MM
+        real = esp32.pos_y()
+        if abs(real - esperado) > 0.25 * abs(esperado) + 150:
+            raise RuntimeError(f"el contador de pasos ({real}) no sigue lo ordenado ({esperado:.0f}): el eje no responde como se ordena")
+        ultimo_chk[0] = time.monotonic()
     motivo = "completado"
     try:
         f0, p5, p95 = lector.tarar()
@@ -245,7 +260,7 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referen
         # ---- APROXIMACION: descenso con SET_VEL hasta detectar contacto (F > umbral) ----
         print(f"Aproximando: rapido {V_RAPIDA / PASOS_MM:.0f} mm/s hasta {hueco_mm - ZONA_LENTA_MM:.0f} mm, "
               f"luego {V_LENTA / PASOS_MM:.0f} mm/s; descenso maximo {hueco_mm + extra_mm:.0f} mm.")
-        t_prev, previa = time.monotonic(), 0.0
+        t_prev, previa, seguidas = time.monotonic(), 0.0, 0
         while True:
             if descenso_mm >= hueco_mm + extra_mm:
                 raise RuntimeError("sin contacto en el descenso maximo")
@@ -256,7 +271,9 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referen
             if f < F_NEG_MAX_N or abs(f - previa) > SALTO_MAX_N:
                 raise RuntimeError(f"lectura anomala en la aproximacion (F={f:.1f} N, previa {previa:.1f})")
             previa = f
-            if f > umbral_contacto_n:
+            verificar_contador()
+            seguidas = seguidas + 1 if f > umbral_contacto_n else 0   # 5 seguidas: el ruido (sigma~3 N) da picos aislados
+            if seguidas >= 5:
                 esp32.detener(EJE_VERTICAL)
                 print(f"CONTACTO a {descenso_mm:.1f} mm de descenso (hueco declarado {hueco_mm:.0f}): F = {f:.1f} N")
                 break
@@ -291,6 +308,7 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referen
                     u_pasos_s = max(-v_max, min(v_max, u_pasos_s))
                     esp32.set_vel(EJE_VERTICAL, u_pasos_s)
                     ahora = time.monotonic(); descenso_mm += -u_pasos_s * (ahora - t_prev) / PASOS_MM; t_prev = ahora
+                    verificar_contador()
                     if descenso_mm >= hueco_mm + extra_mm:
                         raise RuntimeError(f"descenso {descenso_mm:.1f} mm >= maximo {hueco_mm + extra_mm:.0f} mm")
 

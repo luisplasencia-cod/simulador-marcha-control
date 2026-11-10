@@ -1,0 +1,1 @@
+peso_sujeto_n=100.0 n_ciclos=3 kp=15.0 protesis=pie_pasivo_1 (la unica probada hasta ahora) k_asumido=26.4 pasos_por_n=3.030 fmax_n=150.0 hueco_mm=100.0 angulo_deg=0.0 v_max=1600 umbral_contacto_n=8.0 extra_mm=20.0 simulado=False
