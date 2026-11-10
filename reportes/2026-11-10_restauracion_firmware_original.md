@@ -23,7 +23,7 @@
 
 Incidente menor: la primera corrida de regresión, lanzada a los pocos segundos del flasheo, leyó basura. No era un bucle de reinicio: una escucha pasiva a 115200 y a 74880 baud dio 0 bytes, y repetida tras esperar 4 s dio TODO OK. Causa más probable (NO verificada): abrí el puerto en pleno arranque. Regla práctica: esperar ≥4 s tras flashear.
 
-## Pendiente (en curso al escribir esto)
+## (Superado por la sección 'Resultado v3' al final) Pendiente al escribir la parte inicial
 - **Error mío, corregido:** al preparar la copia para compilar v3 usé `patch -p4` en vez de `-p3`; el parche NO se aplicó (main.cpp quedó en 846 líneas). La compilación que corría en ese momento es del original SIN parche con 7.0.1. Sirve de control (¿reproduce el binario original, IDF v4.4.7?), no de prueba del parche.
 - Falta: aplicar v3 con `-p3`, compilar con 7.0.1, comprobar `esp-idf: v4.4.7`, respaldar, flashear, repetir regresión (con `SET_VEL`) y latencia (GET_POSITION contra 4.94 ms). Resultado: se agrega abajo cuando exista; si no hay sección "Resultado v3", no se hizo.
 
@@ -42,3 +42,29 @@ Incidente menor: la primera corrida de regresión, lanzada a los pocos segundos 
 - `pruebas/leer_ads1256_fz.py --diagnostico` → "El ADS1256 no devolvio lo escrito: leido={ADCON:0, MUX:0, DRATE:0} esperado={ADCON:0, MUX:8, DRATE:161}". Leer todo ceros es el mismo síntoma que el 2026-11-05 14:48 (línea digital desconectada/floja). Comprobado con `ps` que ningún proceso tenía el SPI abierto (el PID que mostró un `pgrep -f` era la propia shell). Causa NO determinada; falta que Luis revise los cables digitales (SCLK/DIN/DOUT/CS/DRDY/5V/GND) o use `pruebas/diagnostico_guiado_ads1256.py`.
 - Sin Fz no se puede cerrar el lazo: el movimiento con contacto queda bloqueado hasta que el ADC responda.
 - **Luis reconectó el ADC; `--diagnostico` repetido: registros correctos** (STATUS 0x30, MUX 0x08, ADCON 0x00, DRATE 0xA1). AIN0 (Fz) media −55.66 mV (≈ −31.5 N de offset, se tara; igual al −55 mV visto antes hoy), pico-pico 11.3 mV con el pie montado. Los pico-a-pico de los demás canales (800 mV) son canales sin conectar y, según el reporte de picos del 2026-11-05, incluyen errores de bit del SPI: usar mediana de 3–5, no el pico-pico como medida de ruido. Qué cable estaba suelto: no se sabe (Luis no lo dijo). Sigue sin movimiento.
+
+
+## Resultado v3 (parche SET_VEL v3 compilado con espressif32 @ 7.0.1) — sin movimiento
+**Bloqueos encontrados en el camino (todos resueltos, documentados por si se repiten):**
+1. Mi `patch -p4` no aplicó el parche (era `-p3`); detectado por `wc -l` (846 líneas). Con `-p3`: main.cpp 846→**1002** líneas, `SET_VEL` presente en main.cpp (11) y communication.h (2), sin `.rej`.
+2. El build se colgó ~25 min: un `pio run` abandonado de la mañana (PID 7087, `build_base617`) tenía `packages.lock`; lo terminé por PID.
+3. `No space left on device`: `/tmp` es tmpfs de 4 GB y el core de PlatformIO ocupaba 2.8 GB. Se movió el core al disco: `/home/simgaitlibra/pio_core_scratch` (fuera del repo; usar `PLATFORMIO_CORE_DIR=` ahí).
+4. Con 7.0.1 el esptool (4.11) necesitó `pip install intelhex` en el venv de PlatformIO.
+5. Un `pgrep -f` en un bucle de espera se habría encontrado a sí mismo (regla 7): detenido antes de que importara.
+
+**Compilación:** `esp-idf: v4.4.7 38eeba213a` (igual al original); `bootloader.bin` y `partitions.bin` con SHA-256 IDÉNTICO al original; `firmware.bin` 284192 B (original 283408; +784 B del parche), SHA-256 `ba6c2954…a0d5`. Binarios guardados en `control/firmware/binarios/v3_7.0.1/` (+ `sha256sums.txt`).
+
+**Flasheo:** hash verificado por esptool en los 3 offsets. **Respaldo previo NO hecho en este flasheo** (el script de respaldo se colgó y lo maté; el encadenado siguió al flasheo porque `| tail` devolvía éxito). Lo que había en la flash era el original restaurado, cuyos binarios y SHA están en `binarios/original_laptop/`, así que el estado anterior es recuperable. Mejora pendiente: no encadenar el flasheo al respaldo con un pipe.
+
+**Pruebas (ningún eje se movió; solo PING, GET_POSITION, TRAJ_STATUS y SET_VEL con velocidad 0):**
+| Medida | v3 con 7.0.1 | Original | v3 con 6.5.0 (mañana) |
+|---|---|---|---|
+| Regresión + `SET_VEL:1:0`→OK, `SET_VEL:9:0`→BUSY | TODO OK | — | 5/5 |
+| PING válidos / RTT | 200/200, **5.983 ms (σ 0.077)** | 5.97–5.99 ms | — |
+| GET_POSITION (n=100) | **4.970 ms (σ 0.478, máx 9.68)** | 4.94 ms | 44 ms |
+| TRAJ_STATUS (n=100) | 4.947 ms (σ 0.376, máx 8.49) | — | — |
+
+→ La degradación de la mañana era del toolchain (6.5.0), no del parche. Con 7.0.1, v3 tiene la misma latencia que el original.
+Datos: `pruebas/resultados/ping_pong_20261110_v3_701.csv`, `pruebas/resultados/latencia_comandos_20261110_v3_701.csv`.
+
+**Limitaciones:** (a) en la corrida de `medir_latencia_comandos.py` PING dio 98/100 válidos con un máximo de 107.9 ms; probablemente las primeras respuestas durante el arranque tras abrir el puerto, NO verificado (la corrida de 200 PING no perdió ninguno). (b) Como tras restaurar, la primera apertura del puerto tras flashear lee basura; hace falta repetir tras ≥5 s. (c) `SET_VEL` con velocidad distinta de 0, el watchdog (80 ms) y el comportamiento real del motor NO están probados: requieren mover Y. (d) Que el eje responda en el sentido correcto (signo) sigue sin medir.
