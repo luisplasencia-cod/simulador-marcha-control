@@ -10,3 +10,37 @@ Contexto: en la Pi flasheé firmware al ESP32 SIN respaldar el binario original;
 ## Reglas
 - No tocar `main.cpp`, `communication.h` ni el parche; solo agregar esos archivos.
 - Después avisar a Luis; en la Pi se hace `git pull` y se compara con el original recompilado.
+
+---
+
+## ✅ RESPUESTA DESDE LA LAPTOP (2026-11-10 14:32)
+
+1. **Subidos** a `control/firmware/binarios/original_laptop/`: `firmware.bin`, `bootloader.bin`,
+   `partitions.bin` (mtime original 2026-11-02 14:44, antes de cualquier flasheo de hoy desde la
+   Pi), `platformio.ini`, `sha256sums.txt`, `versiones_pio.txt`.
+
+2. **⚠️ Hallazgo importante — la versión exacta NO se pudo confirmar, y lo que sí se pudo medir
+   contradice el supuesto de "6.5.0 / core 2.0.14":**
+   - El binario `firmware.bin` tiene embebido el string `esp-idf: v4.4.7 38eeba213a` (sacado del
+     binario mismo con un escaneo de strings, no supuesto) — IDF v4.4.7, consistente con un
+     "Arduino core 2.0.x" pero **no identifica el patch exacto** (2.0.11/2.0.14/etc. todos pueden
+     llevar IDF 4.4.7).
+   - El binario también tiene rutas de compilación con `C:/Users/Libra/.platformio/packages/...`
+     — se compiló bajo un perfil de Windows **distinto al de esta sesión** ("Libra", no existe en
+     esta máquina). **No se puede reconstruir el entorno exacto que lo compiló desde aquí.**
+   - `pio pkg list` en ESTA máquina da `espressif32 @ 7.0.1` (Arduino core "3.x" sobre IDF 5.x) —
+     **esto NO es la versión que compiló el binario original**, es solo lo que esta laptop tiene
+     instalado hoy. Lo dejé documentado igual en `versiones_pio.txt`, marcado explícitamente como
+     "no es el entorno real".
+   - Causa raíz probable de que los binarios no coincidan entre máquinas: `platformio.ini` no fija
+     `platform = espressif32 @ <version>` (solo dice `platform = espressif32` sin versión) — cada
+     máquina instala lo más nuevo disponible al compilar. Recomendación pendiente de que Luis
+     decida: fijar una versión exacta en el `.ini` (verificada antes de asumir cuál, p. ej. probar
+     si `6.3.2` o `6.5.0` embeben IDF 4.4.7) para que sea reproducible.
+   - Detalle completo: `control/firmware/binarios/original_laptop/versiones_pio.txt`.
+
+3. **Fecha del último flasheo desde la laptop antes de hoy:** no tengo memoria propia de la fecha
+   exacta del último `pio run -t upload`; el único dato objetivo es el `mtime` del archivo en esta
+   máquina (2026-11-02 14:44), que es cuando se generó ese build — coincide con la fecha de la
+   última sesión de laptop documentada en `CLAUDE.md` (2026-11-02). No confirmado si ESE build
+   específico llegó a flashearse al ESP32 ese día o si es solo el último `.pio/build` cacheado.
