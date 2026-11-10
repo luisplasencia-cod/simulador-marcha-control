@@ -1,73 +1,70 @@
 # Punto de entrada para Claude en el Raspberry Pi
 
 Si acabas de llegar a este repo en el RPi (primera vez o retomando): lee esto completo antes de
-hacer nada. **Todo lo de abajo es sobre Fz (eje vertical) — no se toca Fy ni sagital hasta que Fz
-quede probado funcionando de verdad en el simulador real** (regla de Luis).
+hacer nada. **Todo lo de abajo es sobre Fz (eje vertical) — no se toca Fy ni sagital en lazo cerrado
+hasta que Fz quede probado funcionando de verdad en el simulador real** (regla de Luis).
 
 ## Qué es este repo
 Tesis de control del simulador de marcha (Luis Plasencia, PUCP). Contexto completo y SIEMPRE
 actualizado del proyecto: `CLAUDE.md` (léelo primero, siempre — tiene fecha en cada entrada, la más
-reciente es la vigente). Detalle de auditorías/búsquedas pasadas: `HISTORIAL.md`. Reportes diarios
-completos (Objetivo→Metodología→Resultado→Limitaciones→Fuentes): `reportes/`, los más recientes son
-`2026-11-04_reporte_dia.md` y `2026-11-05_reporte_dia.md` — léelos antes de los de fechas anteriores.
+reciente es la vigente). Detalle de auditorías/búsquedas pasadas: `HISTORIAL.md`.
 
-## Estado al cierre de la sesión de laptop del 2026-11-05 — léelo primero
-**Decisión de control para Fz: híbrido RT (tiempo real) + ILC**, no ILC solo (Luis autorizó
-modificar el firmware el 2026-11-04, revierte la decisión anterior de no tocarlo). Todo lo de abajo
-está diseñado y documentado pero **nada probado en hardware real** — sin RPi en las sesiones del
-2026-11-04/05. Ver `control/DECISION_TIPO_CONTROL.md` para la justificación completa.
+## ⚡ ESTADO ACTUAL (2026-11-10) — hecho SIN RPi desde el último cierre en banco, léelo primero
+Reporte consolidado de todo lo avanzado sin hardware: **`reportes/2026-11-08_avance_sin_rpi.md`**
+(con figura y tabla). Resumen de lo que cambió desde que el RPi estuvo aquí por última vez:
 
-## Al retomar tras el reinicio del RPi (2026-11-05 ~11:15) — si Luis dice "continuar"
-Lee en `CLAUDE.md` las dos entradas del 2026-11-05 ~11:15 (ADC caído + estado). Orden: verificar el ADC (`pruebas/leer_ads1256_fz.py --diagnostico`, monitor cerrado) → probar la subida de trayectoria al ESP32 → investigar el reinicio del ESP32 → ver el filtro en el monitor → capturas de ruido. Pasos/mm (checklist 1) ya está hecho.
+1. **`control/firmware/control_velocidad_continua.patch` corregido** (2026-11-08): `RUN` (usado por
+   X/sagital, trayectoria del montaje 37) ya NO se bloquea por el eje Y en modo `SET_VEL` — antes
+   cualquier eje en modo continuo bloqueaba `RUN` para todos, lo que impedía la arquitectura
+   objetivo (Y cerrado + X/sagital en `RUN` simultáneo). Verificado con `git apply --check` (aplica
+   limpio). **Sigue sin compilar ni flashear.**
+2. **`SET_VEL` confirmado que SÍ responde `OK`/`BUSY`** (leyendo `communication.h`/`main.cpp`, no
+   asumido): mismo mecanismo bloqueante que `PING`/`PONG`. `control/lazo_fz_tiempo_real.py` ya lee
+   y descarta esa respuesta en cada `set_vel()` — **falta confirmar en banco** que no se degrada con
+   el servo en movimiento.
+3. **`Kp` de partida recomendado: 15 1/s** (antes solo 10 sin justificar), de un barrido en
+   `control/simulacion/rt_vs_ilc_latencia.py` contra el `k` real del Ensayo A. Detalle y figura:
+   reporte del punto 1, §3. No usar `Kp≥40` sin medir la latencia completa.
+4. **Decisión nueva (2026-11-10): el firmware SÍ se puede flashear desde la RPi**, no solo desde la
+   laptop — usa el mismo cable USB-serial que ya usa `SET_VEL`/`PING`. **Falta verificar si
+   PlatformIO/esptool están instalados aquí**; si no, instalarlos antes de flashear.
 
 ## Qué hacer, en orden (checklist para esta sesión del RPi)
+Es el mismo checklist de `reportes/2026-11-08_avance_sin_rpi.md` §4 — se repite aquí para no tener
+que abrir dos archivos:
 
-1. **Verificar `pasos_por_mm` del eje vertical (barato, primero, sin prótesis).**
-   `control/identificacion/PROTOCOLO.md`, "Ensayo 0": mandar un número conocido de pasos al eje
-   vertical (`MANUAL`/`GOTO`, firmware actual sin cambios) y medir el desplazamiento real con una
-   regla. Debe dar 80 pasos/mm (`control/ilc/fz_ilc.py`, `PASOS_POR_MM_Y`). Si no coincide, **parar
-   y avisar** — todo lo de abajo depende de este número.
+1. **USB/tierra del ESP32** — medir la diferencia de tierra Pi↔ESP32 con el servo vertical en
+   movimiento (hipótesis principal de las desconexiones USB de noviembre, ver `CLAUDE.md`
+   2026-11-06). Si falla USB otra vez, esto es lo primero que se mira.
+2. **Compilar y flashear `control_velocidad_continua.patch`** (con el fix de `RUN`/eje Y ya
+   aplicado al patch, punto 1 arriba). Protocolo de 5 pasos en `control/firmware/README.md` — no
+   saltarse pasos: compilar solo → motores desconectados → probar watchdog → motores conectados a
+   velocidad baja, supervisado → integrar. Puede hacerse desde la RPi (punto 4 arriba) o desde la
+   laptop como antes — reportar cuál se usó.
+3. **Confirmar en banco que `SET_VEL` responde `OK`/`BUSY`** como se dedujo del código (punto 2
+   arriba).
+4. **Medir el RTT real de `SET_VEL` con el servo vertical en movimiento** (no solo `PING`/`PONG` en
+   reposo, que fue 5.97 ms quieto).
+5. **Probar el watchdog (80 ms)** — que un eje en `SET_VEL` se detenga solo si el RPi deja de
+   mandar comandos.
+6. **Medir la constante del servo `tau_a`** (Ensayo B, no hecho todavía — hoy se usa 20 ms SIN
+   MEDIR en la simulación).
+7. **Medir la latencia completa del lazo** (AMTI + ADC + cómputo RPi + `SET_VEL` + ejecución
+   ESP32) — hoy solo hay latencia PARCIAL medida (≈10 ms: RPi↔ESP32 + ADS1256/SPI; falta AMTI real
+   y cómputo+ejecución).
+8. **Elegir el `Kp` definitivo** contra la latencia completa y `tau_a` ya medidos (re-correr
+   `control/simulacion/rt_vs_ilc_latencia.py` con esos datos reales, no los supuestos de hoy).
+9. **Correr `control/lazo_fz_tiempo_real.py` por primera vez** — quitar el `SystemExit` del final
+   del script recién cuando 1-8 estén hechos (está puesto a propósito para no correrlo antes de
+   tiempo).
+10. **Integrar con X/sagital**: `RUN` simultáneo con Y en `SET_VEL` (el fix del punto 1 es lo que
+    lo permite). Esto es lo último, después de que Fz funcione de verdad solo.
 
-2. **Aplicar y probar el parche de firmware `SET_VEL` (tiempo real).**
-   `control/firmware/control_velocidad_continua.patch` (ya verificado con `git apply --check`, NO
-   aplicado). El protocolo de 5 pasos está en `control/firmware/README.md` — **no saltarse pasos**:
-   compilar solo → flashear con motores desconectados (osciloscopio/LED en STEP) → probar el
-   watchdog (80 ms) → motores conectados, velocidad baja, supervisado → recién ahí integrar con
-   `control/ilc/fz_ilc.py`. El firmware se flashea **desde la laptop** (PlatformIO, cable USB ahí) —
-   si hace falta un cambio, documentarlo aquí para que la sesión de la laptop lo aplique, no asumir
-   que se puede flashear desde el RPi.
+**Solo después de que 1-10 funcionen de verdad (no solo en simulación) se pasa a Fy en lazo
+cerrado** — misma arquitectura, otra instancia de `ilc_core.py`, su propia `k` y `pasos_por_mm`.
 
-3. **Medir la rigidez de contacto `k` (N/mm) con al menos una prótesis.**
-   `control/identificacion/PROTOCOLO.md`, "Ensayo A" (necesita el Ensayo 0 ya confirmado). Esto es
-   lo único que falta para que `fz_ilc.py` pueda correr con un `rigidez_n_por_mm=` real en vez de
-   negarse a generar una trayectoria.
-
-4. **Probar `control/ilc/protocolo_subida_esp32.py` contra el ESP32 real** (nunca probado, se
-   escribió leyendo el código del firmware).
-
-5. **Escribir el script del lazo real en el RPi** (no existe todavía — es el siguiente bloque que
-   falta). Debe: leer el ADS1256 (ya validado contra el AMTI real, RMSE 1.89 N, r=0.9999 — no repetir
-   esa validación), calcular `Kp·e(t)` + la corrección ILC de `fz_ilc.py`, mandar `SET_VEL` por
-   `protocolo_subida_esp32.py`, y **loguear cada muestra con el formato de
-   `control/telemetria/formato_log.md`** para que el visor funcione sin cambios.
-
-6. **Ver el lazo correr con `control/telemetria/visor_en_vivo.py`** (probado solo con datos
-   sintéticos hasta ahora — `python visor_en_vivo.py --ultimo` con pantalla, o `--guardar` sin
-   pantalla). Si aparece el salto pequeño y repetible en cada frontera de ciclo que se vio con datos
-   sintéticos, no es necesariamente un bug del RPi — ver la nota en `control/telemetria/README.md`.
-
-7. **Validar el híbrido RT+ILC — DOS comparaciones distintas, no una sola (aclarado 2026-11-06 con Luis):**
-   (a) **RMSE/correlación contra la curva de referencia PUBLICADA** (Gutenberg 2021 o Fukuchi 2018,
-   la misma que ya usa `curva_objetivo_fz()` en `control/ilc/fz_ilc.py`) — esta es la comparación
-   **publicable**, porque se mide contra datos de marcha sana reales, no contra uno mismo.
-   (b) **RMSE/correlación contra el lazo abierto actual** (como en el artículo de conferencia) — sirve
-   como referencia interna para mostrar cuánto mejoró el control nuevo respecto al anterior, pero
-   **NO es publicable por sí sola**: comparar contra el propio lazo abierto no demuestra nada frente a
-   una fuente externa, solo que se mejoró respecto a lo que había antes. Reportar ambas, nunca solo (b).
-   El cierre real de la Etapa 3 para Fz exige (a); (b) es complementaria.
-
-**Solo después de que 1-7 funcionen de verdad (no solo en simulación) se pasa a Fy y sagital** —
-misma arquitectura, otra instancia de `ilc_core.py`, su propia `k` y `pasos_por_mm`.
+Si algo de esto queda sin poder confirmarse en esta sesión, anotarlo explícito en un reporte nuevo
+(`reportes/<fecha>_reporte_dia.md`) y dejarlo pendiente aquí mismo — no asumir que "ya se vio".
 
 ## Arquitectura física (para no perderse)
 AMTI → ADS1256 (SPI0 del RPi) → RPi (corre todo el cálculo) → USB serie 115200 baud (`SET_VEL`,
@@ -100,6 +97,7 @@ Diagrama completo con pines reales: `control/diagramas/implementacion/`. Mapeo d
 - Nunca `pkill -f`/`pgrep -f` con el patrón en la propia línea de comando: matar por PID.
 
 ## Firmware del ESP32 — importante
-El firmware se edita/flashea **desde la laptop** (PlatformIO, cable USB ahí), no desde el RPi. Si
-necesitas un cambio, documéntalo en el commit/push (o en `Codigo ESP32 MOV/CAMBIOS_PENDIENTES_DESDE_RPI.md`
-si es puntual) y Luis lo coordina con esa sesión — no asumas que vas a flashear el ESP32 desde aquí.
+**(Actualizado 2026-11-10)** El firmware SÍ se puede flashear desde la RPi (mismo cable USB-serial
+que usa `SET_VEL`/`PING`) — antes esta sección decía que solo desde la laptop, ya no aplica.
+Verificar primero si PlatformIO/esptool están instalados aquí; si no, instalarlos. Si se flashea
+desde la laptop en vez de la RPi, también está bien — reportar cuál se usó y cómo salió.
