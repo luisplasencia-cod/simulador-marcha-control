@@ -65,6 +65,7 @@ from fz_ilc import ControlFzILC, PASOS_POR_MM_Y, cargar_k_asumido  # noqa: E402
 
 EJE_VERTICAL = 1  # ENTERO: eje 0=X, 1=Y (vertical), 2=K. NO usar texto: el firmware hace atoi("Y")=0 -> movia X (error 2026-11-10)
 DT_CONTROL_S = 0.010  # 10 ms -- bien menor al watchdog de 80 ms del firmware; AJUSTAR si hace falta
+N_BLOQUE = 7  # lecturas por ciclo de control (mediana de bloque); ver LectorFzFiltrado.leer_n
 N_MEDIANA = 5  # filtro de errores de bit SPI con el servo activo (ver bloqueo 5 arriba)
 # SIGNO (2026-11-10): en el firmware, SET_VEL usa la misma convencion que MANUAL:
 # signo + sobre Y = SUBIR (medido en el Ensayo 0, <MANUAL:1:4000> = +50 mm hacia arriba).
@@ -163,12 +164,14 @@ class LectorFzFiltrado:
         return self.f0, filt[len(filt) // 20], filt[-len(filt) // 20]
 
     def leer_n(self):
-        n = self._volts_a_newtons(self.adc.leer_volts())
-        self.buffer.append(n)
-        if len(self.buffer) == self.buffer.maxlen and len(set(self.buffer)) == 1:
-            raise RuntimeError(f"Sensor de Fz congelado/desconectado: {self.buffer.maxlen} lecturas identicas "
-                               f"({n:.2f} N). Se aborta y se detiene el eje.")
-        return sorted(self.buffer)[len(self.buffer) // 2] - self.f0
+        """Mediana de un BLOQUE de N_BLOQUE lecturas consecutivas (el ADC entrega 1000 SPS; ~1 ms cada una).
+        2026-11-10: con el servo Y arrancando aparecen rafagas de 3+ errores de bit que la mediana causal de 5
+        (1 lectura por ciclo) no filtra. El bloque tolera rafagas de hasta (N_BLOQUE-1)//2 y cuesta ~N_BLOQUE ms."""
+        raw = [self._volts_a_newtons(self.adc.leer_volts()) for _ in range(N_BLOQUE)]
+        if len(set(raw)) == 1:
+            raise RuntimeError(f"Sensor de Fz congelado/desconectado: {N_BLOQUE} lecturas identicas "
+                               f"({raw[0]:.2f} N). Se aborta y se detiene el eje.")
+        return sorted(raw)[N_BLOQUE // 2] - self.f0
 
     def cerrar(self):
         self.adc.cerrar()
