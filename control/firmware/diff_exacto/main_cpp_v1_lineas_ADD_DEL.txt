@@ -1,0 +1,175 @@
+ADD 32:   // Velocidad continua (control en tiempo real): un eje en este modo no
+ADD 33:   // decrementa steps_remaining para detenerse solo -- sigue hasta que se pide
+ADD 34:   // parar (SET_VEL con velocidad 0, limite, o el watchdog de auxiliar_task).
+ADD 35:   volatile int continuous_mode;
+ADD 36:   volatile unsigned long last_vel_update_ms;
+ADD 37: 
+ADD 43: // Si el RPi no manda un SET_VEL nuevo dentro de este tiempo, el eje se
+ADD 44: // detiene solo (ver auxiliar_task). Pensado para una tasa de control de
+ADD 45: // ~10-20 ms; da margen a 2-3 ciclos perdidos antes de cortar motricidad.
+ADD 46: #define VEL_WATCHDOG_TIMEOUT_MS 80
+ADD 47: 
+ADD 55:   // Modo velocidad continua: igual que el modo normal abajo, pero nunca se
+ADD 56:   // detiene por cuenta de pasos (no la tiene). Solo stop_requested (parada
+ADD 57:   // pedida por axis_stop: limite, watchdog, o SET_VEL con velocidad 0) lo
+ADD 58:   // frena, y siempre en STEP bajo -- igual disciplina que el modo finito, para
+ADD 59:   // no cambiar DIR ni desarmar el timer a mitad de un pulso.
+ADD 60:   if (ax.continuous_mode){
+ADD 61:     ax.step_state ^= 1;
+ADD 62: 
+ADD 63:     if (ax.step_state) {
+ADD 64:       GPIO.out_w1ts = ax.step_mask; // RISING EDGE
+ADD 65:     }
+ADD 66:     else {
+ADD 67:       GPIO.out_w1tc = ax.step_mask; // FALLING EDGE
+ADD 68:       ax.steps_position += ax.motion_sign;
+ADD 69: 
+ADD 70:       if (ax.stop_requested) {
+ADD 71:         ax.stop_requested = 0;
+ADD 72:         timerAlarmDisable(ax.timer);
+ADD 73:         timerStop(ax.timer);
+ADD 74:         ax.continuous_mode = 0;
+ADD 75:       }
+ADD 76:     }
+ADD 77: 
+ADD 78:     portEXIT_CRITICAL_ISR(&axes_mux);
+ADD 79:     return;
+ADD 80:   }
+ADD 81: 
+DEL 94:     timerStop(ax.timer);    
+ADD 132:     timerStop(ax.timer);
+ADD 135:     ax.continuous_mode = 0;  // por si se llama con el eje en modo velocidad y STEP ya en bajo
+ADD 165:   ax.continuous_mode = 0;
+ADD 166:   ax.last_vel_update_ms = 0;
+DEL 171:   // Verifiy if the requested axis is moving
+DEL 172:   if (ax.steps_remaining != 0){
+ADD 212:   // Verifiy if the requested axis is moving (incluye velocidad continua: un
+ADD 213:   // move_steps finito NUNCA debe pisar un eje en modo continuo)
+ADD 214:   if (ax.steps_remaining != 0 || ax.continuous_mode){
+ADD 255: // Velocidad continua para un eje (control en tiempo real, ciclo a ciclo de
+ADD 256: // comunicacion con el RPi -- NO es un lazo dentro del ESP32, es el RPi
+ADD 257: // reenviando SET_VEL a su propio ritmo). steps_per_sec == 0 pide parar ese
+ADD 258: // eje. Devuelve 0 si se rechaza (eje ocupado con un movimiento finito,
+ADD 259: // direccion invalida, o limite de carrera en esa direccion).
+ADD 260: int axis_set_velocity(Axis &ax, int direction, int steps_per_sec){
+ADD 261:   if (steps_per_sec == 0){
+ADD 262:     portENTER_CRITICAL(&axes_mux);
+ADD 263:     if (ax.continuous_mode) axis_stop(ax);
+ADD 264:     portEXIT_CRITICAL(&axes_mux);
+ADD 265:     return 1;
+ADD 266:   }
+ADD 267: 
+ADD 268:   if (steps_per_sec < 0) return 0;
+ADD 269: 
+ADD 270:   // Ocupado con un movimiento finito (MANUAL/GOTO/trayectoria)
+ADD 271:   if (!ax.continuous_mode && ax.steps_remaining != 0) return 0;
+ADD 272: 
+ADD 273:   if (direction != 0 && direction != 1) return 0;
+ADD 274: 
+ADD 275:   if (!(direction == ax.positive_dir) && button_pressed(ax.limit_min_pin)) return 0;
+ADD 276:   if ((direction == ax.positive_dir) && button_pressed(ax.limit_max_pin)) return 0;
+ADD 277: 
+ADD 278:   int nuevo_sign = (direction == ax.positive_dir) ? 1 : -1;
+ADD 279:   int step_period_us = 1000000 / steps_per_sec;
+ADD 280: 
+ADD 281:   // Cambio de sentido con el eje ya en movimiento: NUNCA cambiar DIR mientras
+ADD 282:   // el driver puede estar a mitad de un pulso. Se para primero (axis_stop ya
+ADD 283:   // espera a STEP bajo antes de desarmar el timer) y se rearma en el
+ADD 284:   // siguiente SET_VEL -- este ciclo de control pierde como maximo un periodo
+ADD 285:   // de control (~10-20 ms), no es instantaneo pero es seguro para el driver.
+ADD 286:   if (ax.continuous_mode && ax.motion_sign != nuevo_sign){
+ADD 287:     portENTER_CRITICAL(&axes_mux);
+ADD 288:     axis_stop(ax);
+ADD 289:     portEXIT_CRITICAL(&axes_mux);
+ADD 290:     return 1;  // el RPi debe reintentar en el siguiente ciclo con el eje ya parado
+ADD 291:   }
+ADD 292: 
+ADD 293:   digitalWrite(ax.dir_pin, direction);
+ADD 294:   if (!ax.continuous_mode) delayMicroseconds(ax.dir_setup_us);  // primer arranque: igual que axis_move_steps
+ADD 295: 
+ADD 296:   portENTER_CRITICAL(&axes_mux);
+ADD 297:   ax.motion_sign = nuevo_sign;
+ADD 298:   ax.last_vel_update_ms = millis();
+ADD 299: 
+ADD 300:   if (!ax.continuous_mode){
+ADD 301:     ax.continuous_mode = 1;
+ADD 302:     timerWrite(ax.timer, 0);
+ADD 303:     timerAlarmWrite(ax.timer, step_period_us / 2, true);
+ADD 304:     timerAlarmEnable(ax.timer);
+ADD 305:     timerStart(ax.timer);
+ADD 306:   }
+ADD 307:   else{
+ADD 308:     timerAlarmWrite(ax.timer, step_period_us / 2, true);  // solo cambia el periodo, no la fase
+ADD 309:   }
+ADD 310:   portEXIT_CRITICAL(&axes_mux);
+ADD 311:   return 1;
+ADD 312: }
+ADD 313: 
+DEL 216:   return axis_x.steps_remaining == 0 && axis_y.steps_remaining == 0 && axis_k.steps_remaining == 0;
+ADD 317:   return axis_x.steps_remaining == 0 && !axis_x.continuous_mode &&
+ADD 318:          axis_y.steps_remaining == 0 && !axis_y.continuous_mode &&
+ADD 319:          axis_k.steps_remaining == 0 && !axis_k.continuous_mode;
+ADD 616: // Comando SET_VEL:eje:pasos_por_seg_con_signo -- control en tiempo real.
+ADD 617: // El RPi reenvia este comando a su propio ritmo (ej. cada 10-20 ms) con la
+ADD 618: // velocidad que calcule su lazo de realimentacion; el ESP32 no corre ningun
+ADD 619: // lazo, solo aplica la velocidad pedida al eje indicado. pasos_por_seg = 0
+ADD 620: // detiene ese eje. El signo da la direccion (positivo = ax.positive_dir).
+ADD 621: void handle_velocity_command(Packet &rxPacket, Packet &txPacket){
+ADD 622:   if (strcmp(rxPacket.command, SET_VEL) != 0) return;
+ADD 623: 
+ADD 624:   int eje = rxPacket.parameters[0];
+ADD 625:   int v = rxPacket.parameters[1];
+ADD 626:   int mag = abs(v);
+ADD 627:   int ok = 0;
+ADD 628: 
+ADD 629:   // No se mezcla con una trayectoria activa (misma regla que MANUAL/GOTO)
+ADD 630:   if (Traj_state != TRAJ_IDLE){
+ADD 631:     strncpy(txPacket.command, BUSY, MAX_COMMAND_LENGTH);
+ADD 632:     txPacket.parameter_count = 0;
+ADD 633:     return;
+ADD 634:   }
+ADD 635: 
+ADD 636:   if (eje == 0) ok = axis_set_velocity(axis_x, (v >= 0) ? axis_x.positive_dir : !axis_x.positive_dir, mag);
+ADD 637:   else if (eje == 1) ok = axis_set_velocity(axis_y, (v >= 0) ? axis_y.positive_dir : !axis_y.positive_dir, mag);
+ADD 638:   else if (eje == 2) ok = axis_set_velocity(axis_k, (v >= 0) ? axis_k.positive_dir : !axis_k.positive_dir, mag);
+ADD 639: 
+ADD 640:   strncpy(txPacket.command, ok ? OK : BUSY, MAX_COMMAND_LENGTH);
+ADD 641:   txPacket.parameter_count = 0;
+ADD 642: }
+ADD 643: 
+DEL 602:     if (Traj_state != TRAJ_IDLE){
+ADD 733:     if (Traj_state != TRAJ_IDLE || axis_x.continuous_mode || axis_k.continuous_mode){
+ADD 734:       // NO se incluye axis_y: la arquitectura objetivo corre Y en SET_VEL
+ADD 735:       // (control de Fz en tiempo real) AL MISMO TIEMPO que RUN mueve X/K
+ADD 736:       // (trayectoria preestablecida del montaje 37) -- fix 2026-11-08,
+ADD 737:       // ver reportes/2026-11-08_fix_firmware_run_set_vel.md
+ADD 738:       // X y K si se siguen bloqueando entre si y con RUN, igual que antes.
+ADD 860:   else if (strcmp(rxPacket.command, SET_VEL) == 0){
+ADD 861:     handle_velocity_command(rxPacket, txPacket);
+ADD 862:   }
+ADD 863: 
+ADD 925: // Watchdog de velocidad continua: si el RPi deja de mandar SET_VEL para un
+ADD 926: // eje por mas de VEL_WATCHDOG_TIMEOUT_MS, ese eje se detiene solo. Es la
+ADD 927: // unica red de seguridad contra un RPi colgado o un cable desconectado
+ADD 928: // mientras un eje esta en modo continuo -- sin esto, ese eje seguiria
+ADD 929: // moviendose indefinidamente (ISR de velocidad continua no tiene cuenta de
+ADD 930: // pasos para detenerse por si sola).
+ADD 931: void revisar_watchdog_velocidad(){
+ADD 932:   unsigned long ahora = millis();
+ADD 933:   Axis *ejes[3] = {&axis_x, &axis_y, &axis_k};
+ADD 934:   for (int i = 0; i < 3; i++){
+ADD 935:     if (ejes[i]->continuous_mode && (ahora - ejes[i]->last_vel_update_ms) > VEL_WATCHDOG_TIMEOUT_MS){
+ADD 936:       portENTER_CRITICAL(&axes_mux);
+ADD 937:       axis_stop(*ejes[i]);
+ADD 938:       portEXIT_CRITICAL(&axes_mux);
+ADD 939:     }
+ADD 940:   }
+ADD 941: }
+ADD 942: 
+ADD 945:     revisar_watchdog_velocidad();
+ADD 946: 
+DEL 795:     vTaskDelay(pdMS_TO_TICKS(100));
+ADD 955:     // Antes 100 ms: bajado a 20 ms para que el watchdog de velocidad continua
+ADD 956:     // reaccione a tiempo (timeout 80 ms). No cambia el comportamiento de la
+ADD 957:     // trayectoria, solo la frecuencia con que se revisa su arranque.
+ADD 958:     vTaskDelay(pdMS_TO_TICKS(20));

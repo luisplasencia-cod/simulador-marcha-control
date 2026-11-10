@@ -1,0 +1,15 @@
+--- /tmp/claude-1000/-home-simgaitlibra-simulador-marcha-control/e88b3b62-80e4-492f-9b7a-0c5ba4cae7b1/scratchpad/communication_base.h	2026-11-10 12:55:25.549559541 -0500
++++ communication.h	2026-11-10 12:55:25.550716209 -0500
+@@ -57,6 +57,12 @@
+ #define MANUAL_STOP       "MANUAL_STOP"
+ #define STOPPED           "STOPPED"
+ 
++// Continuous velocity command (real-time control loop on the RPi side).
++// SET_VEL:eje:pasos_por_seg_con_signo -- responde OK, BUSY (eje ocupado con
++// un movimiento finito o con una trayectoria activa) o ERROR (parametros
++// invalidos). pasos_por_seg = 0 detiene ese eje.
++#define SET_VEL           "SET_VEL"
++
+ // Absolute positioning commands (NOT IMPLEMENTED IN RPI SIDE)
+ #define GOTO              "GOTO"
+ //#define OK                "OK"

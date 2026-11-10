@@ -1,0 +1,39 @@
+{
+ "ok_total": true,
+ "resultados": [
+  {
+   "prueba": "ping",
+   "cmd": "PING",
+   "respuesta": "PONG",
+   "esperado": "PONG",
+   "ok": true
+  },
+  {
+   "prueba": "trayectoria_idle",
+   "cmd": "TRAJ_STATUS",
+   "respuesta": "IDLE",
+   "esperado": "IDLE",
+   "ok": true
+  },
+  {
+   "prueba": "set_vel_cero_eje_parado",
+   "cmd": "SET_VEL:1:0",
+   "respuesta": "OK",
+   "esperado": "OK",
+   "ok": true
+  },
+  {
+   "prueba": "set_vel_eje_invalido",
+   "cmd": "SET_VEL:9:0",
+   "respuesta": "BUSY",
+   "esperado": "BUSY",
+   "ok": true
+  },
+  {
+   "prueba": "posicion_sin_cambio",
+   "antes": "POSITION:0:0:0",
+   "despues": "POSITION:0:0:0",
+   "ok": true
+  }
+ ]
+}

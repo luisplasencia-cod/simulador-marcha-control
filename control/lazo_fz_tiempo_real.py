@@ -66,6 +66,16 @@ from fz_ilc import ControlFzILC, PASOS_POR_MM_Y, cargar_k_asumido  # noqa: E402
 EJE_VERTICAL = "Y"  # CONFIRMADO (ver control/ilc/README.md): Y = vertical = Fz
 DT_CONTROL_S = 0.010  # 10 ms -- bien menor al watchdog de 80 ms del firmware; AJUSTAR si hace falta
 N_MEDIANA = 5  # filtro de errores de bit SPI con el servo activo (ver bloqueo 5 arriba)
+# SIGNO (2026-11-10): en el firmware, SET_VEL usa la misma convencion que MANUAL:
+# signo + sobre Y = SUBIR (medido en el Ensayo 0, <MANUAL:1:4000> = +50 mm hacia arriba).
+# Para AUMENTAR la fuerza hay que BAJAR el eje => velocidad NEGATIVA cuando e = r - F > 0.
+# Sin este -1 el lazo seria realimentacion POSITIVA (error de fuerza -> sube -> fuerza cae).
+SIGNO_ERROR_A_VELOCIDAD = -1
+# Saturacion de seguridad de |velocidad| [pasos/s]. ELECCION DE DISEÑO (no medida): 1600 pasos/s
+# = 20 mm/s en Y = la velocidad fija que ya usa MANUAL en los ensayos. Bajarla para las primeras corridas.
+V_MAX_PASOS_S = 1600
+# Sensor "muerto": si las ultimas N_MEDIANA lecturas crudas son IDENTICAS (ruido real sigma~0.9 N, imposible
+# que 5 seguidas coincidan), el ADC esta desconectado/congelado (ya paso: 0.0 exacto el 2026-11-05).
 
 
 class ClienteVelocidadESP32:
@@ -118,14 +128,17 @@ class LectorFzFiltrado:
         v = self.adc.leer_volts()
         n = self._volts_a_newtons(v)
         self.buffer.append(n)
+        if len(self.buffer) == self.buffer.maxlen and len(set(self.buffer)) == 1:
+            raise RuntimeError(f"Sensor de Fz congelado/desconectado: {self.buffer.maxlen} lecturas identicas "
+                               f"({n:.2f} N). Se aborta y se detiene el eje.")
         return sorted(self.buffer)[len(self.buffer) // 2]
 
     def cerrar(self):
         self.adc.cerrar()
 
 
-def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, referencia="gutenberg",
-                 puerto_esp32="/dev/ttyUSB0", carpeta_log="control/telemetria/registros"):
+def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, referencia="gutenberg",
+                 puerto_esp32="/dev/ttyUSB0", carpeta_log="control/telemetria/registros", v_max=V_MAX_PASOS_S):
     k_asumido = cargar_k_asumido(protesis)
     pasos_por_n = PASOS_POR_MM_Y / k_asumido
     ctrl = ControlFzILC(peso_sujeto_n, duracion_s=3.69, rigidez_n_por_mm=k_asumido, referencia=referencia)
@@ -153,7 +166,10 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, referencia="gutenberg",
 
                     f_med = lector.leer_n()
                     e = r_corregida - f_med
-                    u_pasos_s = kp * e * pasos_por_n
+                    if f_med > fmax_n:
+                        raise RuntimeError(f"Fuerza {f_med:.1f} N > tope {fmax_n:.1f} N: se aborta y se detiene el eje.")
+                    u_pasos_s = SIGNO_ERROR_A_VELOCIDAD * kp * e * pasos_por_n
+                    u_pasos_s = max(-v_max, min(v_max, u_pasos_s))
                     esp32.set_vel(EJE_VERTICAL, u_pasos_s)
 
                     w.writerow([f"{t_rel:.4f}", ciclo, f"{r_n:.2f}", f"{delta_n:.2f}",
@@ -185,6 +201,9 @@ if __name__ == "__main__":
                           "2026-11-08 (ver reportes/2026-11-08_avance_sin_rpi.md Sec.3 y "
                           "control/simulacion/barrido_kp_2026-11-08.png); re-elegir cuando tau_a "
                           "y la latencia completa esten medidas, no solo supuestas.")
+    ap.add_argument("--fmax_n", type=float, required=True,
+                     help="tope de fuerza [N]: si la Fz medida lo supera, se detiene el eje y se aborta (obligatorio)")
+    ap.add_argument("--v_max", type=float, default=V_MAX_PASOS_S, help="saturacion de |velocidad| [pasos/s]")
     ap.add_argument("--protesis", default="pie_pasivo_1 (la unica probada hasta ahora)")
     ap.add_argument("--referencia", default="gutenberg")
     ap.add_argument("--puerto_esp32", default="/dev/ttyUSB0")

@@ -1,0 +1,288 @@
+--- "a/Codigo ESP32 MOV/platformIO_control_trayectoria_v1/src/main.cpp"	2026-11-10 12:56:14.995726321 -0500
++++ "b/Codigo ESP32 MOV/platformIO_control_trayectoria_v1/src/main.cpp"	2026-11-10 13:39:10.577473914 -0500
+@@ -1,4 +1,5 @@
+ // confirmada la conexion
++#include <esp_timer.h>
+ #include <Arduino.h>
+ 
+ #include "configurable_motion_data.h"
+@@ -29,11 +30,23 @@
+   volatile int step_state;
+   volatile int stop_requested;
+ 
++  // Velocidad continua (control en tiempo real): un eje en este modo no
++  // decrementa steps_remaining para detenerse solo -- sigue hasta que se pide
++  // parar (SET_VEL con velocidad 0, limite, o el watchdog de auxiliar_task).
++  volatile int continuous_mode;
++  volatile uint32_t last_vel_update_us;  // esp_timer_get_time() truncado a 32 bits (us); la resta modular sirve para intervalos < 71 min
++
+   // Used outside ISR
+   int steps_min_range;
+   int steps_max_range;
+ };
+ 
++// Si el RPi no manda un SET_VEL nuevo dentro de este tiempo, el eje se
++// detiene solo (ver auxiliar_task). Pensado para una tasa de control de
++// ~10-20 ms; da margen a 2-3 ciclos perdidos antes de cortar motricidad.
++#define VEL_WATCHDOG_TIMEOUT_MS 80
++#define VEL_WATCHDOG_TIMEOUT_US (VEL_WATCHDOG_TIMEOUT_MS * 1000UL)
++
+ Axis axis_x, axis_y, axis_k;
+ portMUX_TYPE axes_mux = portMUX_INITIALIZER_UNLOCKED; // A mux is used because of ESP32 has two cores
+ portMUX_TYPE traj_state_mux = portMUX_INITIALIZER_UNLOCKED; // A mux is used because of ESP32 has two cores
+@@ -41,6 +54,36 @@
+ static inline void IRAM_ATTR axis_isr_common(Axis &ax){
+   portENTER_CRITICAL_ISR(&axes_mux);
+ 
++  // Modo velocidad continua: igual que el modo normal abajo, pero nunca se
++  // detiene por cuenta de pasos (no la tiene). Solo stop_requested (parada
++  // pedida por axis_stop: limite, watchdog, o SET_VEL con velocidad 0) lo
++  // frena, y siempre en STEP bajo -- igual disciplina que el modo finito, para
++  // no cambiar DIR ni desarmar el timer a mitad de un pulso.
++  if (ax.continuous_mode){
++    // Watchdog (v3): sin SET_VEL nuevo en VEL_WATCHDOG_TIMEOUT_MS -> pedir parada; se ejecuta en el
++    // siguiente flanco de bajada (igual disciplina que cualquier parada). Sin tarea ni seccion critica extra.
++    if ((uint32_t)esp_timer_get_time() - ax.last_vel_update_us > VEL_WATCHDOG_TIMEOUT_US) ax.stop_requested = 1;
++    ax.step_state ^= 1;
++
++    if (ax.step_state) {
++      GPIO.out_w1ts = ax.step_mask; // RISING EDGE
++    }
++    else {
++      GPIO.out_w1tc = ax.step_mask; // FALLING EDGE
++      ax.steps_position += ax.motion_sign;
++
++      if (ax.stop_requested) {
++        ax.stop_requested = 0;
++        timerAlarmDisable(ax.timer);
++        timerStop(ax.timer);
++        ax.continuous_mode = 0;
++      }
++    }
++
++    portEXIT_CRITICAL_ISR(&axes_mux);
++    return;
++  }
++
+   // Protection against a pending timer interrupt occurring immediately after axis_stop()
+   if (ax.steps_remaining <= 0){
+     ax.stop_requested = 0;
+@@ -91,9 +134,10 @@
+     ax.stop_requested = 0;
+ 
+     timerAlarmDisable(ax.timer);
+-    timerStop(ax.timer);    
++    timerStop(ax.timer);
+     ax.step_state = 0;
+     ax.steps_remaining = 0;
++    ax.continuous_mode = 0;  // por si se llama con el eje en modo velocidad y STEP ya en bajo
+   }
+ }
+ 
+@@ -123,6 +167,8 @@
+   ax.steps_remaining = 0;
+   ax.step_state = 0;
+   ax.stop_requested = 0;
++  ax.continuous_mode = 0;
++  ax.last_vel_update_us = 0;
+ 
+   ax.steps_min_range = 0;
+   ax.steps_max_range = 0;
+@@ -168,8 +214,9 @@
+ }
+ 
+ void axis_move_steps(Axis &ax, int direction, int steps, int steps_per_sec){
+-  // Verifiy if the requested axis is moving
+-  if (ax.steps_remaining != 0){
++  // Verifiy if the requested axis is moving (incluye velocidad continua: un
++  // move_steps finito NUNCA debe pisar un eje en modo continuo)
++  if (ax.steps_remaining != 0 || ax.continuous_mode){
+     return;
+   }
+ 
+@@ -210,10 +257,82 @@
+   portEXIT_CRITICAL(&axes_mux);
+ }
+ 
++// Velocidad continua para un eje (control en tiempo real, ciclo a ciclo de
++// comunicacion con el RPi -- NO es un lazo dentro del ESP32, es el RPi
++// reenviando SET_VEL a su propio ritmo). steps_per_sec == 0 pide parar ese
++// eje. Devuelve 0 si se rechaza (eje ocupado con un movimiento finito,
++// direccion invalida, o limite de carrera en esa direccion).
++int axis_set_velocity(Axis &ax, int direction, int steps_per_sec){
++  if (steps_per_sec == 0){
++    portENTER_CRITICAL(&axes_mux);
++    if (ax.continuous_mode) axis_stop(ax);
++    portEXIT_CRITICAL(&axes_mux);
++    return 1;
++  }
++
++  if (steps_per_sec < 0) return 0;
++
++  // Ocupado con un movimiento finito (MANUAL/GOTO/trayectoria)
++  if (!ax.continuous_mode && ax.steps_remaining != 0) return 0;
++
++  if (direction != 0 && direction != 1) return 0;
++
++  if (!(direction == ax.positive_dir) && button_pressed(ax.limit_min_pin)) return 0;
++  if ((direction == ax.positive_dir) && button_pressed(ax.limit_max_pin)) return 0;
++
++  int nuevo_sign = (direction == ax.positive_dir) ? 1 : -1;
++  int step_period_us = 1000000 / steps_per_sec;
++
++  // Cambio de sentido con el eje ya en movimiento: NUNCA cambiar DIR mientras
++  // el driver puede estar a mitad de un pulso. Se para primero (axis_stop ya
++  // espera a STEP bajo antes de desarmar el timer) y se rearma en el
++  // siguiente SET_VEL -- este ciclo de control pierde como maximo un periodo
++  // de control (~10-20 ms), no es instantaneo pero es seguro para el driver.
++  if (ax.continuous_mode && ax.motion_sign != nuevo_sign){
++    portENTER_CRITICAL(&axes_mux);
++    axis_stop(ax);
++    portEXIT_CRITICAL(&axes_mux);
++    return 1;  // el RPi debe reintentar en el siguiente ciclo con el eje ya parado
++  }
++
++  digitalWrite(ax.dir_pin, direction);
++  if (!ax.continuous_mode) delayMicroseconds(ax.dir_setup_us);  // primer arranque: igual que axis_move_steps
++
++  portENTER_CRITICAL(&axes_mux);
++  ax.motion_sign = nuevo_sign;
++  ax.last_vel_update_us = (uint32_t) esp_timer_get_time();
++
++  if (!ax.continuous_mode){
++    ax.continuous_mode = 1;
++    timerWrite(ax.timer, 0);
++    timerAlarmWrite(ax.timer, step_period_us / 2, true);
++    timerAlarmEnable(ax.timer);
++    timerStart(ax.timer);
++  }
++  else{
++    timerAlarmWrite(ax.timer, step_period_us / 2, true);  // solo cambia el periodo, no la fase
++  }
++  portEXIT_CRITICAL(&axes_mux);
++  return 1;
++}
++
+ // Specific function
+ // It does not need to be atomic as long as a single movement launcher is guaranteed
+ int all_axes_finished(){
+-  return axis_x.steps_remaining == 0 && axis_y.steps_remaining == 0 && axis_k.steps_remaining == 0;
++  return axis_x.steps_remaining == 0 && !axis_x.continuous_mode &&
++         axis_y.steps_remaining == 0 && !axis_y.continuous_mode &&
++         axis_k.steps_remaining == 0 && !axis_k.continuous_mode;
++}
++
++// Igual que all_axes_finished() pero IGNORA el modo continuo del eje Y: lo usan
++// los bucles de espera de las trayectorias (RUN). Con Y en SET_VEL (lazo de Fz)
++// all_axes_finished() nunca daria 1 y la trayectoria quedaria bloqueada en su
++// primer punto. X y K en modo continuo siguen contando (RUN ya se rechaza si
++// estan en ese modo). Fix 2026-11-10, ver reportes/2026-11-10_firmware_diff_main_cpp.md
++int trajectory_axes_finished(){
++  return axis_x.steps_remaining == 0 && !axis_x.continuous_mode &&
++         axis_y.steps_remaining == 0 &&
++         axis_k.steps_remaining == 0 && !axis_k.continuous_mode;
+ }
+ 
+ // Specific function
+@@ -343,7 +462,7 @@
+     axis_move_steps(axis_k, dirk, sk, vk);
+     
+     vTaskDelay(pdMS_TO_TICKS(dt_ms[i]));
+-    while(!all_axes_finished());
++    while(!trajectory_axes_finished());
+ 
+   }
+ 
+@@ -400,7 +519,7 @@
+     axis_move_steps(axis_k, dirk, sk, vk);
+     
+     vTaskDelay(pdMS_TO_TICKS(dt_ms[i]));
+-    while(!all_axes_finished()) {vTaskDelay(pdMS_TO_TICKS(1));}
++    while(!trajectory_axes_finished()) {vTaskDelay(pdMS_TO_TICKS(1));}
+ 
+   }
+ 
+@@ -457,7 +576,7 @@
+     axis_move_steps(axis_y, diry, sy, vy);
+     axis_move_steps(axis_k, dirk, sk, vk);
+     
+-    while(!all_axes_finished()) {vTaskDelay(pdMS_TO_TICKS(100));}
++    while(!trajectory_axes_finished()) {vTaskDelay(pdMS_TO_TICKS(100));}
+ 
+   }
+ 
+@@ -510,6 +629,34 @@
+   }
+ }
+ 
++// Comando SET_VEL:eje:pasos_por_seg_con_signo -- control en tiempo real.
++// El RPi reenvia este comando a su propio ritmo (ej. cada 10-20 ms) con la
++// velocidad que calcule su lazo de realimentacion; el ESP32 no corre ningun
++// lazo, solo aplica la velocidad pedida al eje indicado. pasos_por_seg = 0
++// detiene ese eje. El signo da la direccion (positivo = ax.positive_dir).
++void handle_velocity_command(Packet &rxPacket, Packet &txPacket){
++  if (strcmp(rxPacket.command, SET_VEL) != 0) return;
++
++  int eje = rxPacket.parameters[0];
++  int v = rxPacket.parameters[1];
++  int mag = abs(v);
++  int ok = 0;
++
++  // No se mezcla con una trayectoria activa (misma regla que MANUAL/GOTO)
++  if (Traj_state != TRAJ_IDLE){
++    strncpy(txPacket.command, BUSY, MAX_COMMAND_LENGTH);
++    txPacket.parameter_count = 0;
++    return;
++  }
++
++  if (eje == 0) ok = axis_set_velocity(axis_x, (v >= 0) ? axis_x.positive_dir : !axis_x.positive_dir, mag);
++  else if (eje == 1) ok = axis_set_velocity(axis_y, (v >= 0) ? axis_y.positive_dir : !axis_y.positive_dir, mag);
++  else if (eje == 2) ok = axis_set_velocity(axis_k, (v >= 0) ? axis_k.positive_dir : !axis_k.positive_dir, mag);
++
++  strncpy(txPacket.command, ok ? OK : BUSY, MAX_COMMAND_LENGTH);
++  txPacket.parameter_count = 0;
++}
++
+ void handle_manual_absolute_command(Packet &rxPacket, Packet &txPacket){
+   int dx_steps, dy_steps, dk_steps;
+ 
+@@ -599,7 +746,12 @@
+   int any_limit_pressed = 0;
+ 
+   if (strcmp(rxPacket.command, RUN) == 0){
+-    if (Traj_state != TRAJ_IDLE){
++    if (Traj_state != TRAJ_IDLE || axis_x.continuous_mode || axis_k.continuous_mode){
++      // NO se incluye axis_y: la arquitectura objetivo corre Y en SET_VEL
++      // (control de Fz en tiempo real) AL MISMO TIEMPO que RUN mueve X/K
++      // (trayectoria preestablecida del montaje 37) -- fix 2026-11-08,
++      // ver reportes/2026-11-08_fix_firmware_run_set_vel.md
++      // X y K si se siguen bloqueando entre si y con RUN, igual que antes.
+       strncpy(txPacket.command, ERROR, MAX_COMMAND_LENGTH);
+       txPacket.parameter_count = 0;
+     }
+@@ -721,6 +873,10 @@
+     handle_manual_relative_command(rxPacket, txPacket);
+   }
+ 
++  else if (strcmp(rxPacket.command, SET_VEL) == 0){
++    handle_velocity_command(rxPacket, txPacket);
++  }
++
+   else if (strcmp(rxPacket.command, GOTO) == 0){
+     handle_manual_absolute_command(rxPacket, txPacket);
+   }
+--- "a/Codigo ESP32 MOV/platformIO_control_trayectoria_v1/src/communication.h"	2026-11-10 12:56:14.996717865 -0500
++++ "b/Codigo ESP32 MOV/platformIO_control_trayectoria_v1/src/communication.h"	2026-11-10 13:39:10.577514211 -0500
+@@ -57,6 +57,12 @@
+ #define MANUAL_STOP       "MANUAL_STOP"
+ #define STOPPED           "STOPPED"
+ 
++// Continuous velocity command (real-time control loop on the RPi side).
++// SET_VEL:eje:pasos_por_seg_con_signo -- responde OK, BUSY (eje ocupado con
++// un movimiento finito o con una trayectoria activa) o ERROR (parametros
++// invalidos). pasos_por_seg = 0 detiene ese eje.
++#define SET_VEL           "SET_VEL"
++
+ // Absolute positioning commands (NOT IMPLEMENTED IN RPI SIDE)
+ #define GOTO              "GOTO"
+ //#define OK                "OK"
