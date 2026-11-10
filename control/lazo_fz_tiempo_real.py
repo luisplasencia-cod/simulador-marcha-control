@@ -102,6 +102,10 @@ class ClienteVelocidadESP32:
             raise RuntimeError("ESP32 no responde PING tras abrir el puerto")
 
     def _cmd(self, cmd):
+        # Guarda central (error 2026-11-10: eje "Y" -> atoi()=0 -> movia X): todo comando con eje exige ENTERO 0/1/2.
+        partes = cmd.split(":")
+        if partes[0] in ("MANUAL", "SET_VEL", "GOTO") and (len(partes) < 2 or partes[1] not in ("0", "1", "2")):
+            raise ValueError(f"comando {cmd!r}: el eje debe ser el ENTERO 0, 1 o 2 (el firmware hace atoi y un texto cae en X)")
         self.ser.reset_input_buffer()
         self.ser.write(f"<{cmd}>".encode("ascii"))
         return self.ser.readline().decode("ascii", errors="replace").strip()

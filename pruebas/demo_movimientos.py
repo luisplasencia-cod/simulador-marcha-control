@@ -25,12 +25,27 @@ motivo = "completada"
 
 
 def pos():
-    r = e._cmd("GET_POSITION")
-    return dict(zip("XYK", (int(v) for v in r.split(":")[1:4])))
+    """Lee el contador. Si la respuesta llega incompleta (error 2026-11-10: KeyError('Y')) reintenta; si no, error claro."""
+    r = ""
+    for _ in range(5):
+        r = e._cmd("GET_POSITION")
+        v = r.split(":")
+        if v[0] == "POSITION" and len(v) == 4:
+            try:
+                return dict(zip("XYK", (int(x) for x in v[1:4])))
+            except ValueError:
+                pass
+        time.sleep(0.1)
+    raise RuntimeError(f"GET_POSITION sin respuesta valida tras 5 intentos (ultima: {r!r}); posible perdida del USB")
+
+
+_ult = [0.0]
 
 
 def estado(msg):
     ev.escribir("demo", float("nan"), delta["Y"], f"{msg}  [X={delta['X']/PX:+.1f} cm  Y={delta['Y']/PY:+.1f} cm  K={delta['K']/PK:+.1f}°]")
+    if time.monotonic() - _ult[0] < 1.0: return
+    _ult[0] = time.monotonic()
     print(f"  {msg:<34s} X={delta['X']/PX:+5.1f} cm  Y={delta['Y']/PY:+5.1f} cm  K={delta['K']/PK:+6.1f}°", flush=True)
 
 
