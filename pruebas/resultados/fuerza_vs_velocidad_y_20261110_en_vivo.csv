@@ -1,0 +1,785 @@
+# Fz vs velocidad de Y (en el aire, sin contacto)
+0.000,inicio,0.00,0,CONECTANDO (el ESP32 se reinicia al abrir el puerto: espera 6 s)
+6.146,tara,0.00,0,TARA: eje quieto y sin contacto
+6.482,reposo,1.26,0,REPOSO inicial (eje quieto)
+6.491,reposo,1.53,0,REPOSO inicial (eje quieto)
+6.500,reposo,2.07,0,REPOSO inicial (eje quieto)
+6.509,reposo,2.22,0,REPOSO inicial (eje quieto)
+6.518,reposo,-3.94,0,REPOSO inicial (eje quieto)
+6.528,reposo,-0.43,0,REPOSO inicial (eje quieto)
+6.540,reposo,-0.10,0,REPOSO inicial (eje quieto)
+6.550,reposo,-1.64,0,REPOSO inicial (eje quieto)
+6.558,reposo,-2.82,0,REPOSO inicial (eje quieto)
+6.568,reposo,3.51,0,REPOSO inicial (eje quieto)
+6.578,reposo,0.22,0,REPOSO inicial (eje quieto)
+6.588,reposo,-4.31,0,REPOSO inicial (eje quieto)
+6.596,reposo,-0.86,0,REPOSO inicial (eje quieto)
+6.605,reposo,-3.28,0,REPOSO inicial (eje quieto)
+6.613,reposo,3.77,0,REPOSO inicial (eje quieto)
+6.623,reposo,1.20,0,REPOSO inicial (eje quieto)
+6.633,reposo,-2.02,0,REPOSO inicial (eje quieto)
+6.643,reposo,3.72,0,REPOSO inicial (eje quieto)
+6.653,reposo,1.50,0,REPOSO inicial (eje quieto)
+6.666,reposo,2.08,0,REPOSO inicial (eje quieto)
+6.678,reposo,1.11,0,REPOSO inicial (eje quieto)
+6.692,reposo,-0.95,0,REPOSO inicial (eje quieto)
+6.701,reposo,2.78,0,REPOSO inicial (eje quieto)
+6.717,reposo,0.63,0,REPOSO inicial (eje quieto)
+6.724,reposo,0.88,0,REPOSO inicial (eje quieto)
+6.738,reposo,-0.56,0,REPOSO inicial (eje quieto)
+6.748,reposo,0.59,0,REPOSO inicial (eje quieto)
+6.757,reposo,2.61,0,REPOSO inicial (eje quieto)
+6.767,reposo,1.52,0,REPOSO inicial (eje quieto)
+6.774,reposo,0.62,0,REPOSO inicial (eje quieto)
+6.782,reposo,-6.29,0,REPOSO inicial (eje quieto)
+6.792,reposo,1.22,0,REPOSO inicial (eje quieto)
+6.802,reposo,-2.53,0,REPOSO inicial (eje quieto)
+6.809,reposo,3.83,0,REPOSO inicial (eje quieto)
+6.819,reposo,-3.27,0,REPOSO inicial (eje quieto)
+6.829,reposo,-0.63,0,REPOSO inicial (eje quieto)
+6.838,reposo,2.02,0,REPOSO inicial (eje quieto)
+6.850,reposo,1.02,0,REPOSO inicial (eje quieto)
+6.862,reposo,1.81,0,REPOSO inicial (eje quieto)
+6.869,reposo,-2.95,0,REPOSO inicial (eje quieto)
+6.877,reposo,1.22,0,REPOSO inicial (eje quieto)
+6.888,reposo,-1.33,0,REPOSO inicial (eje quieto)
+6.896,reposo,0.99,0,REPOSO inicial (eje quieto)
+6.907,reposo,0.76,0,REPOSO inicial (eje quieto)
+6.917,reposo,1.46,0,REPOSO inicial (eje quieto)
+6.927,reposo,4.02,0,REPOSO inicial (eje quieto)
+6.937,reposo,-0.14,0,REPOSO inicial (eje quieto)
+6.946,reposo,-2.21,0,REPOSO inicial (eje quieto)
+6.955,reposo,1.77,0,REPOSO inicial (eje quieto)
+6.968,reposo,0.59,0,REPOSO inicial (eje quieto)
+6.976,reposo,1.22,0,REPOSO inicial (eje quieto)
+6.987,reposo,2.67,0,REPOSO inicial (eje quieto)
+6.995,reposo,1.17,0,REPOSO inicial (eje quieto)
+7.005,reposo,2.12,0,REPOSO inicial (eje quieto)
+7.014,reposo,-0.81,0,REPOSO inicial (eje quieto)
+7.021,reposo,-4.46,0,REPOSO inicial (eje quieto)
+7.032,reposo,-2.67,0,REPOSO inicial (eje quieto)
+7.040,reposo,-0.22,0,REPOSO inicial (eje quieto)
+7.048,reposo,2.01,0,REPOSO inicial (eje quieto)
+7.060,reposo,1.89,0,REPOSO inicial (eje quieto)
+7.069,reposo,1.32,0,REPOSO inicial (eje quieto)
+7.079,reposo,1.96,0,REPOSO inicial (eje quieto)
+7.086,reposo,0.91,0,REPOSO inicial (eje quieto)
+7.096,reposo,-0.08,0,REPOSO inicial (eje quieto)
+7.106,reposo,-0.41,0,REPOSO inicial (eje quieto)
+7.113,reposo,0.42,0,REPOSO inicial (eje quieto)
+7.127,reposo,1.97,0,REPOSO inicial (eje quieto)
+7.136,reposo,0.60,0,REPOSO inicial (eje quieto)
+7.144,reposo,4.32,0,REPOSO inicial (eje quieto)
+7.158,reposo,0.26,0,REPOSO inicial (eje quieto)
+7.166,reposo,-0.58,0,REPOSO inicial (eje quieto)
+7.177,reposo,0.69,0,REPOSO inicial (eje quieto)
+7.189,reposo,-0.90,0,REPOSO inicial (eje quieto)
+7.200,reposo,2.50,0,REPOSO inicial (eje quieto)
+7.211,reposo,3.38,0,REPOSO inicial (eje quieto)
+7.224,reposo,1.07,0,REPOSO inicial (eje quieto)
+7.232,reposo,0.93,0,REPOSO inicial (eje quieto)
+7.240,reposo,1.29,0,REPOSO inicial (eje quieto)
+7.252,reposo,1.61,0,REPOSO inicial (eje quieto)
+7.261,reposo,1.73,0,REPOSO inicial (eje quieto)
+7.271,reposo,1.06,0,REPOSO inicial (eje quieto)
+7.285,reposo,0.02,0,REPOSO inicial (eje quieto)
+7.295,reposo,1.67,0,REPOSO inicial (eje quieto)
+7.304,reposo,-0.79,0,REPOSO inicial (eje quieto)
+7.319,reposo,1.36,0,REPOSO inicial (eje quieto)
+7.326,reposo,-0.08,0,REPOSO inicial (eje quieto)
+7.339,reposo,2.27,0,REPOSO inicial (eje quieto)
+7.348,reposo,-1.86,0,REPOSO inicial (eje quieto)
+7.361,reposo,-0.46,0,REPOSO inicial (eje quieto)
+7.369,reposo,-1.02,0,REPOSO inicial (eje quieto)
+7.380,reposo,-2.56,0,REPOSO inicial (eje quieto)
+7.389,reposo,-1.46,0,REPOSO inicial (eje quieto)
+7.403,reposo,1.42,0,REPOSO inicial (eje quieto)
+7.411,reposo,0.92,0,REPOSO inicial (eje quieto)
+7.421,reposo,-0.05,0,REPOSO inicial (eje quieto)
+7.428,reposo,2.24,0,REPOSO inicial (eje quieto)
+7.437,reposo,1.22,0,REPOSO inicial (eje quieto)
+7.446,reposo,2.74,0,REPOSO inicial (eje quieto)
+7.457,reposo,1.80,0,REPOSO inicial (eje quieto)
+7.469,reposo,-0.17,0,REPOSO inicial (eje quieto)
+7.487,baja 400,0.38,-7,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.497,baja 400,-3.76,-11,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.513,baja 400,-4.67,-17,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.533,baja 400,17.92,-25,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.549,baja 400,-1.85,-31,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.567,baja 400,25.07,-38,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.582,baja 400,8.36,-45,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.594,baja 400,7.98,-49,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.611,baja 400,7.29,-56,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.626,baja 400,-12.04,-62,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.638,baja 400,-12.72,-67,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.651,baja 400,5.24,-72,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.693,baja 400,19.37,-89,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.707,baja 400,12.07,-94,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.720,baja 400,22.47,-100,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.733,baja 400,12.45,-105,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.751,baja 400,21.25,-112,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.765,baja 400,-4.46,-118,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.788,baja 400,12.55,-127,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.803,baja 400,-2.91,-133,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.822,baja 400,14.98,-141,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.836,baja 400,-1.40,-146,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.849,baja 400,-0.61,-151,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.863,baja 400,0.85,-157,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.886,baja 400,17.16,-166,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.899,baja 400,4.03,-171,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.917,baja 400,26.68,-178,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.932,baja 400,12.16,-185,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.944,baja 400,14.39,-190,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.963,baja 400,11.19,-197,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.978,baja 400,-4.41,-203,BAJA Y a 5 mm/s (Y se esta moviendo)
+7.992,tras parar,-7.84,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.000,tras parar,-15.25,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.087,tras parar,19.19,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.101,tras parar,33.09,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.109,tras parar,32.10,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.116,tras parar,35.09,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.123,tras parar,34.85,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.130,tras parar,35.20,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.137,tras parar,37.47,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.144,tras parar,36.90,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.151,tras parar,36.87,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.158,tras parar,36.61,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.165,tras parar,36.89,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.172,tras parar,36.56,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.179,tras parar,36.17,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.186,tras parar,36.21,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.193,tras parar,35.81,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.200,tras parar,35.00,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.207,tras parar,34.07,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.215,tras parar,33.94,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.222,tras parar,31.59,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.229,tras parar,31.96,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.236,tras parar,32.05,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.243,tras parar,32.82,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.250,tras parar,31.93,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.257,tras parar,30.79,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.266,tras parar,30.84,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.274,tras parar,29.18,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.283,tras parar,28.98,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.295,tras parar,26.84,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.304,tras parar,27.28,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.317,tras parar,25.01,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.337,tras parar,27.00,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.351,tras parar,27.01,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.372,tras parar,24.48,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.402,tras parar,23.51,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.455,tras parar,28.41,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.484,tras parar,28.06,-203,Y detenido tras baja 400: leyendo 0.5 s
+8.497,sube 400,32.64,-198,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.507,sube 400,37.79,-194,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.520,sube 400,40.02,-189,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.533,sube 400,32.89,-184,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.553,sube 400,43.76,-175,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.565,sube 400,39.60,-170,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.578,sube 400,40.36,-165,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.591,sube 400,39.84,-160,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.604,sube 400,39.61,-155,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.617,sube 400,33.36,-150,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.630,sube 400,32.53,-144,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.655,sube 400,43.83,-135,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.668,sube 400,37.92,-130,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.681,sube 400,41.11,-124,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.694,sube 400,40.11,-119,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.707,sube 400,39.70,-114,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.720,sube 400,40.76,-109,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.733,sube 400,38.53,-103,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.753,sube 400,41.41,-96,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.765,sube 400,39.50,-90,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.778,sube 400,34.62,-85,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.791,sube 400,39.90,-80,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.804,sube 400,40.06,-75,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.817,sube 400,39.77,-70,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.830,sube 400,36.08,-64,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.852,sube 400,42.97,-56,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.863,sube 400,31.42,-52,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.875,sube 400,42.04,-46,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.888,sube 400,40.53,-41,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.901,sube 400,41.49,-36,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.914,sube 400,40.82,-31,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.927,sube 400,33.88,-26,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.950,sube 400,43.25,-17,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.965,sube 400,39.44,-11,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.979,sube 400,36.18,-5,SUBE Y a 5 mm/s (Y se esta moviendo)
+8.991,sube 400,40.03,0,SUBE Y a 5 mm/s (Y se esta moviendo)
+9.004,tras parar,40.51,0,Y detenido tras sube 400: leyendo 0.5 s
+9.011,tras parar,40.74,0,Y detenido tras sube 400: leyendo 0.5 s
+9.018,tras parar,39.31,0,Y detenido tras sube 400: leyendo 0.5 s
+9.025,tras parar,32.15,0,Y detenido tras sube 400: leyendo 0.5 s
+9.032,tras parar,31.35,0,Y detenido tras sube 400: leyendo 0.5 s
+9.039,tras parar,28.03,0,Y detenido tras sube 400: leyendo 0.5 s
+9.046,tras parar,24.59,0,Y detenido tras sube 400: leyendo 0.5 s
+9.053,tras parar,27.54,0,Y detenido tras sube 400: leyendo 0.5 s
+9.060,tras parar,19.16,0,Y detenido tras sube 400: leyendo 0.5 s
+9.067,tras parar,9.60,0,Y detenido tras sube 400: leyendo 0.5 s
+9.074,tras parar,5.03,0,Y detenido tras sube 400: leyendo 0.5 s
+9.081,tras parar,8.53,0,Y detenido tras sube 400: leyendo 0.5 s
+9.088,tras parar,12.80,0,Y detenido tras sube 400: leyendo 0.5 s
+9.095,tras parar,16.76,0,Y detenido tras sube 400: leyendo 0.5 s
+9.102,tras parar,15.13,0,Y detenido tras sube 400: leyendo 0.5 s
+9.109,tras parar,14.71,0,Y detenido tras sube 400: leyendo 0.5 s
+9.116,tras parar,11.08,0,Y detenido tras sube 400: leyendo 0.5 s
+9.123,tras parar,9.89,0,Y detenido tras sube 400: leyendo 0.5 s
+9.130,tras parar,7.31,0,Y detenido tras sube 400: leyendo 0.5 s
+9.137,tras parar,5.23,0,Y detenido tras sube 400: leyendo 0.5 s
+9.145,tras parar,0.14,0,Y detenido tras sube 400: leyendo 0.5 s
+9.151,tras parar,-0.76,0,Y detenido tras sube 400: leyendo 0.5 s
+9.158,tras parar,-0.72,0,Y detenido tras sube 400: leyendo 0.5 s
+9.165,tras parar,-2.64,0,Y detenido tras sube 400: leyendo 0.5 s
+9.173,tras parar,-3.78,0,Y detenido tras sube 400: leyendo 0.5 s
+9.180,tras parar,-1.09,0,Y detenido tras sube 400: leyendo 0.5 s
+9.187,tras parar,-2.30,0,Y detenido tras sube 400: leyendo 0.5 s
+9.195,tras parar,-4.94,0,Y detenido tras sube 400: leyendo 0.5 s
+9.202,tras parar,-6.34,0,Y detenido tras sube 400: leyendo 0.5 s
+9.209,tras parar,-5.56,0,Y detenido tras sube 400: leyendo 0.5 s
+9.215,tras parar,-5.95,0,Y detenido tras sube 400: leyendo 0.5 s
+9.222,tras parar,-4.54,0,Y detenido tras sube 400: leyendo 0.5 s
+9.230,tras parar,-5.83,0,Y detenido tras sube 400: leyendo 0.5 s
+9.237,tras parar,-4.62,0,Y detenido tras sube 400: leyendo 0.5 s
+9.244,tras parar,-5.39,0,Y detenido tras sube 400: leyendo 0.5 s
+9.252,tras parar,-4.60,0,Y detenido tras sube 400: leyendo 0.5 s
+9.259,tras parar,-6.12,0,Y detenido tras sube 400: leyendo 0.5 s
+9.266,tras parar,-6.64,0,Y detenido tras sube 400: leyendo 0.5 s
+9.274,tras parar,-5.44,0,Y detenido tras sube 400: leyendo 0.5 s
+9.281,tras parar,-7.00,0,Y detenido tras sube 400: leyendo 0.5 s
+9.288,tras parar,-5.63,0,Y detenido tras sube 400: leyendo 0.5 s
+9.295,tras parar,-6.81,0,Y detenido tras sube 400: leyendo 0.5 s
+9.302,tras parar,-6.04,0,Y detenido tras sube 400: leyendo 0.5 s
+9.309,tras parar,-6.37,0,Y detenido tras sube 400: leyendo 0.5 s
+9.316,tras parar,-5.35,0,Y detenido tras sube 400: leyendo 0.5 s
+9.323,tras parar,-6.13,0,Y detenido tras sube 400: leyendo 0.5 s
+9.330,tras parar,-6.52,0,Y detenido tras sube 400: leyendo 0.5 s
+9.337,tras parar,-5.75,0,Y detenido tras sube 400: leyendo 0.5 s
+9.345,tras parar,-5.74,0,Y detenido tras sube 400: leyendo 0.5 s
+9.352,tras parar,-5.70,0,Y detenido tras sube 400: leyendo 0.5 s
+9.359,tras parar,-5.67,0,Y detenido tras sube 400: leyendo 0.5 s
+9.366,tras parar,-6.27,0,Y detenido tras sube 400: leyendo 0.5 s
+9.374,tras parar,-4.87,0,Y detenido tras sube 400: leyendo 0.5 s
+9.381,tras parar,-5.69,0,Y detenido tras sube 400: leyendo 0.5 s
+9.388,tras parar,-4.16,0,Y detenido tras sube 400: leyendo 0.5 s
+9.394,tras parar,-3.85,0,Y detenido tras sube 400: leyendo 0.5 s
+9.402,tras parar,-3.16,0,Y detenido tras sube 400: leyendo 0.5 s
+9.410,tras parar,-4.94,0,Y detenido tras sube 400: leyendo 0.5 s
+9.417,tras parar,-4.46,0,Y detenido tras sube 400: leyendo 0.5 s
+9.425,tras parar,-5.23,0,Y detenido tras sube 400: leyendo 0.5 s
+9.432,tras parar,-4.86,0,Y detenido tras sube 400: leyendo 0.5 s
+9.439,tras parar,-4.34,0,Y detenido tras sube 400: leyendo 0.5 s
+9.447,tras parar,-4.65,0,Y detenido tras sube 400: leyendo 0.5 s
+9.454,tras parar,-3.55,0,Y detenido tras sube 400: leyendo 0.5 s
+9.461,tras parar,-4.00,0,Y detenido tras sube 400: leyendo 0.5 s
+9.468,tras parar,-3.67,0,Y detenido tras sube 400: leyendo 0.5 s
+9.475,tras parar,-3.66,0,Y detenido tras sube 400: leyendo 0.5 s
+9.483,tras parar,-4.66,0,Y detenido tras sube 400: leyendo 0.5 s
+9.491,tras parar,-2.56,0,Y detenido tras sube 400: leyendo 0.5 s
+9.498,tras parar,-4.62,0,Y detenido tras sube 400: leyendo 0.5 s
+9.505,tras parar,-3.44,0,Y detenido tras sube 400: leyendo 0.5 s
+9.516,baja 800,0.50,-9,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.528,baja 800,-2.93,-19,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.541,baja 800,32.00,-29,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.554,baja 800,41.98,-40,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.567,baja 800,41.13,-50,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.585,baja 800,26.12,-65,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.599,baja 800,41.01,-76,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.616,baja 800,36.25,-89,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.631,baja 800,31.38,-101,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.644,baja 800,30.58,-112,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.657,baja 800,22.72,-122,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.679,baja 800,3.77,-139,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.689,baja 800,16.16,-147,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.703,baja 800,18.75,-159,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.720,baja 800,22.17,-172,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.734,baja 800,38.39,-184,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.747,baja 800,39.35,-194,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.760,baja 800,30.84,-205,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.777,baja 800,33.86,-218,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.792,baja 800,26.68,-230,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.805,baja 800,7.77,-241,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.840,baja 800,28.12,-269,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.855,baja 800,23.61,-281,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.869,baja 800,26.34,-292,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.882,baja 800,19.72,-302,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.894,baja 800,30.40,-312,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.907,baja 800,24.16,-322,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.924,baja 800,24.18,-336,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.939,baja 800,18.30,-348,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.952,baja 800,21.85,-358,BAJA Y a 10 mm/s (Y se esta moviendo)
+9.988,baja 800,19.21,-386,BAJA Y a 10 mm/s (Y se esta moviendo)
+10.002,baja 800,13.56,-398,BAJA Y a 10 mm/s (Y se esta moviendo)
+10.017,baja 800,5.10,-410,BAJA Y a 10 mm/s (Y se esta moviendo)
+10.031,tras parar,33.10,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.038,tras parar,32.10,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.045,tras parar,19.29,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.057,tras parar,13.31,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.064,tras parar,19.79,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.071,tras parar,32.79,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.078,tras parar,36.43,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.085,tras parar,36.38,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.092,tras parar,35.36,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.099,tras parar,35.69,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.106,tras parar,35.35,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.113,tras parar,34.74,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.120,tras parar,36.40,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.127,tras parar,36.15,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.135,tras parar,31.93,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.142,tras parar,31.14,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.149,tras parar,34.82,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.156,tras parar,35.57,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.163,tras parar,36.13,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.170,tras parar,36.19,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.177,tras parar,37.09,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.184,tras parar,38.06,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.191,tras parar,37.03,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.198,tras parar,36.80,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.205,tras parar,37.80,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.212,tras parar,37.99,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.219,tras parar,37.34,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.226,tras parar,37.42,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.233,tras parar,38.12,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.240,tras parar,37.19,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.246,tras parar,36.99,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.254,tras parar,35.80,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.261,tras parar,34.72,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.268,tras parar,34.18,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.276,tras parar,32.72,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.282,tras parar,31.26,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.289,tras parar,31.19,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.296,tras parar,30.38,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.304,tras parar,30.28,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.310,tras parar,31.57,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.317,tras parar,28.18,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.324,tras parar,30.81,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.330,tras parar,30.90,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.338,tras parar,28.85,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.344,tras parar,29.28,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.351,tras parar,27.99,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.358,tras parar,29.28,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.365,tras parar,26.63,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.373,tras parar,27.83,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.380,tras parar,28.43,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.386,tras parar,26.64,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.393,tras parar,28.40,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.400,tras parar,28.68,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.407,tras parar,27.88,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.414,tras parar,27.71,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.421,tras parar,27.12,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.428,tras parar,26.45,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.435,tras parar,26.20,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.443,tras parar,26.94,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.450,tras parar,27.32,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.456,tras parar,25.24,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.463,tras parar,27.21,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.470,tras parar,25.60,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.478,tras parar,27.79,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.485,tras parar,27.65,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.492,tras parar,27.07,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.499,tras parar,25.73,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.506,tras parar,25.63,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.512,tras parar,27.33,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.519,tras parar,26.22,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.526,tras parar,26.75,-410,Y detenido tras baja 800: leyendo 0.5 s
+10.539,sube 800,30.99,-399,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.552,sube 800,39.77,-389,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.565,sube 800,39.72,-379,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.578,sube 800,39.13,-368,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.595,sube 800,40.73,-355,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.611,sube 800,41.04,-342,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.627,sube 800,41.54,-329,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.642,sube 800,40.36,-317,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.655,sube 800,40.61,-307,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.668,sube 800,36.03,-296,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.687,sube 800,39.88,-281,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.700,sube 800,34.89,-271,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.713,sube 800,40.25,-261,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.726,sube 800,39.41,-250,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.741,sube 800,40.38,-238,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.752,sube 800,40.03,-229,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.765,sube 800,40.66,-219,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.783,sube 800,39.63,-205,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.797,sube 800,40.83,-193,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.810,sube 800,41.59,-183,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.823,sube 800,36.37,-173,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.838,sube 800,40.49,-160,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.849,sube 800,38.61,-151,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.862,sube 800,40.13,-141,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.875,sube 800,36.53,-131,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.889,sube 800,39.61,-119,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.901,sube 800,40.61,-110,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.914,sube 800,41.55,-99,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.930,sube 800,39.63,-87,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.940,sube 800,40.76,-78,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.953,sube 800,40.16,-68,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.966,sube 800,40.45,-58,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.983,sube 800,43.47,-44,SUBE Y a 10 mm/s (Y se esta moviendo)
+10.998,sube 800,38.91,-32,SUBE Y a 10 mm/s (Y se esta moviendo)
+11.011,sube 800,40.76,-22,SUBE Y a 10 mm/s (Y se esta moviendo)
+11.024,sube 800,37.80,-11,SUBE Y a 10 mm/s (Y se esta moviendo)
+11.039,sube 800,40.64,0,SUBE Y a 10 mm/s (Y se esta moviendo)
+11.050,tras parar,39.11,0,Y detenido tras sube 800: leyendo 0.5 s
+11.057,tras parar,39.63,0,Y detenido tras sube 800: leyendo 0.5 s
+11.064,tras parar,40.31,0,Y detenido tras sube 800: leyendo 0.5 s
+11.071,tras parar,26.65,0,Y detenido tras sube 800: leyendo 0.5 s
+11.078,tras parar,2.37,0,Y detenido tras sube 800: leyendo 0.5 s
+11.085,tras parar,3.75,0,Y detenido tras sube 800: leyendo 0.5 s
+11.092,tras parar,5.06,0,Y detenido tras sube 800: leyendo 0.5 s
+11.099,tras parar,-9.88,0,Y detenido tras sube 800: leyendo 0.5 s
+11.106,tras parar,5.53,0,Y detenido tras sube 800: leyendo 0.5 s
+11.113,tras parar,-8.42,0,Y detenido tras sube 800: leyendo 0.5 s
+11.120,tras parar,-4.68,0,Y detenido tras sube 800: leyendo 0.5 s
+11.127,tras parar,-7.43,0,Y detenido tras sube 800: leyendo 0.5 s
+11.134,tras parar,-8.63,0,Y detenido tras sube 800: leyendo 0.5 s
+11.142,tras parar,-8.71,0,Y detenido tras sube 800: leyendo 0.5 s
+11.149,tras parar,-7.55,0,Y detenido tras sube 800: leyendo 0.5 s
+11.155,tras parar,-7.64,0,Y detenido tras sube 800: leyendo 0.5 s
+11.162,tras parar,-5.21,0,Y detenido tras sube 800: leyendo 0.5 s
+11.171,tras parar,-5.06,0,Y detenido tras sube 800: leyendo 0.5 s
+11.178,tras parar,-6.22,0,Y detenido tras sube 800: leyendo 0.5 s
+11.184,tras parar,-5.05,0,Y detenido tras sube 800: leyendo 0.5 s
+11.192,tras parar,-6.08,0,Y detenido tras sube 800: leyendo 0.5 s
+11.199,tras parar,-5.49,0,Y detenido tras sube 800: leyendo 0.5 s
+11.206,tras parar,-4.34,0,Y detenido tras sube 800: leyendo 0.5 s
+11.214,tras parar,-5.29,0,Y detenido tras sube 800: leyendo 0.5 s
+11.221,tras parar,-4.74,0,Y detenido tras sube 800: leyendo 0.5 s
+11.228,tras parar,-3.77,0,Y detenido tras sube 800: leyendo 0.5 s
+11.235,tras parar,-3.26,0,Y detenido tras sube 800: leyendo 0.5 s
+11.242,tras parar,-4.10,0,Y detenido tras sube 800: leyendo 0.5 s
+11.248,tras parar,-3.93,0,Y detenido tras sube 800: leyendo 0.5 s
+11.255,tras parar,-1.52,0,Y detenido tras sube 800: leyendo 0.5 s
+11.262,tras parar,-2.73,0,Y detenido tras sube 800: leyendo 0.5 s
+11.269,tras parar,-1.95,0,Y detenido tras sube 800: leyendo 0.5 s
+11.277,tras parar,-1.75,0,Y detenido tras sube 800: leyendo 0.5 s
+11.284,tras parar,-1.93,0,Y detenido tras sube 800: leyendo 0.5 s
+11.291,tras parar,-2.79,0,Y detenido tras sube 800: leyendo 0.5 s
+11.298,tras parar,-2.67,0,Y detenido tras sube 800: leyendo 0.5 s
+11.306,tras parar,-2.59,0,Y detenido tras sube 800: leyendo 0.5 s
+11.313,tras parar,-3.43,0,Y detenido tras sube 800: leyendo 0.5 s
+11.320,tras parar,-1.42,0,Y detenido tras sube 800: leyendo 0.5 s
+11.327,tras parar,-2.80,0,Y detenido tras sube 800: leyendo 0.5 s
+11.334,tras parar,-1.45,0,Y detenido tras sube 800: leyendo 0.5 s
+11.342,tras parar,-2.15,0,Y detenido tras sube 800: leyendo 0.5 s
+11.349,tras parar,-3.62,0,Y detenido tras sube 800: leyendo 0.5 s
+11.356,tras parar,-4.25,0,Y detenido tras sube 800: leyendo 0.5 s
+11.363,tras parar,-3.39,0,Y detenido tras sube 800: leyendo 0.5 s
+11.370,tras parar,-4.58,0,Y detenido tras sube 800: leyendo 0.5 s
+11.378,tras parar,-5.43,0,Y detenido tras sube 800: leyendo 0.5 s
+11.385,tras parar,-5.51,0,Y detenido tras sube 800: leyendo 0.5 s
+11.391,tras parar,-4.92,0,Y detenido tras sube 800: leyendo 0.5 s
+11.398,tras parar,-5.38,0,Y detenido tras sube 800: leyendo 0.5 s
+11.405,tras parar,-3.48,0,Y detenido tras sube 800: leyendo 0.5 s
+11.412,tras parar,-4.09,0,Y detenido tras sube 800: leyendo 0.5 s
+11.420,tras parar,-4.69,0,Y detenido tras sube 800: leyendo 0.5 s
+11.427,tras parar,-5.66,0,Y detenido tras sube 800: leyendo 0.5 s
+11.435,tras parar,-4.99,0,Y detenido tras sube 800: leyendo 0.5 s
+11.443,tras parar,-4.33,0,Y detenido tras sube 800: leyendo 0.5 s
+11.450,tras parar,-6.33,0,Y detenido tras sube 800: leyendo 0.5 s
+11.458,tras parar,-5.47,0,Y detenido tras sube 800: leyendo 0.5 s
+11.465,tras parar,-3.40,0,Y detenido tras sube 800: leyendo 0.5 s
+11.472,tras parar,-2.24,0,Y detenido tras sube 800: leyendo 0.5 s
+11.479,tras parar,-5.64,0,Y detenido tras sube 800: leyendo 0.5 s
+11.487,tras parar,-6.25,0,Y detenido tras sube 800: leyendo 0.5 s
+11.494,tras parar,-4.91,0,Y detenido tras sube 800: leyendo 0.5 s
+11.501,tras parar,-2.69,0,Y detenido tras sube 800: leyendo 0.5 s
+11.508,tras parar,-3.64,0,Y detenido tras sube 800: leyendo 0.5 s
+11.515,tras parar,-1.73,0,Y detenido tras sube 800: leyendo 0.5 s
+11.523,tras parar,-3.42,0,Y detenido tras sube 800: leyendo 0.5 s
+11.530,tras parar,-2.24,0,Y detenido tras sube 800: leyendo 0.5 s
+11.537,tras parar,-4.23,0,Y detenido tras sube 800: leyendo 0.5 s
+11.545,tras parar,-2.51,0,Y detenido tras sube 800: leyendo 0.5 s
+11.558,baja 1600,0.84,-20,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.568,baja 1600,33.56,-36,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.581,baja 1600,40.47,-57,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.594,baja 1600,38.51,-78,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.607,baja 1600,40.14,-99,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.621,baja 1600,41.25,-121,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.633,baja 1600,41.58,-141,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.648,baja 1600,41.71,-164,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.659,baja 1600,42.01,-182,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.672,baja 1600,40.00,-203,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.685,baja 1600,37.92,-223,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.703,baja 1600,30.31,-252,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.717,baja 1600,42.68,-274,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.730,baja 1600,41.33,-296,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.744,baja 1600,41.75,-317,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.757,baja 1600,40.18,-338,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.769,baja 1600,37.05,-357,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.783,baja 1600,40.32,-380,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.795,baja 1600,39.70,-400,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.808,baja 1600,40.03,-421,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.822,baja 1600,39.88,-442,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.834,baja 1600,40.95,-462,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.849,baja 1600,27.39,-485,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.861,baja 1600,41.46,-504,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.875,baja 1600,40.79,-527,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.888,baja 1600,34.46,-548,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.899,baja 1600,39.59,-566,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.916,baja 1600,37.54,-592,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.926,baja 1600,39.66,-608,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.938,baja 1600,38.46,-629,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.951,baja 1600,39.86,-649,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.964,baja 1600,38.84,-670,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.979,baja 1600,29.06,-693,BAJA Y a 20 mm/s (Y se esta moviendo)
+11.992,baja 1600,39.35,-715,BAJA Y a 20 mm/s (Y se esta moviendo)
+12.006,baja 1600,39.10,-736,BAJA Y a 20 mm/s (Y se esta moviendo)
+12.016,baja 1600,29.52,-753,BAJA Y a 20 mm/s (Y se esta moviendo)
+12.029,baja 1600,38.79,-774,BAJA Y a 20 mm/s (Y se esta moviendo)
+12.044,baja 1600,38.20,-797,BAJA Y a 20 mm/s (Y se esta moviendo)
+12.055,baja 1600,40.59,-815,BAJA Y a 20 mm/s (Y se esta moviendo)
+12.068,tras parar,38.72,-815,Y detenido tras baja 1600: leyendo 0.5 s
+12.075,tras parar,35.41,-815,Y detenido tras baja 1600: leyendo 0.5 s
+12.082,tras parar,38.12,-815,Y detenido tras baja 1600: leyendo 0.5 s
+12.093,tras parar,33.40,-815,Y detenido tras baja 1600: leyendo 0.5 s
+12.112,tras parar,27.00,-815,Y detenido tras baja 1600: leyendo 0.5 s
+12.124,tras parar,38.79,-815,Y detenido tras baja 1600: leyendo 0.5 s
+12.131,tras parar,39.16,-815,Y detenido tras baja 1600: leyendo 0.5 s
+12.138,tras parar,39.61,-815,Y detenido tras baja 1600: leyendo 0.5 s
+12.146,tras parar,39.14,-815,Y detenido tras baja 1600: leyendo 0.5 s
+12.153,tras parar,37.41,-815,Y detenido tras baja 1600: leyendo 0.5 s
+12.248,tras parar,11.44,-815,Y detenido tras baja 1600: leyendo 0.5 s
+12.255,tras parar,17.73,-815,Y detenido tras baja 1600: leyendo 0.5 s
+12.262,tras parar,25.20,-815,Y detenido tras baja 1600: leyendo 0.5 s
+12.270,tras parar,26.37,-815,Y detenido tras baja 1600: leyendo 0.5 s
+12.278,tras parar,25.26,-815,Y detenido tras baja 1600: leyendo 0.5 s
+12.326,tras parar,22.72,-815,Y detenido tras baja 1600: leyendo 0.5 s
+12.336,tras parar,25.29,-815,Y detenido tras baja 1600: leyendo 0.5 s
+12.343,tras parar,22.70,-815,Y detenido tras baja 1600: leyendo 0.5 s
+13.119,tras parar,22.52,-815,Y detenido tras baja 1600: leyendo 0.5 s
+13.133,sube 1600,38.49,-793,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.144,sube 1600,33.57,-775,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.157,sube 1600,41.95,-754,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.170,sube 1600,41.40,-734,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.182,sube 1600,42.26,-713,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.196,sube 1600,41.57,-693,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.208,sube 1600,41.34,-672,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.223,sube 1600,39.03,-649,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.235,sube 1600,41.07,-630,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.247,sube 1600,41.58,-610,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.260,sube 1600,38.73,-589,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.273,sube 1600,39.70,-568,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.286,sube 1600,40.53,-547,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.303,sube 1600,43.28,-521,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.313,sube 1600,40.53,-505,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.329,sube 1600,40.88,-480,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.339,sube 1600,41.28,-464,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.352,sube 1600,40.30,-443,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.365,sube 1600,39.56,-422,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.377,sube 1600,41.29,-401,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.393,sube 1600,39.24,-377,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.404,sube 1600,39.65,-360,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.419,sube 1600,39.03,-335,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.429,sube 1600,41.93,-319,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.442,sube 1600,40.48,-298,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.455,sube 1600,40.80,-277,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.471,sube 1600,40.01,-252,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.482,sube 1600,40.76,-234,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.497,sube 1600,37.73,-211,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.508,sube 1600,40.39,-193,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.523,sube 1600,41.85,-169,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.534,sube 1600,41.94,-151,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.549,sube 1600,40.33,-126,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.560,sube 1600,40.30,-110,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.575,sube 1600,40.64,-86,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.586,sube 1600,40.98,-68,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.601,sube 1600,40.76,-44,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.612,sube 1600,41.63,-27,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.626,sube 1600,41.72,-4,SUBE Y a 20 mm/s (Y se esta moviendo)
+13.637,tras parar,40.84,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.646,tras parar,40.30,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.655,tras parar,35.61,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.662,tras parar,40.89,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.670,tras parar,34.88,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.683,tras parar,-9.17,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.690,tras parar,-9.87,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.703,tras parar,26.08,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.713,tras parar,19.47,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.720,tras parar,5.88,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.729,tras parar,-1.56,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.737,tras parar,5.93,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.758,tras parar,36.87,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.766,tras parar,38.80,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.773,tras parar,39.36,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.780,tras parar,34.83,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.787,tras parar,24.95,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.794,tras parar,32.91,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.801,tras parar,37.51,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.808,tras parar,38.47,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.815,tras parar,36.41,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.822,tras parar,35.64,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.829,tras parar,36.13,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.835,tras parar,35.47,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.842,tras parar,34.33,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.849,tras parar,33.54,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.856,tras parar,33.27,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.863,tras parar,33.35,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.870,tras parar,33.01,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.877,tras parar,31.49,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.884,tras parar,30.98,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.891,tras parar,33.27,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.898,tras parar,31.68,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.905,tras parar,32.29,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.912,tras parar,32.06,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.919,tras parar,32.39,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.926,tras parar,30.88,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.933,tras parar,32.11,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.940,tras parar,31.59,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.947,tras parar,30.68,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.954,tras parar,30.89,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.961,tras parar,29.67,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.968,tras parar,31.15,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.975,tras parar,33.78,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.982,tras parar,36.76,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.989,tras parar,35.52,-4,Y detenido tras sube 1600: leyendo 0.5 s
+13.996,tras parar,37.19,-4,Y detenido tras sube 1600: leyendo 0.5 s
+14.003,tras parar,36.55,-4,Y detenido tras sube 1600: leyendo 0.5 s
+14.010,tras parar,35.50,-4,Y detenido tras sube 1600: leyendo 0.5 s
+14.017,tras parar,36.41,-4,Y detenido tras sube 1600: leyendo 0.5 s
+14.024,tras parar,36.77,-4,Y detenido tras sube 1600: leyendo 0.5 s
+14.031,tras parar,35.92,-4,Y detenido tras sube 1600: leyendo 0.5 s
+14.038,tras parar,35.88,-4,Y detenido tras sube 1600: leyendo 0.5 s
+14.045,tras parar,34.64,-4,Y detenido tras sube 1600: leyendo 0.5 s
+14.052,tras parar,31.84,-4,Y detenido tras sube 1600: leyendo 0.5 s
+14.059,tras parar,29.62,-4,Y detenido tras sube 1600: leyendo 0.5 s
+14.066,tras parar,25.67,-4,Y detenido tras sube 1600: leyendo 0.5 s
+14.073,tras parar,24.53,-4,Y detenido tras sube 1600: leyendo 0.5 s
+14.080,tras parar,23.70,-4,Y detenido tras sube 1600: leyendo 0.5 s
+14.088,tras parar,22.37,-4,Y detenido tras sube 1600: leyendo 0.5 s
+14.095,tras parar,21.17,-4,Y detenido tras sube 1600: leyendo 0.5 s
+14.102,tras parar,19.51,-4,Y detenido tras sube 1600: leyendo 0.5 s
+14.109,tras parar,17.98,-4,Y detenido tras sube 1600: leyendo 0.5 s
+14.116,tras parar,19.61,-4,Y detenido tras sube 1600: leyendo 0.5 s
+14.123,tras parar,16.49,-4,Y detenido tras sube 1600: leyendo 0.5 s
+14.131,tras parar,14.46,-4,Y detenido tras sube 1600: leyendo 0.5 s
+14.139,tras parar,14.52,-4,Y detenido tras sube 1600: leyendo 0.5 s
+14.147,reposo,16.73,-4,REPOSO final
+14.159,reposo,14.35,-4,REPOSO final
+14.175,reposo,14.77,-4,REPOSO final
+14.197,reposo,13.86,-4,REPOSO final
+14.217,reposo,18.69,-4,REPOSO final
+14.237,reposo,18.54,-4,REPOSO final
+14.250,reposo,17.56,-4,REPOSO final
+14.260,reposo,18.80,-4,REPOSO final
+14.268,reposo,19.09,-4,REPOSO final
+14.276,reposo,18.94,-4,REPOSO final
+14.283,reposo,18.41,-4,REPOSO final
+14.290,reposo,19.32,-4,REPOSO final
+14.297,reposo,20.31,-4,REPOSO final
+14.304,reposo,19.80,-4,REPOSO final
+14.311,reposo,20.93,-4,REPOSO final
+14.318,reposo,20.37,-4,REPOSO final
+14.325,reposo,20.86,-4,REPOSO final
+14.332,reposo,20.71,-4,REPOSO final
+14.339,reposo,21.71,-4,REPOSO final
+14.346,reposo,20.04,-4,REPOSO final
+14.353,reposo,20.93,-4,REPOSO final
+14.360,reposo,19.62,-4,REPOSO final
+14.367,reposo,17.95,-4,REPOSO final
+14.374,reposo,13.81,-4,REPOSO final
+14.381,reposo,16.34,-4,REPOSO final
+14.388,reposo,12.36,-4,REPOSO final
+14.395,reposo,6.56,-4,REPOSO final
+14.402,reposo,8.58,-4,REPOSO final
+14.412,reposo,5.09,-4,REPOSO final
+14.419,reposo,4.24,-4,REPOSO final
+14.425,reposo,0.75,-4,REPOSO final
+14.432,reposo,-2.99,-4,REPOSO final
+14.439,reposo,-3.83,-4,REPOSO final
+14.446,reposo,-6.50,-4,REPOSO final
+14.453,reposo,-5.91,-4,REPOSO final
+14.460,reposo,-7.15,-4,REPOSO final
+14.467,reposo,-7.90,-4,REPOSO final
+14.475,reposo,-7.89,-4,REPOSO final
+14.482,reposo,-5.94,-4,REPOSO final
+14.490,reposo,-6.15,-4,REPOSO final
+14.498,reposo,-4.60,-4,REPOSO final
+14.505,reposo,-5.40,-4,REPOSO final
+14.512,reposo,-0.84,-4,REPOSO final
+14.520,reposo,-0.23,-4,REPOSO final
+14.527,reposo,4.02,-4,REPOSO final
+14.535,reposo,3.34,-4,REPOSO final
+14.543,reposo,6.49,-4,REPOSO final
+14.550,reposo,3.21,-4,REPOSO final
+14.558,reposo,8.64,-4,REPOSO final
+14.565,reposo,6.47,-4,REPOSO final
+14.572,reposo,9.03,-4,REPOSO final
+14.580,reposo,9.47,-4,REPOSO final
+14.588,reposo,10.32,-4,REPOSO final
+14.595,reposo,11.25,-4,REPOSO final
+14.603,reposo,11.12,-4,REPOSO final
+14.611,reposo,11.24,-4,REPOSO final
+14.618,reposo,10.55,-4,REPOSO final
+14.626,reposo,11.19,-4,REPOSO final
+14.634,reposo,11.51,-4,REPOSO final
+14.641,reposo,11.27,-4,REPOSO final
+14.648,reposo,10.57,-4,REPOSO final
+14.655,reposo,11.86,-4,REPOSO final
+14.663,reposo,10.30,-4,REPOSO final
+14.670,reposo,10.03,-4,REPOSO final
+14.677,reposo,10.99,-4,REPOSO final
+14.685,reposo,10.65,-4,REPOSO final
+14.692,reposo,9.85,-4,REPOSO final
+14.699,reposo,9.54,-4,REPOSO final
+14.707,reposo,12.24,-4,REPOSO final
+14.715,reposo,9.79,-4,REPOSO final
+14.722,reposo,8.91,-4,REPOSO final
+14.729,reposo,10.39,-4,REPOSO final
+14.736,reposo,10.88,-4,REPOSO final
+14.743,reposo,9.50,-4,REPOSO final
+14.750,reposo,7.70,-4,REPOSO final
+14.756,reposo,9.45,-4,REPOSO final
+14.763,reposo,7.49,-4,REPOSO final
+14.770,reposo,8.53,-4,REPOSO final
+14.778,reposo,9.15,-4,REPOSO final
+14.786,reposo,8.16,-4,REPOSO final
+14.793,reposo,7.21,-4,REPOSO final
+14.800,reposo,7.35,-4,REPOSO final
+14.808,reposo,5.76,-4,REPOSO final
+14.815,reposo,7.56,-4,REPOSO final
+14.823,reposo,7.72,-4,REPOSO final
+14.829,reposo,6.75,-4,REPOSO final
+14.836,reposo,8.79,-4,REPOSO final
+14.844,reposo,6.39,-4,REPOSO final
+14.851,reposo,8.10,-4,REPOSO final
+14.858,reposo,6.25,-4,REPOSO final
+14.866,reposo,4.89,-4,REPOSO final
+14.873,reposo,6.79,-4,REPOSO final
+14.880,reposo,4.98,-4,REPOSO final
+14.888,reposo,5.42,-4,REPOSO final
+14.895,reposo,5.45,-4,REPOSO final
+14.903,reposo,5.49,-4,REPOSO final
+14.910,reposo,5.28,-4,REPOSO final
+14.918,reposo,6.97,-4,REPOSO final
+14.925,reposo,7.15,-4,REPOSO final
+14.932,reposo,7.29,-4,REPOSO final
+14.939,reposo,7.56,-4,REPOSO final
+14.946,reposo,6.70,-4,REPOSO final
+14.953,reposo,6.39,-4,REPOSO final
+14.961,reposo,4.47,-4,REPOSO final
+14.969,reposo,6.29,-4,REPOSO final
+14.976,reposo,4.07,-4,REPOSO final
+14.984,reposo,6.49,-4,REPOSO final
+14.991,reposo,5.63,-4,REPOSO final
+14.998,reposo,7.02,-4,REPOSO final
+15.006,reposo,5.45,-4,REPOSO final
+15.013,reposo,7.43,-4,REPOSO final
+15.020,reposo,4.53,-4,REPOSO final
+15.028,reposo,4.12,-4,REPOSO final
+15.034,reposo,4.43,-4,REPOSO final
+15.042,reposo,3.88,-4,REPOSO final
+15.049,reposo,7.46,-4,REPOSO final
+15.056,reposo,5.84,-4,REPOSO final
+15.063,reposo,5.56,-4,REPOSO final
+15.072,reposo,5.08,-4,REPOSO final
+15.079,reposo,6.75,-4,REPOSO final
+15.086,reposo,8.12,-4,REPOSO final
+15.092,reposo,6.60,-4,REPOSO final
+15.099,reposo,8.39,-4,REPOSO final
+15.106,reposo,7.96,-4,REPOSO final
+15.113,reposo,5.24,-4,REPOSO final
+15.120,reposo,5.65,-4,REPOSO final
+15.128,reposo,7.65,-4,REPOSO final
+15.135,reposo,7.77,-4,REPOSO final
+15.142,reposo,8.26,-4,REPOSO final
+15.142,retorno,0.00,-4,completada -> REPONIENDO Y
+# completada

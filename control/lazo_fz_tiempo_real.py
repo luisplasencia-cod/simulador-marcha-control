@@ -242,7 +242,7 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referen
         planta = _PlantaSimulada(contacto_mm=hueco_mm - 5.0)   # el hueco declarado sobreestima 5 mm (como paso en el ensayo real)
         esp32, lector = ESP32Simulado(planta), LectorSimulado(planta)
     else:
-        esp32, lector = ClienteVelocidadESP32(puerto_esp32), LectorFzFiltrado()
+        lector = LectorFzFiltrado(); esp32 = ClienteVelocidadESP32(puerto_esp32)   # ADC PRIMERO (ver reporte 2026-11-10)
 
     descenso_mm = 0.0   # integral de la velocidad ORDENADA (no medida) desde el inicio
     ultimo_chk = [time.monotonic()]
