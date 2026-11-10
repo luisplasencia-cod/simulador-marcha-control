@@ -1,57 +1,57 @@
 # Version del entorno que compilo firmware.bin / bootloader.bin / partitions.bin (original_laptop)
 
-## Lo VERIFICADO (sacado directo del binario, no supuesto)
-Cadena embebida encontrada en firmware.bin (buscada con un escaneo de strings ASCII):
+## CONCLUSION (2026-11-10, medido en la laptop)
+El firmware original se reproduce con **platform espressif32 @ 7.0.1**
+(framework-arduinoespressif32 @ 3.20017.241212 = **core Arduino 2.0.17**, ESP-IDF v4.4.7).
+**NO con espressif32 @ 6.5.0** (core 2.0.14, ESP-IDF v4.4.6), que es lo que uso la Pi.
+`platformio.ini` del proyecto quedo fijado en `platform = espressif32 @ 7.0.1`.
 
-    esp-idf: v4.4.7 38eeba213a
+## Evidencia (main.cpp original sin parche, compilado en la laptop el 2026-11-10)
 
-Esto corresponde a **ESP-IDF v4.4.7** (el commit corto 38eeba213a es el hash de IDF usado por ese
-build de arduino-esp32). IDF 4.4.x es la base del "Arduino core 2.0.x" para ESP32 (framework
-`framework-arduinoespressif32`), consistente con lo que reporto la sesion de la RPi (core 2.0.14),
-pero el string del binario NO dice el numero de parche exacto del core de Arduino (2.0.11, 2.0.14,
-etc. todos pueden embeber IDF 4.4.7) -- **no se puede afirmar el numero de patch exacto del core
-solo con este dato.**
+| Plataforma          | Core Arduino | String IDF en firmware.bin   | firmware.bin (bytes) | bootloader.bin / partitions.bin |
+|---------------------|--------------|------------------------------|----------------------|---------------------------------|
+| ORIGINAL (2026-11-02) | ?          | esp-idf: v4.4.7 38eeba213a   | 283408               | (referencia)                    |
+| espressif32 @ 7.0.1 | 2.0.17       | esp-idf: v4.4.7 38eeba213a   | 283408               | SHA-256 IDENTICOS al original   |
+| espressif32 @ 6.5.0 | 2.0.14       | esp-idf: v4.4.6 3572900934   | (no anotado; la Pi reporta 280832) | no comparados       |
 
-El binario tambien contiene rutas de compilacion como:
+- El core se leyo de `cores/esp32/esp_arduino_version.h` de cada paquete instalado (2.0.17 y 2.0.14).
+- El string IDF se saco del propio binario (escaneo de strings ASCII).
+- SHA-256 de bootloader.bin y partitions.bin recompilados con 7.0.1: iguales a los de
+  `sha256sums.txt` (3d234a74... y 148b959c...).
 
-    C:/Users/Libra/.platformio/packages/framework-arduinoespressif32/...
+## Limitaciones (no afirmar mas de esto)
+- `firmware.bin` recompilado con 7.0.1 tiene el MISMO TAMANO y el mismo IDF, pero su SHA-256 NO
+  es igual al original (ce3fa523... vs f221f1bd...). No se investigo byte a byte la diferencia.
+  Causa probable, NO verificada: el binario lleva rutas de compilacion embebidas
+  (`C:/Users/Libra/.platformio/...` en el original, `C:/Users/chees/...` en el recompilado) y el
+  hash del ELF.
+- El original se compilo bajo un perfil de Windows "Libra" que no existe en esta laptop: no se
+  puede leer directamente que version tenia instalada. La conclusion es por reproduccion, no por
+  lectura de ese entorno. Otras versiones con core 2.0.17 (p. ej. 6.9.x, 6.10.x) podrian dar lo
+  mismo; no se probaron.
+- No se probo en el ESP32: falta que la Pi compile con 7.0.1 y repita la regresion y la latencia.
 
--> Se compilo bajo el perfil de Windows "Libra", **no el de esta sesion (usuario "chees")**. Esa
-carpeta `C:\Users\Libra\.platformio\` no existe en esta maquina (verificado: `ls` da "No such file
-or directory") -- o se compilo en otra maquina, o en otro perfil de usuario de la misma maquina que
-ya no esta aqui. **No se puede reconstruir el entorno exacto (version de platform `espressif32`,
-version exacta del framework, version del toolchain) desde esta sesion.**
+## CORRECCION de una version anterior de este archivo
+Antes decia que `espressif32 @ 7.0.1` era "Arduino core 3.x sobre IDF 5.x" y que NO era la version
+del binario. **Era falso**: lo deduje del numero de paquete "3.20017" sin abrir el paquete. El
+paquete dice core 2.0.17.
 
-## Lo que SI se pudo correr en ESTA sesion (NO es el entorno que compilo el binario)
-`pio pkg list` en `Codigo ESP32 MOV/platformIO_control_trayectoria_v1/` (usuario "chees", 2026-11-10):
-
+## Salida de `pio pkg list` en la laptop (2026-11-10, usuario "chees")
     Platform espressif32 @ 7.0.1 (required: espressif32)
-    |-- framework-arduinoespressif32 @ 3.20017.241212+sha.dcc1105b (required: platformio/framework-arduinoespressif32 @ ~3.20017.0)
-    |-- tool-esptoolpy @ 2.41100.0 (required: platformio/tool-esptoolpy @ ~2.41100.0)
-    |-- tool-mkfatfs @ 2.0.1 (required: platformio/tool-mkfatfs @ ~2.0.0)
-    |-- tool-mklittlefs @ 1.203.210628 (required: platformio/tool-mklittlefs @ ~1.203.0)
-    |-- tool-mkspiffs @ 2.230.0 (required: platformio/tool-mkspiffs @ ~2.230.0)
-    `-- toolchain-xtensa-esp32 @ 8.4.0+2021r2-patch5 (required: espressif/toolchain-xtensa-esp32 @ 8.4.0+2021r2-patch5)
+    |-- framework-arduinoespressif32 @ 3.20017.241212+sha.dcc1105b
+    |-- tool-esptoolpy @ 2.41100.0
+    |-- tool-mkfatfs @ 2.0.1
+    |-- tool-mklittlefs @ 1.203.210628
+    |-- tool-mkspiffs @ 2.230.0
+    `-- toolchain-xtensa-esp32 @ 8.4.0+2021r2-patch5
 
-**ESTO NO ES LA VERSION QUE COMPILO firmware.bin.** `espressif32 @ 7.0.1` usa Arduino core
-"3.20017.x" (numeracion nueva, equivale a Arduino-ESP32 core 3.x sobre IDF 5.x), que es una familia
-de IDF totalmente distinta a la v4.4.7 que esta embebida en el binario de 2026-11-02. Si alguien
-recompila `main.cpp` HOY en esta maquina con el `platformio.ini` actual (que no fija version de
-`platform`), el binario resultante **no sera igual** al original -- platformio.ini no fija una
-version (`platform = espressif32` sin `@`), asi que instala lo mas nuevo disponible en cada maquina
-nueva.
-
-## Pendiente / sin resolver
-- No se puede confirmar la version exacta de `espressif32`/framework que generaron el binario
-  original sin encontrar la maquina o el perfil "Libra" que lo compilo, o sin decodificar mas
-  (ej. revisar `firmware.elf` con mas detalle, o preguntarle a quien tenga ese perfil).
-- Para reproducir el binario original de verdad: fijar `platform = espressif32 @ <version con IDF
-  4.4.7>` en `platformio.ini` antes de compilar (ej. probar `espressif32 @ 6.3.2` o `6.5.0`, que se
-  sabe usan IDF 4.4.x -- VERIFICAR, no asumir, antes de depender de esto).
-- `platformio.ini` de esta carpeta no fija version de plataforma ni de framework -- es una causa
-  raiz real de que "compilar en la laptop" y "compilar en la Pi" puedan dar binarios distintos
-  incluso con el mismo `main.cpp`. Recomendacion (no aplicada todavia, pendiente de que Luis decida):
-  fijar `platform = espressif32 @ <version verificada>` en el .ini para que sea reproducible.
-
-Fecha de los binarios copiados: 2026-11-02 14:44 (mtime del archivo original en esta maquina, antes
-de que la sesion de la RPi flasheara nada hoy 2026-11-10).
+## Que hacer en la Pi
+1. `git pull` (trae `platformio.ini` con `platform = espressif32 @ 7.0.1`).
+2. `pio run -e esp32dev` -> instala solo la plataforma 7.0.1 y el framework 3.20017.
+3. Comprobar: `grep -a -o "esp-idf: v[0-9.]* [0-9a-f]*" .pio/build/esp32dev/firmware.bin`
+   debe dar `esp-idf: v4.4.7 38eeba213a`.
+4. Para restaurar el estado exacto de antes: flashear los 3 binarios de esta carpeta
+   (bootloader 0x1000, partitions 0x8000, firmware 0x10000 -- offsets estandar de esp32dev en
+   Arduino; VERIFICAR contra la salida de `pio run -t upload -v` antes de flashear).
+5. Re-aplicar el parche v3 sobre esta base y repetir regresion + latencia: la degradacion de
+   hoy (82/100, GET_POSITION 44 ms) se midio sobre core 2.0.14 y puede no repetirse.

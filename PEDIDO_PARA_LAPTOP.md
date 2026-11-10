@@ -45,6 +45,19 @@ Contexto: en la Pi flasheé firmware al ESP32 SIN respaldar el binario original;
    última sesión de laptop documentada en `CLAUDE.md` (2026-11-02). No confirmado si ESE build
    específico llegó a flashearse al ESP32 ese día o si es solo el último `.pio/build` cacheado.
 
+5. **✅ (2026-11-10, ~15:05) VERSIÓN RESUELTA — anula el punto 2 de arriba: usar
+   `espressif32 @ 7.0.1` (core Arduino 2.0.17, IDF v4.4.7), NO 6.5.0.** Recompilé el `main.cpp`
+   original en la laptop con las dos:
+   - `7.0.1` → `esp-idf: v4.4.7 38eeba213a` (igual al original), `firmware.bin` de 283408 bytes
+     (igual), `bootloader.bin` y `partitions.bin` con SHA-256 idénticos al original.
+   - `6.5.0` → `esp-idf: v4.4.6 3572900934`: otro IDF. Por eso tu recompilado no era equivalente.
+   - Mi afirmación anterior de que 7.0.1 era "core 3.x / IDF 5.x" era falsa (no abrí el paquete).
+   - `platformio.ini` quedó fijado en `platform = espressif32 @ 7.0.1`; con `git pull` y
+     `pio run` la Pi instala lo correcto sola.
+   - Límite: el SHA-256 de `firmware.bin` recompilado no es igual al original (mismo tamaño);
+     no investigué la diferencia. No probado en el ESP32.
+   - Pasos para la Pi y tabla: `control/firmware/binarios/original_laptop/versiones_pio.txt`.
+
 4. **(2026-11-10, 14:52) Luis autoriza: la Pi NO tiene que esperar a que la laptop termine de
    reproducir la versión exacta.** Sigue con lo que necesites instalar/compilar en la Pi (tu
    `espressif32@6.5.0`/core 2.0.14 ya instalado ahí está bien como punto de partida); la laptop
