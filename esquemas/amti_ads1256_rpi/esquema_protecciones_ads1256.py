@@ -45,10 +45,11 @@ ads = elm.Ic(pins=pins, size=(15, H)).at((0, 0)).anchor('AIN0'); d.add(ads)
 T((ads.AIN0.x + 7.5, ads.AIN0.y + 2.6), 'ADS1256 (placa)', size=F_COMP + 4, ha='center', va='bottom')
 
 XR = ads.SCLK.x + 30
-rows_l = ['GPIO27 SCLK', 'GPIO26 MOSI', 'GPIO25 MISO', 'GPIO33 DRDY', 'GPIO32 CS', 'GPIO17 TX2 (a RPi)', 'GPIO16 RX2 (de RPi, sin uso)', '3V3', 'GND']
+rows_l = ['GPIO27 SCLK', 'GPIO26 MOSI', 'GPIO25 MISO', 'GPIO33 DRDY', 'GPIO32 CS', 'GPIO17 TX2 (a RPi)', 'GPIO16 RX2 (de RPi, sin uso)', '3V3 (sin uso, salida del regulador de la propia placa)', 'GND']
 pi = elm.Ic(pins=[elm.IcPin(lblsize=F_PIN, name=n, anchorname=f'P{i}', side='left', slot=f'{len(rows_l) - i}/{len(rows_l)}') for i, n in enumerate(rows_l)],
             size=(16, H)).at((XR, ads.SCLK.y)).anchor('P0'); d.add(pi)
 T((XR + 8, ads.SCLK.y + 2.6), 'ESP32 (nuevo, solo lectura)', size=F_COMP + 4, ha='center', va='bottom')
+T((XR + 8, ads.SCLK.y + 1.3), 'Alimentación de la placa (VIN/5V, su propio cable USB): NO dibujada aquí, NO es la fuente de 5V del ADC (④)', size=F_NOTE, color=BLUE, ha='center', va='bottom')
 
 # --- UART2 del ESP32 hacia el RPi ---
 XU = XR + 24
