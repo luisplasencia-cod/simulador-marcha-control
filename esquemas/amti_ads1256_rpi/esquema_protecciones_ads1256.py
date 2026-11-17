@@ -36,7 +36,7 @@ def tag(xy, n): T(xy, n, size=F_TAG, color=YEL, ha='center', va='center')
 H, N = 22, 8
 rows_r = ['SCLK', 'DIN', 'DOUT', 'DRDY', 'CS', 'PDWN']
 pins = [elm.IcPin(lblsize=F_PIN, name='AIN0', anchorname='AIN0', side='left', slot='8/8'),
-        elm.IcPin(lblsize=F_PIN, name='GND (junto a AIN0)', anchorname='AGND', side='left', slot='7/8'),
+        elm.IcPin(lblsize=F_PIN, name='AIN1', anchorname='AIN1', side='left', slot='7/8'),
         elm.IcPin(lblsize=F_PIN, name='5V', anchorname='V5', side='top', slot='1/1'),
         elm.IcPin(lblsize=F_PIN, name='GND', anchorname='DGND', side='bottom', slot='1/1')]
 for i, n in enumerate(rows_r):
@@ -45,10 +45,21 @@ ads = elm.Ic(pins=pins, size=(15, H)).at((0, 0)).anchor('AIN0'); d.add(ads)
 T((ads.AIN0.x + 7.5, ads.AIN0.y + 2.6), 'ADS1256 (placa)', size=F_COMP + 4, ha='center', va='bottom')
 
 XR = ads.SCLK.x + 30
-rows_l = ['GPIO11 SCLK', 'GPIO10 MOSI', 'GPIO9 MISO', 'GPIO17 DRDY', 'GPIO8 CE0', '3V3 (sin usar aquí)', 'GND']
-pi = elm.Ic(pins=[elm.IcPin(lblsize=F_PIN, name=n, anchorname=f'P{i}', side='left', slot=f'{8 - i}/8') for i, n in enumerate(rows_l)],
-            size=(14, H)).at((XR, ads.SCLK.y)).anchor('P0'); d.add(pi)
-T((XR + 7, ads.SCLK.y + 2.6), 'Raspberry Pi', size=F_COMP + 4, ha='center', va='bottom')
+rows_l = ['GPIO27 SCLK', 'GPIO26 MOSI', 'GPIO25 MISO', 'GPIO33 DRDY', 'GPIO32 CS', 'GPIO17 TX2 (a RPi)', 'GPIO16 RX2 (de RPi, sin uso)', '3V3', 'GND']
+pi = elm.Ic(pins=[elm.IcPin(lblsize=F_PIN, name=n, anchorname=f'P{i}', side='left', slot=f'{len(rows_l) - i}/{len(rows_l)}') for i, n in enumerate(rows_l)],
+            size=(16, H)).at((XR, ads.SCLK.y)).anchor('P0'); d.add(pi)
+T((XR + 8, ads.SCLK.y + 2.6), 'ESP32 (nuevo, solo lectura)', size=F_COMP + 4, ha='center', va='bottom')
+
+# --- UART2 del ESP32 hacia el RPi ---
+XU = XR + 24
+rpi2 = elm.Ic(pins=[elm.IcPin(lblsize=F_PIN, name='RX (GPIO15, o USB-serie)', anchorname='RX', side='left', slot='2/2'),
+                    elm.IcPin(lblsize=F_PIN, name='GND', anchorname='RPGND', side='left', slot='1/2')],
+              size=(16, 6)).at((XU, pi.P5.y)).anchor('RX'); d.add(rpi2)
+T((XU + 8, pi.P5.y + 2.6), 'Raspberry Pi', size=F_COMP + 4, ha='center', va='bottom')
+L((pi.P5.x, pi.P5.y), (rpi2.RX.x, rpi2.RX.y))
+T((pi.P5.x + 7, pi.P5.y - 1.0), 'UART2, 115200 8N1\n"<valor>" por cada lectura, sin ACK', size=F_COMP, color=BLUE, ha='center', va='top')
+L((pi.P8.x, pi.P8.y), (XU - 2, pi.P8.y), (XU - 2, rpi2.RPGND.y), (rpi2.RPGND.x, rpi2.RPGND.y))
+tag((pi.P5.x + 10, pi.P5.y + 2.2), '⑥')
 
 # --- SPI con R serie ---
 xs, xr = ads.SCLK.x, XR - 8
@@ -77,21 +88,20 @@ T((reg.IN.x - 4.6, reg.IN.y), '5 V de la fuente externa\n(tomar ANTES de R5)', s
 gnd((reg.RGND.x, reg.RGND.y))
 T((xb + 5, reg.IN.y), 'Regulador 3.3 V\n(ej. AMS1117-3.3)\n+ sus capacitores\n(ver su hoja)', size=F_COMP, color=YEL, ha='left', va='center')
 tag((xs + 11, yp + 1.9), '②')
-L((XR - 4, pi.P6.y), (XR, pi.P6.y)); gnd((XR - 4, pi.P6.y))
 
-# --- analogico (sin filtro RC: se evaluo y se descarto, ver nota) ---
+# --- analogico, ENTRADA DIFERENCIAL (AIN1 señal, AIN0 referencia) — rechaza ruido de modo comun del servo ---
 AX = ads.AIN0.x - 34
-amti = elm.Ic(pins=[elm.IcPin(lblsize=F_PIN, name='Señal Fz', anchorname='SIG', side='right', slot='8/8'),
-                    elm.IcPin(lblsize=F_PIN, name='Referencia', anchorname='REF', side='right', slot='7/8')],
-              size=(12, H)).at((AX, ads.AIN0.y)).anchor('SIG').theta(0); d.add(amti)
+amti = elm.Ic(pins=[elm.IcPin(lblsize=F_PIN, name='Referencia', anchorname='REF', side='right', slot='8/8'),
+                    elm.IcPin(lblsize=F_PIN, name='Señal Fz', anchorname='SIG', side='right', slot='7/8')],
+              size=(12, H)).at((AX, ads.AIN0.y)).anchor('REF').theta(0); d.add(amti)
 T((AX - 6, ads.AIN0.y + 2.6), 'AMTI (salida Fz)', size=F_COMP + 4, ha='center', va='bottom')
 xr1, xr2 = AX + 12, AX + 20
-L((AX, ads.AIN0.y), (xr1, ads.AIN0.y))
-d.add(elm.Resistor().at((xr1, ads.AIN0.y)).to((xr2, ads.AIN0.y)).label('1 kΩ', fontsize=F_COMP, color=YEL, loc='top'))
-L((xr2, ads.AIN0.y), (ads.AIN0.x, ads.AIN0.y))
-L((AX, ads.AGND.y), (ads.AGND.x, ads.AGND.y))
-T((AX + 1, ads.AIN0.y - 0.5), 'solo resistencia en serie (protección), SIN capacitor', size=F_NOTE, color=BLUE, ha='left')
-tag((xr2 + 2.5, ads.AIN0.y + 1.6), '③')
+for pin_amti, pin_ads, lbl in ((amti.REF, ads.AIN0, 'Referencia'), (amti.SIG, ads.AIN1, 'Señal Fz')):
+    L((AX, pin_amti.y), (xr1, pin_amti.y))
+    d.add(elm.Resistor().at((xr1, pin_amti.y)).to((xr2, pin_amti.y)).label('1 kΩ', fontsize=F_COMP, color=YEL, loc='top'))
+    L((xr2, pin_amti.y), (pin_ads.x, pin_ads.y))
+T((AX + 1, ads.AIN0.y - 0.5), 'par diferencial: 1 kΩ en serie en AMBAS líneas (protección), SIN capacitor', size=F_NOTE, color=BLUE, ha='left')
+tag((xr2 + 2.5, (ads.AIN0.y + ads.AIN1.y) / 2), '③')
 
 # --- alimentacion ---
 yt = ads.V5.y + 9
@@ -112,30 +122,46 @@ T((ads.DGND.x - 1.5, ads.DGND.y - 0.6), 'PUNTO ÚNICO DE GND:\nsoldar AQUÍ todo
 
 # --- titulo y leyenda ---
 TOP = yt + 7
-T((AX - 8, TOP), 'PROTECCIONES DECIDIDAS para el ADS1256 — discutidas parte por parte con Luis, 2026-11-11', size=F_TIT)
-T((AX - 8, TOP - 2.6), 'Hipótesis de foros + razonamiento propio; sigue sin confirmarse con medición directa (sin RPi disponible esta sesión).', size=F_NOTE, color=RED)
+T((AX - 8, TOP), 'PROTECCIONES DECIDIDAS para el ADS1256 — host ESP32 + entrada DIFERENCIAL AIN1/AIN0, 2026-11-17', size=F_TIT)
+T((AX - 8, TOP - 2.6), 'Hipótesis de foros + razonamiento propio; sigue sin confirmarse con medición directa. NADA cableado todavía (confirmado por Luis).', size=F_NOTE, color=RED)
 y0 = ads.DGND.y - 9.5
 T((AX - 8, y0),
   '①  100 Ω en serie en SCLK, DIN y CS (antes 47 Ω — TI recomienda ~100 Ω). Rango permitido: 47–220 Ω (a 500 kHz no afecta el tiempo). DOUT y DRDY directos.\n'
   '②  PDWN: 5 V de la fuente externa → IN del regulador; OUT (3.3 V) → resistencia de 10 kΩ → pin PDWN; 100 nF de PDWN a GND; GND del regulador al punto único.\n'
   '     Ya NO depende del 3.3V del RPi: PDWN queda en la misma alimentación que el ADC. El cable del pin 1 del RPi a PDWN se retira.\n'
-  '③  AIN0: solo 1 kΩ en serie, como PROTECCIÓN (sin capacitor: el filtro RC se descartó). Motivo: la entrada admite −0.1 V a AVDD+0.1 V (datasheet) y al cortar\n'
+  '③  Entrada DIFERENCIAL: Señal Fz → AIN1, Referencia → AIN0 (antes AIN0/AINCOM single-ended). Ventaja: rechaza ruido de modo común (p. ej. del\n'
+  '     servo) porque mide la diferencia entre ambos pines, NO es "leer dos canales a la vez" — sigue siendo 1 sola lectura de Fz, 1 de los 8 canales del chip.\n'
+  '     1 kΩ en serie en AMBAS líneas (protección, sin capacitor). Motivo: la entrada admite −0.1 V a AVDD+0.1 V (datasheet) y al cortar\n'
   '     el 5 V del ADC con el AMTI encendido entra tensión a un chip apagado; 1 kΩ limita esa corriente a ≈3.5 mA (máx. 10 mA). Impedancia de salida del AMTI: sin medir.\n'
   '④  Entrada de 5 V: R5 = 2.2 Ω en serie (reemplaza la ferrita, que no hay) + C1 100 µF + C2 100 nF pegados al módulo. fc ≈ 720 Hz.\n'
   '     Corriente medida de la placa: ≈10 mA (0.01 A) → caída en R5 ≈ 22 mV, despreciable (AVDD sigue ≈5 V, muy sobre el mínimo de 4.75 V del datasheet).\n'
-  '⑤  GND de fuente externa, ADC, AMTI y RPi unidos en UN SOLO PUNTO físico (marcado abajo): soldar todos los cables de tierra ahí, no en varios lugares.\n'
-  '     Cable del AMTI blindado (malla a GND en un solo extremo) y ≥ 30 cm de separación del cable del servo y del freno.',
+  '⑤  GND de fuente externa, ADC, AMTI y ESP32 unidos en UN SOLO PUNTO físico (marcado abajo): soldar todos los cables de tierra ahí, no en varios lugares.\n'
+  '     Cable del AMTI blindado (malla a GND en un solo extremo) y ≥ 30 cm de separación del cable del servo y del freno.\n'
+  '⑥  ESP32→RPi por UART2 (GPIO17 TX, 115200 8N1): transmite "<valor>" por cada lectura, SIN confirmación ni control de flujo (código de\n'
+  '     platformIO_medicion_sensores_v1, ya probado antes). El MUX diferencial AIN1/AIN0 (0x10) del firmware YA coincide con este cableado — no se toca.\n'
+  '     Único cambio de código: la escala, de 1.7631 a 1.7665 mV/N (valor confirmado del AMTI; la ganancia no depende del cableado del ADC). GND del ESP32 al punto único.',
   size=F_NOTE, color=YEL)
-T((AX - 8, y0 - 11.5),
+T((AX - 8, y0 - 15),
   'PENDIENTE (no bloquea cablear esto): con el ADC caído, medir PDWN y el 5V/3.3V de la placa ANTES de reiniciar, para saber si realmente era PDWN o alimentación.\n'
-  'Dato ya conocido: quitar y poner el 5V no SIEMPRE arregla la caída (a veces sí, a veces no) — no asumir que es solo un bajón pasajero de tensión.\n'
+  'Dato ya conocido: quitar y poner el 5V no SIEMPRE arregla la caída (a veces sí, a veces no) — no asumir que es solo un bajón pasajero de tensión. El cambio de\n'
+  'host (RPi→ESP32) NO ataca esta causa si es analógica/alimentación — es independiente de quién lee el SPI; se hace por preferencia de Luis, no como arreglo.\n'
   'El corte de los 4 puertos USB del RPi (2026-11-10, 16:57) fue un evento APARTE, coincidente con manipulación de cables — NO se confirmó relación con las\n'
   'caídas previas del ADC (esas ya pasaban antes, sin ese evento). No tratar ambos como la misma causa.',
   size=F_NOTE, color=RED)
-T((AX - 8, y0 - 20),
+T((AX - 8, y0 - 24),
   'LISTA DE COMPRAS (criterio propio, ninguna fuente lo confirma):  1) 100 µF, 100 nF, resistencias 100 Ω, 2.2 Ω, 1 kΩ, 10 kΩ; regulador 3.3V (ej. AMS1117-3.3).\n'
   '2) OTRA placa ADS1256 igual (separa placa dañada de causa externa).   3) Cable de par trenzado apantallado para AIN0 (higiene general, no urgente ya sin RC).\n'
-  '4) Solo si lo anterior falla: aislador SPI de 4 canales y aislador/hub USB alimentado para el ESP32.   NO comprar otro ADC (ADS1261/1263): la falla es cuelgue, no ruido.',
+  '4) Solo si lo anterior falla: aislador SPI de 4 canales y aislador/hub USB alimentado para el ESP32.   NO comprar otro ADC (ADS1261/1263): la falla es cuelgue, no ruido.\n'
+  '5) Cable/adaptador USB-serie o usar el header UART del RPi (GPIO14/15) para recibir el ESP32 — decidir cuál antes de cablear ⑥.',
   size=F_NOTE, color=GREEN)
+T((AX - 8, y0 - 33),
+  'QUÉ HACER DESPUÉS, EN LA RPi (nada de esto existe todavía):\n'
+  '1) Decidir el puerto de recepción: header UART (GPIO14/15, directo, sin USB) o un adaptador USB-serie — y reservarlo aparte del puerto del ESP32 de motores.\n'
+  '2) Escribir el lector Python del protocolo "<valor>" (framing por < >, detectar paquete cortado/corrupto — el firmware no numera ni verifica paquetes).\n'
+  '3) Corregir en el firmware ESP32 la escala: 1.7631→1.7665 mV/N (único cambio de código; el MUX diferencial ya coincide), ANTES de usarlo con el cableado real.\n'
+  '4) Medir la latencia real ESP32→UART→RPi (igual que medir_latencia_ping_pong.py) — no asumir que es mejor que los 1.6-2.4 ms del SPI directo sin medirlo.\n'
+  '5) Validar contra el AMTI real (como ya se hizo el 2026-11-03 con el lector directo: RMSE, correlación) antes de confiar en esta ruta para el lazo de Fz.\n'
+  '6) Repetir el vigilante de caídas (vigilar_adc.py, adaptado a leer del UART en vez de SPI) para ver si cambiar de host realmente reduce las caídas o no.',
+  size=F_NOTE, color=BLUE)
 d.save(OUT + '.png', dpi=100, transparent=False); d.save(OUT + '.svg', transparent=False)
 print("guardado", OUT + ".png")
