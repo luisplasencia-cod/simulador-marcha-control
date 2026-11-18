@@ -1,0 +1,8 @@
+PLAN: escala 60 N (pico ~71 N), 3 ciclos, Kp=10.0, k_asumido=26.4 N/mm -> 3.03 pasos/N, tope 40.0 N, hueco 45.0 mm (descenso max 75 mm), v_max 1600 pasos/s, simulado=False
+Tara: f0 = -1.72 N (p5 -5.67, p95 0.79). Debe estar SIN contacto y el eje quieto.
+Aproximando: rapido 20 mm/s hasta 15 mm, luego 5 mm/s; descenso maximo 75 mm.
+CONTACTO a 57.5 mm de descenso (hueco declarado 45): F = 20.4 N
+ABORTADO: RuntimeError('Fuerza 42.9 N > tope 40.0 N')
+Retorno: contador Y = -4807 pasos -> subiendo 4807 pasos
+Y final respecto al inicio: 0 pasos (debe ser ~0)
+Motivo de cierre: ABORTADO: RuntimeError('Fuerza 42.9 N > tope 40.0 N') | log: control/telemetria/registros/2026-11-18_115246_fz.csv
