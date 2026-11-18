@@ -181,6 +181,81 @@ class LectorFzFiltrado:
         self.adc.cerrar()
 
 
+class LectorFzUART:
+    """Fz desde el ESP32 de LECTURA (ADS1256 diferencial) por UART2 -> RPi (Fase G, 2026-11-18).
+    NO PROBADO EN HARDWARE. Misma interfaz que LectorFzFiltrado (tarar/leer_n/cerrar). El firmware ya entrega
+    NEWTONS (no volts). Un hilo lee el puerto sin parar (1000 paquetes/s) y deja las muestras en un deque con un
+    contador; leer_n() espera N_BLOQUE muestras NUEVAS (no reusa las del ciclo anterior) y devuelve su mediana.
+    El signo (+ = carga) NO esta verificado para la entrada diferencial: se confirma en L3 de INICIO_RPI.md
+    (masa conocida debe SUBIR Fz) y, si sale invertido, se pasa signo=-1."""
+
+    def __init__(self, puerto, signo=1.0, n_bloque=N_BLOQUE):
+        import threading
+        import serial
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "pruebas"))
+        from leer_ads1256_fz_esp32_uart import BAUD, extraer_paquetes
+        self._extraer = extraer_paquetes
+        self.signo, self.n_bloque, self.f0 = float(signo), n_bloque, 0.0
+        self.ser = serial.Serial(puerto, BAUD, timeout=0.05)
+        self.ser.reset_input_buffer()
+        self._muestras = deque(maxlen=4096)
+        self._total = 0
+        self._visto = 0
+        self._lock = threading.Lock()
+        self._parar = False
+        self._hilo = threading.Thread(target=self._leer_siempre, daemon=True)
+        self._hilo.start()
+
+    def _leer_siempre(self):
+        buf = b""
+        while not self._parar:
+            try:
+                chunk = self.ser.read(256)
+            except Exception:
+                return          # puerto caido: leer_n lo detecta por falta de muestras nuevas
+            if not chunk:
+                continue
+            valores, buf, _ = self._extraer(buf + chunk)
+            if valores:
+                with self._lock:
+                    self._muestras.extend(valores)
+                    self._total += len(valores)
+
+    def _esperar_nuevas(self, n, timeout_s=0.5):
+        t0 = time.monotonic()
+        while True:
+            with self._lock:
+                if self._total - self._visto >= n:
+                    nuevas = list(self._muestras)[-(self._total - self._visto):][-n:] if n else []
+                    self._visto = self._total
+                    return nuevas
+            if time.monotonic() - t0 > timeout_s:
+                raise RuntimeError(f"Sin muestras nuevas de Fz por UART en {timeout_s} s (ESP32 de lectura caido, "
+                                   f"cable UART/GND suelto o puerto equivocado). Se aborta y se detiene el eje.")
+            time.sleep(0.0005)
+
+    def tarar(self, n=200):
+        crudas = [self.signo * v for v in self._esperar_nuevas(n, timeout_s=2.0)]
+        s = sorted(crudas)
+        self.f0 = s[len(s) // 2]
+        filt = sorted(sorted(crudas[i - N_MEDIANA + 1:i + 1])[N_MEDIANA // 2] for i in range(N_MEDIANA - 1, len(crudas)))
+        return self.f0, filt[len(filt) // 20], filt[-len(filt) // 20]
+
+    def leer_n(self):
+        with self._lock:            # descartar lo acumulado: el lazo debe actuar sobre muestras FRESCAS, no sobre
+            self._visto = self._total   # las que llegaron mientras calculaba/esperaba (edad desconocida)
+        raw = [self.signo * v for v in self._esperar_nuevas(self.n_bloque)]
+        if len(set(raw)) == 1:
+            raise RuntimeError(f"Sensor de Fz congelado/desconectado: {self.n_bloque} lecturas identicas "
+                               f"({raw[0]:.2f} N). Se aborta y se detiene el eje.")
+        return sorted(raw)[len(raw) // 2] - self.f0
+
+    def cerrar(self):
+        self._parar = True
+        self._hilo.join(timeout=1.0)
+        self.ser.close()
+
+
 class _PlantaSimulada:
     """SOLO para --simulado (probar la logica sin hardware): pie con rigidez k en contacto a `contacto_mm` de descenso."""
 
@@ -228,7 +303,7 @@ class LectorSimulado:
 
 
 def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referencia="gutenberg",
-                puerto_esp32="/dev/ttyUSB0", carpeta_log="control/telemetria/registros", v_max=V_MAX_PASOS_S,
+                puerto_esp32="/dev/ttyUSB0", fuente_fz="spi", puerto_fz=None, signo_fz=1.0, carpeta_log="control/telemetria/registros", v_max=V_MAX_PASOS_S,
                 umbral_contacto_n=8.0, extra_mm=20.0, simulado=False, angulo_deg=None):
     k_asumido = cargar_k_asumido(protesis)
     pasos_por_n = PASOS_POR_MM_Y / k_asumido
@@ -246,7 +321,16 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referen
         planta = _PlantaSimulada(contacto_mm=hueco_mm - 5.0)   # el hueco declarado sobreestima 5 mm (como paso en el ensayo real)
         esp32, lector = ESP32Simulado(planta), LectorSimulado(planta)
     else:
-        lector = LectorFzFiltrado(); esp32 = ClienteVelocidadESP32(puerto_esp32)   # ADC PRIMERO (ver reporte 2026-11-10)
+        if fuente_fz == "uart":
+            if not puerto_fz:
+                raise SystemExit("--fuente_fz uart exige --puerto_fz (p.ej. /dev/serial/by-id/... o /dev/ttyAMA0); "
+                                 "nunca asumir cual de los DOS ESP32 es.")
+            if puerto_fz == puerto_esp32:
+                raise SystemExit("--puerto_fz y --puerto_esp32 son el MISMO puerto: uno es el ESP32 de lectura y otro el de motores.")
+            lector = LectorFzUART(puerto_fz, signo=signo_fz)
+        else:
+            lector = LectorFzFiltrado()
+        esp32 = ClienteVelocidadESP32(puerto_esp32)   # ADC PRIMERO (ver reporte 2026-11-10)
 
     descenso_mm = 0.0   # integral de la velocidad ORDENADA (no medida) desde el inicio
     ultimo_chk = [time.monotonic()]
@@ -373,6 +457,10 @@ if __name__ == "__main__":
     ap.add_argument("--protesis", default="pie_pasivo_1 (la unica probada hasta ahora)")
     ap.add_argument("--referencia", default="gutenberg")
     ap.add_argument("--puerto_esp32", default="/dev/ttyUSB0")
+    ap.add_argument("--fuente_fz", choices=["spi", "uart"], default="spi",
+                    help="spi = ADS1256 directo por SPI del RPi (camino anterior, defecto); uart = ESP32 de lectura por UART2 (Fase G, NO probado)")
+    ap.add_argument("--puerto_fz", default=None, help="puerto del ESP32 de lectura (solo --fuente_fz uart)")
+    ap.add_argument("--signo_fz", type=float, default=1.0, choices=[1.0, -1.0], help="-1 si en L3 Fz BAJA al poner masa")
     ap.add_argument("--simulado", action="store_true", help="planta y ESP32 simulados: prueba la logica SIN hardware")
     ap.add_argument("--ejecutar", action="store_true", help="sin esto solo imprime el plan y sale (no abre puertos)")
     a = ap.parse_args()
@@ -386,4 +474,4 @@ if __name__ == "__main__":
         raise SystemExit("Falta --hueco_remedido: el hueco se mide de nuevo antes de CADA corrida (regla de Luis).")
     correr_lazo(a.peso_sujeto_n, a.n_ciclos, a.kp, a.protesis, a.fmax_n, a.hueco_mm, a.referencia, a.puerto_esp32,
                 v_max=a.v_max, umbral_contacto_n=a.umbral_contacto_n, extra_mm=a.extra_mm, simulado=a.simulado,
-                angulo_deg=a.angulo_deg)
+                angulo_deg=a.angulo_deg, fuente_fz=a.fuente_fz, puerto_fz=a.puerto_fz, signo_fz=a.signo_fz)
