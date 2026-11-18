@@ -23,7 +23,7 @@ alertas = 0
 with open(ruta, "w", buffering=1) as f:
     while time.monotonic() < fin:
         linea = ser.readline().decode("ascii", errors="replace").strip()
-        if not linea:
+        if not linea or linea.startswith("F,"):   # F,<valor> = copia a 100/s para el visor
             continue
         f.write(f"{time.strftime('%H:%M:%S')} {linea}\n")
         campos = linea.split(",")
