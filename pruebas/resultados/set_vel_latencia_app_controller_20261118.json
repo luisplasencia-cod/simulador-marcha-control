@@ -1,0 +1,12 @@
+{
+ "n": 1000,
+ "validas": 1000,
+ "no_ok": 0,
+ "timeouts": 0,
+ "mediana_ms": 3.939,
+ "p95_ms": 4.285,
+ "p99_ms": 6.624,
+ "max_ms": 19.597,
+ "posicion": "Position(x=0.0, y=0.0, angle=0.0)",
+ "log_hot_path": true
+}

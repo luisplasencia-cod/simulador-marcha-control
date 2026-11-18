@@ -16,10 +16,10 @@ Escrito el 2026-11-18 a pedido de Luis. Ejecutar **en orden**; cada paso tiene q
 | A4 | `SET_VEL` de Y en el aire (sube 1 mm y vuelve) | el contador vuelve al inicial | ✅ +81 → 0 pasos, 58/58 OK — reporte `reportes/2026-11-18_firmware_v4_grabado.md` |
 
 ### Fase B — Software en la copia `~/Projects/gaitsim-control-fz` (Claude; sin hardware salvo B2)
-| # | Qué | Criterio de paso |
-|---|---|---|
-| B1 | `SET_VEL` en `protocol.py` + `esp32_controller.py` + `docs/protocol.md`; pruebas en `tests/` | pruebas pasan; las existentes siguen pasando |
-| B2 | Latencia de `SET_VEL` a través del controlador de la app (puerto abierto por la app, `SET_VEL:1:0`, nada se mueve) | p95 ≤ 10 ms; si no, el lazo usa un acceso propio de baja latencia al mismo puerto |
+| # | Qué | Criterio de paso | Estado |
+|---|---|---|---|
+| B1 | `SET_VEL` en `protocol.py` + `esp32_controller.py` + `docs/protocol.md`; pruebas en `tests/` | pruebas pasan; las existentes siguen pasando | ✅ 17/17; las previas fallan igual en el original (no por esto) |
+| B2 | Latencia de `SET_VEL` a través del controlador de la app (puerto abierto por la app, `SET_VEL:1:0`, nada se mueve) | p95 ≤ 10 ms; si no, el lazo usa un acceso propio de baja latencia al mismo puerto | ✅ mediana 3.94 / p99 4.2 / máx 5.5 ms con `log_hot_path=False` (con el log encendido: máx 19–67 ms) |
 | B3 | `src/controllers/fz_loop.py` (sin Qt): lector Fz por UART, P + ILC, tope, detección de contacto, aborto, retorno a `y0`, log. **La duración del ciclo sale de la trayectoria × la escala de tiempo** (talla 174: 0.61 s × 6 = 3.66 s), y la curva objetivo se estira a esa duración | en simulación reproduce lo del lazo actual (RMS que baja ciclo a ciclo) |
 | B4 | Envío de la trayectoria con **columna Y constante** (regla del firmware v4) | verificado en los `TRAJ_POINT` enviados: dY = 0 en todos |
 | B5 | Máquina de estados: flujo «corrida con lazo de Fz» (precondiciones: HOME hecho, trayectoria cargada con Y plana, ADC OK, parámetros válidos; PAUSE/ABORT detienen el lazo y suben Y) | pruebas de transiciones pasan; no se puede iniciar sin cumplir las precondiciones |
