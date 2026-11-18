@@ -4,6 +4,8 @@ Si acabas de llegar a este repo (laptop o RPi): lee esto completo antes de hacer
 Contexto completo: `CLAUDE.md` (la entrada con fecha más reciente es la vigente).
 Reescrito el 2026-11-18 desde la laptop.
 
+## ▶ SIGUIENTE (2026-11-18, 12:10): integración con la interfaz → seguir `PLAN_INTEGRACION_LAZO_Y.md` en orden
+
 ## ▶ ACTUALIZACIÓN 2026-11-18 (~11:50, sesión en el RPi): ETAPA 2 R0–R5 HECHA + Ensayo B + primer lazo cerrado en Y
 UART2 funciona (puerto **`/dev/ttyAMA0`**, no `serial0`); R3 10 min 0 caídas; R5 (Y en el aire) sin corrimiento de Fz; Ensayo B (retardo ≈15–23 ms, tau_a ≈3–14 ms, k_din ≈18 N/mm); **primer lazo cerrado en Y con contacto: 3 ciclos, RMS 8.5→4.7 N** (X y K quietos). **Pendiente:** 60 Hz (σ 2.6 N, origen sin determinar), R6 (pesas vs NetForce), más ciclos/carga mayor/Kp, X y K con trayectoria (exige HOME, prohibido con prótesis), transitorio puntual del ciclo 0, qué cambio de cableado evitó las caídas. Atajos: `pruebas/etapa2_rpi.sh`; reportes: `reportes/2026-11-18_*.md`; narrativa y errores: `HISTORIAL.md` § 2026-11-18. El bloque de abajo es el estado de la tarde, anterior a esta sesión.
 
