@@ -24,3 +24,10 @@ Misma orden con `--n_ciclos 6`. Log `control/telemetria/registros/2026-11-18_123
 - **La anomalía NO se repitió:** tiempo plano (<30 N) al inicio 120 ms en la pisada 0 (como toda primera pisada) y 50–70 ms en las demás; rigidez aparente en la carga inicial 21–25 N/mm (16 en la pisada 0). En total 1 caso fuerte en 9 pisadas a 10 kg; causa sin determinar.
 - **Corrección de método:** el "pico" (máximo) y el "valle" (mínimo) de una señal con ruido σ≈2.6 N salen sesgados ±≈2σ (picos 2–4 N sobre el objetivo, valle 4–5 N bajo él en todas las corridas): NO es un error del control; usar el RMS (o un ajuste suavizado) para juzgar.
 **Decisión:** pasar a 20 kg (pico 231 N, tope 280 N, v_max 5000, 6 pisadas).
+
+## Escalón 20 kg × 6 pisadas (12:36:34–12:37:29, reloj)
+`--peso_sujeto_n 196.2 --fmax_n 280 --n_ciclos 6 --v_max 5000` (resto igual). Log `control/telemetria/registros/2026-11-18_123634_fz.csv`; figura `reportes/figuras/2026-11-18_escalera_20kg.png`; salida `pruebas/resultados/etapa2/salidas/escalera_20kg_20261118.txt`.
+- Completó; contacto a 57.5 mm; Y volvió a su inicio.
+- **Error real RMS: 21.5 → 10.8 → 8.4 → 7.7 → 7.1 → 7.1 N** (3.1 % del pico de 231 N al final; en % es mejor que 10 kg).
+- Picos ≈ 225–236 N (objetivo 226/231; ver nota del sesgo max/min). |u| máx 2206 → 2740 pasos/s (34 mm/s), crece pisada a pisada (el ILC adelanta la acción).
+- **Sin anomalía en la carga inicial** (tiempo plano 10–20 ms salvo la pisada 0, 90 ms). Rigidez aparente en la carga inicial **23–28 N/mm** (19.8 en la pisada 0): casi igual que a 10 kg → hasta ≈200 N la prótesis NO se vuelve claramente más rígida.
