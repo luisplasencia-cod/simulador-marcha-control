@@ -1,0 +1,6 @@
+{'v': 2000, 'mm_s': 25.0, 'sube_pasos': 812, 'sube_envios': 58, 'baja_pasos': -812, 'baja_envios': 58, 'y_rel_tras': 0}
+{'v': 4000, 'mm_s': 50.0, 'sube_pasos': 812, 'sube_envios': 29, 'baja_pasos': -812, 'baja_envios': 29, 'y_rel_tras': 0}
+{'v': 6000, 'mm_s': 75.0, 'sube_pasos': 843, 'sube_envios': 20, 'baja_pasos': -843, 'baja_envios': 20, 'y_rel_tras': 0}
+{'v': 9000, 'mm_s': 112.5, 'sube_pasos': 827, 'sube_envios': 13, 'baja_pasos': -827, 'baja_envios': 13, 'y_rel_tras': 0}
+{'v': 12000, 'mm_s': 150.0, 'sube_pasos': 853, 'sube_envios': 10, 'baja_pasos': -853, 'baja_envios': 10, 'y_rel_tras': 0}
+Y final respecto al inicio: 0
