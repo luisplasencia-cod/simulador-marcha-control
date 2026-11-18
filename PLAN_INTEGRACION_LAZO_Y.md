@@ -41,12 +41,12 @@ Escrito el 2026-11-18 a pedido de Luis. Ejecutar **en orden**; cada paso tiene q
 | D4 | Claude + Luis | Corrida integrada: 6 kg (60 N) × 1 ciclo → 3 → 8; luego subir el peso de a poco (10 → 20 → 40 kg …) con tope; Luis mira NetForce y **lee los picos** | sin abortos inesperados; error que baja ciclo a ciclo; picos ADC ≈ NetForce |
 | D5 | Claude | Reporte de la sesión | — |
 
-## Decisiones de Luis (2026-11-18, 12:25)
+## Decisiones de Luis (2026-11-18, ≈12:15–12:25, hora estimada)
 - HOME: retira la prótesis antes; la vuelve a montar después, con la app abierta. ✅
 - Talla **174**, escala **×6**. ✅
 - Peso objetivo **80 kg** (picos ≈ 906/925 N). Se llega **subiendo de a poco**: 6 → 10 → 20 → 40 → 60 → 80 kg, cada escalón con su criterio (sin abortos inesperados, error estable, picos ADC ≈ NetForce). ✅
 - **Visibilidad y reporte:** Fz del AMTI y el movimiento de los motores (X, Y, ángulo) en vivo en la pantalla y en el reporte posterior. ✅ — hoy: solo Fz del AMTI está cableado al ADC; el movimiento que se puede mostrar es el contado por el firmware (sin sensores de desplazamiento todavía).
-- Estructura: **varias pisadas seguidas y automáticas tras UN solo HOME**; punto de inicio, parámetros, regreso y repetición = **los de la app de la etapa 2** (el lazo se monta sobre ese flujo). ✅ 12:30
+- Estructura: **varias pisadas seguidas y automáticas tras UN solo HOME**; punto de inicio, parámetros, regreso y repetición = **los de la app de la etapa 2** (el lazo se monta sobre ese flujo). ✅ (≈12:20, hora estimada)
 
 ## Decisiones que necesito de Luis (antes de la Fase D)
 1. **Estructura de cada ciclo:** propuesta = contacto → apoyo con lazo → Y sube (despegue, la app ya tiene uno de 5 cm) → X/K vuelven al punto inicial → bajar de nuevo. ¿Correcto?
