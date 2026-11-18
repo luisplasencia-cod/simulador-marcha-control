@@ -65,7 +65,7 @@ finally:
     try:
         ev.escribir("retorno", 0, y, f"{motivo} -> REPONIENDO Y")
         if e:
-            e.detener(L.EJE_VERTICAL); n = e.pos_y()
+            e.detener(L.EJE_VERTICAL); n = e.pos_y_rel()
             if n < 0: e.subir_pasos(-n)
             print("contador final:", e._cmd("GET_POSITION"))
     except BaseException as ex2:

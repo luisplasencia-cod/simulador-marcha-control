@@ -1,0 +1,8 @@
+tara f0 = -2.7
+baja   400: en movimiento mediana   -0.1 N (min -3.4 max 2.3) | tras parar   -0.4 N
+sube   400: en movimiento mediana    0.2 N (min -3.5 max 2.7) | tras parar    0.2 N
+baja   800: en movimiento mediana    0.2 N (min -3.6 max 2.9) | tras parar    0.5 N
+sube   800: en movimiento mediana   -0.1 N (min -3.4 max 2.5) | tras parar   -0.2 N
+baja  1600: en movimiento mediana   -0.3 N (min -4.2 max 2.5) | tras parar   -0.1 N
+sube  1600: en movimiento mediana    0.3 N (min -3.5 max 2.6) | tras parar   -0.1 N
+contador final: POSITION:0:4500:0

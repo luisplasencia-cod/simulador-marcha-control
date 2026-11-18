@@ -100,6 +100,9 @@ class ClienteVelocidadESP32:
         self.fallos = 0
         if self._cmd("PING") != "PONG" and self._cmd("PING") != "PONG":
             raise RuntimeError("ESP32 no responde PING tras abrir el puerto")
+        # 2026-11-18: el contador de Y NO arranca en 0 (se leyo POSITION:0:4500:0 tras abrir el puerto). Todo el control y el
+        # retorno de seguridad trabajan en pasos RELATIVOS a este valor inicial, no suponen que sea 0.
+        self.y0 = self.pos_y()
 
     def _cmd(self, cmd):
         # Guarda central (error 2026-11-10: eje "Y" -> atoi()=0 -> movia X): todo comando con eje exige ENTERO 0/1/2.
@@ -131,6 +134,10 @@ class ClienteVelocidadESP32:
     def pos_y(self):
         r = self._cmd("GET_POSITION")  # POSITION:x:y:k, contador de pasos ORDENADOS (no medida)
         return int(r.split(":")[2])
+
+    def pos_y_rel(self):
+        """Pasos ordenados en Y desde que se abrio el cliente (+ = mas arriba que al inicio, - = mas abajo)."""
+        return self.pos_y() - self.y0
 
     def subir_pasos(self, pasos):
         """Sube (pasos>0) con MANUAL por tramos de <=800 pasos, igual que la subida gruesa del Ensayo A."""
@@ -280,6 +287,7 @@ class ESP32Simulado:
     def set_vel(self, eje, v): self.p.avanzar(); self.p.v = v; return "OK"
     def detener(self, eje): self.p.avanzar(); self.p.v = 0.0; return "OK"
     def pos_y(self): self.p.avanzar(); return self.p.contador
+    def pos_y_rel(self): return self.pos_y()
     def subir_pasos(self, pasos): self.p.descenso_mm -= pasos / PASOS_MM; self.p.contador += pasos
     def cerrar(self): pass
 
@@ -341,7 +349,7 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referen
         if not forzar and time.monotonic() - ultimo_chk[0] < 0.5:
             return
         esperado = -descenso_mm * PASOS_MM
-        real = esp32.pos_y()
+        real = esp32.pos_y_rel()
         if abs(real - esperado) > 0.25 * abs(esperado) + 150:
             raise RuntimeError(f"el contador de pasos ({real}) no sigue lo ordenado ({esperado:.0f}): el eje no responde como se ordena")
         ultimo_chk[0] = time.monotonic()
@@ -426,11 +434,11 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referen
     finally:
         try:
             esp32.detener(EJE_VERTICAL)
-            neto = esp32.pos_y()  # contador de pasos ordenados (no medido): neto<0 = quedo mas abajo que al inicio
+            neto = esp32.pos_y_rel()  # pasos ordenados desde el inicio (no medido): neto<0 = quedo mas abajo que al inicio
             print(f"Retorno: contador Y = {neto} pasos -> subiendo {-neto} pasos")
             if neto < 0:
                 esp32.subir_pasos(-neto)
-            print(f"Contador Y final: {esp32.pos_y()} (debe ser ~0)")
+            print(f"Y final respecto al inicio: {esp32.pos_y_rel()} pasos (debe ser ~0)")
         except BaseException as e2:
             print(f"!!! NO SE PUDO RETORNAR EL EJE AUTOMATICAMENTE ({e2!r}): SUBIRLO A MANO / con MANUAL")
         for obj in (esp32, lector):
