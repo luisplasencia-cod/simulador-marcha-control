@@ -1,5 +1,7 @@
 # ESTADO Y PENDIENTES — punto de entrada para retomar el trabajo (actualizado 2026-11-05, noche)
 
+> **⚠️ Desactualizado: ver `INICIO_RPI.md` (bloque ACTUALIZACIÓN 2026-11-18) y `CLAUDE.md` para el estado vigente.** Este documento describe el rig al 2026-11-05.
+>
 > Léelo primero. Resume dónde quedó el rig, qué se midió, qué falta, en qué orden y con qué comandos. Detalle y evidencia: `reportes/2026-11-05_*.md`, `CLAUDE.md`, `control/identificacion/`.
 
 ## 1. Estado FÍSICO del simulador al terminar la sesión (verificar con la vista antes de mover nada)

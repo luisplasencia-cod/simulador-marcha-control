@@ -15,6 +15,8 @@
 | `ilc/` | Implementación del ILC para Fz (núcleo genérico + Fz + subida al ESP32) | núcleo y Fz probados en planta sintética; subida al ESP32 sin probar en hardware |
 | `telemetria/` | Formato de log + visor en vivo de $r^*(t)$, $F_{med}(t)$, $e(t)$, $u(t)$, $\delta(t)$ | probado con datos sintéticos; falta el script del lazo real en el RPi |
 | `firmware/` | Parche de velocidad continua `SET_VEL` (tiempo real) + parche opcional de sondeo RX | `SET_VEL` diseñado y verificado con `git apply --check`, no compilado/flasheado |
+| `identificacion/ensayo_B_respuesta_dinamica.py` (+ `graficar_ensayo_B.py`, `identificar_servo_ensayo_B.py`) | Ensayo B: retardo comando→Fz, tau del servo y k dinámico CON contacto (2026-11-18) | hecho 1 corrida; resultados en `identificacion/resultados/ensayoB_*` y `reportes/2026-11-18_ensayo_B_respuesta_dinamica.md` |
+| `lazo_fz_tiempo_real.py` | Lazo cerrado de Fz en Y (RT + ILC) con fuente Fz por UART; X y K quietos | **primera corrida real 2026-11-18** (3 ciclos, RMS 8.5→4.7 N): `reportes/2026-11-18_primer_lazo_cerrado_fz.md` |
 | `../reportes/` | Reportes diarios | al día |
 
 ## Latencia medida hasta ahora (insumo de la simulación)
