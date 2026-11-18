@@ -22,11 +22,16 @@ w = MainWindow(serial_port="/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UAR
 cs, fz, sm = w._connection_screen, w._fz_control_screen, w._bridge.state_machine
 def log(m): print(time.strftime("%H:%M:%S"), m, flush=True)
 
-# Los diálogos los resuelve Claude por comando (con el OK de Luis en el chat): nada modal bloquea la interfaz.
-cs._prompt_initial_position_setup = lambda: (cs._position_session.reset(),
-                                             log("HOME OK: esperando comando 'preparar <trayectoria>'"))
-cs._confirm_trial_start = lambda tid: True
-fz._confirm_safety = lambda: True
+# POR DEFECTO (decisión de Luis 2026-11-18): tras el HOME se muestra el flujo REAL de la interfaz en la pantalla:
+# botón "Prótesis montada" -> LISTA de trayectorias para elegir -> confirmación -> tara automática. Luis lo opera en
+# la pantalla táctil; los comandos (fz/estado/detener) siguen funcionando.
+# Con --sin-dialogos (solo si Luis lo pide) los diálogos se saltan y Claude manda 'preparar <id COMPLETO>'
+# (ej. Control_apoyo_talla170_montaje37, NO talla170_montaje37: el id es el nombre del CSV sin .csv).
+if "--sin-dialogos" in sys.argv:
+    cs._prompt_initial_position_setup = lambda: (cs._position_session.reset(),
+                                                 log("HOME OK: esperando comando 'preparar <trayectoria>'"))
+    cs._confirm_trial_start = lambda tid: True
+    fz._confirm_safety = lambda: True
 
 st = {"intentos": 0, "home": False, "txt": {}}
 def paso_conexion():

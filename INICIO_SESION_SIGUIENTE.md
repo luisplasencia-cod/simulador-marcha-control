@@ -1,6 +1,29 @@
-# EMPEZAR AQUÍ — próxima sesión en el RPi (escrito el 2026-11-18, tras la sesión de la mañana)
+# EMPEZAR AQUÍ — próxima sesión (actualizado 2026-11-18 noche, al cerrar el laboratorio)
 
-Si eres Claude en una sesión nueva: lee este archivo completo, luego `CLAUDE.md` (las entradas con fecha 2026-11-18 son las vigentes) y `PLAN_INTEGRACION_LAZO_Y.md`. **Regla de Luis: todo se documenta (Objetivo → Metodología → Resultado → Limitaciones → Fuentes), sin suponer ni inventar; las horas se leen con `date`, no se estiman.** Luis lee poco texto: respuestas cortas, un tema por intercambio.
+Si eres Claude y Luis dijo «continuar»: lee ESTE bloque primero; lo de más abajo (desde «HISTORIA») es de la mañana y queda solo como referencia. **Reglas de Luis: todo se documenta (Objetivo → Metodología → Resultado → Limitaciones → Fuentes), sin suponer ni inventar; horas con `date`; respuestas cortas, un tema por intercambio.**
+
+## 0. DÓNDE TRABAJAR (no confundirse de proyecto)
+- **Abrir Claude SIEMPRE en `~/simulador-marcha-control`.** La interfaz vigente se alcanza sin salir de aquí: `./interfaz` → enlace a `~/Projects/gaitsim-control` (rama `main`, repo GitHub `GAITSIM`). Ahí está integrado el lazo de Fz (pantalla «Control de Fz», tara automática, flujo post-HOME, pisadas con 3 ejes). Su estado detallado: `interfaz/CLAUDE.md`.
+- **NO ENTRAR:** `~/Projects/gaitsim-control-fz_OBSOLETA_NO_USAR` (copia de la mañana, superada), `~/Projects/gaitsim-control-*backup*`, y las partes de la etapa 2 que no tocan el lazo (matriz de variabilidad, «Ir a Posición Inicial» manual, firmware viejo en `interfaz/firmware/`).
+- Datos de las pisadas de la interfaz: `interfaz/logs/fz/*.csv` (NO van a GitHub) → **copiarlos** a `reportes/datos/<fecha>_.../` con un LEEME y graficarlos con `herramientas/graficar_pisadas_interfaz.py` (figura en `reportes/figuras/`, enlazada desde el reporte).
+
+## 0.1 Estado al cerrar (2026-11-18, 18:00)
+- **Desconectados por Luis al cerrar:** cable USB RPi↔ESP32 de motores (cable NUEVO desde 17:35) y el ESP32 del ADC. Reconectar ambos al llegar.
+- **HOME perdido** (el ESP32 se reinicia al reconectar). Prótesis **montada** (pie en el punto de partida de talla170, ≈10 mm sobre la tara) → **para hacer HOME, Luis DEBE retirarla antes.**
+- Último resultado: pisadas 3 ejes (X y ángulo lazo abierto, Y lazo cerrado de Fz; 75 kg, x10, Kp 5) muy repetibles (RMS ≈ 220 N, 25 %) pero sin aprendizaje: la pisada 2 se abortó por un **hueco de 82 ms en el lazo** (detector de saltos), no por el cable. Reporte con figura: `reportes/2026-11-18_noche_cable_nuevo_home_e_interfaz_vigente.md`.
+
+## 0.2 Qué hacer al llegar, EN ORDEN (cada paso con el OK de Luis)
+1. Reconectar el ESP32 de motores (USB) y el del ADC; comprobar sin mover: `ls /dev/serial/by-id/`, `dmesg | tail`, ADC por `/dev/ttyAMA0` (≈1000 paquetes/s).
+2. Luis retira la prótesis → abrir la interfaz con el lanzador (sección 6): conecta y hace HOME solo. **El lanzador pulsa HOME automáticamente: no abrirlo con la prótesis puesta.**
+3. Tras el HOME la interfaz muestra «Prótesis montada» → lista de trayectorias (elegir `Control_apoyo_talla170_montaje37`) → confirmación → tara automática. Luis lo opera en la pantalla táctil.
+4. **Antes de más pisadas, arreglar (sin hardware) el hueco del lazo:** que el hilo del lazo no se retrase por el redibujado, o que el detector de saltos use |ΔF|/Δt; probar en simulación (`interfaz/tests/manual_test_b5_*`, `..._b6_*`).
+5. Correr 5 pisadas (`fz Control_apoyo_talla170_montaje37 75 10 5`) y ver si el ILC baja el 25 %. Guardar CSV + figura + reporte.
+6. Comprobar en hardware que ya no sale el diálogo «Guardar Posición Inicial» tras las pisadas (arreglado hoy, solo probado offscreen).
+- Abierto: meseta de Fz a 4.5–6 s (¿rigidez en punta, k = 2.4 N/mm?), delta ILC ≈ 89 N casi constante, 60 Hz en Fz, R6 (pesas vs NetForce), oscilación ~7 Hz a carga alta (prueba Kp 3 vs 5), guardar automáticamente la imagen de las gráficas de la interfaz.
+- **Errores que no se repiten (reglas):** el id de trayectoria es el nombre COMPLETO del CSV sin `.csv`; no abrir la copia obsoleta; no abrir `/dev/ttyUSB0` desde otro script con la interfaz abierta; leer el reporte más reciente y `git log` de ambos repos antes de abrir/configurar nada.
+
+---
+# HISTORIA (mañana del 2026-11-18; solo referencia)
 
 ## 1. Dónde quedó el rig (verificar a ojo antes de mover nada)
 - **Prótesis acoplada**, pie **plano ≈ 0°** (por pasos de K, no medido), **X y K quietos**. Eje **Y de vuelta en su posición inicial** (contador relativo 0 tras cada corrida; el contador absoluto del firmware no es posición física). La planta del pie está a ≈ 57 mm del contacto (Luis midió «7 cm del suelo»).

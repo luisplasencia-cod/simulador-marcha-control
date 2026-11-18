@@ -21,3 +21,4 @@ logs/
 control/identificacion/resultados/*_SIM*
 control/telemetria/registros/*_SIM_*
 reportes/escalera/*_SIM/
+interfaz

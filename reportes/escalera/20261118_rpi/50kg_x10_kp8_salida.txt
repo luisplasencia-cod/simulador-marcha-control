@@ -1,0 +1,7 @@
+PLAN: escala 490 N (pico ~578 N), 6 ciclos, Kp=8.0, k_asumido=26.4 N/mm -> 3.03 pasos/N, tope 722.0 N, hueco 110.0 mm (descenso max 170 mm), v_max 9000.0 pasos/s, simulado=False
+Tara: f0 = -4.94 N (p5 -9.27, p95 -2.17). Debe estar SIN contacto y el eje quieto.
+Aproximando: rapido 20 mm/s hasta 80 mm, luego 5 mm/s; descenso maximo 170 mm.
+CONTACTO a 108.2 mm de descenso (hueco declarado 110): F = 18.9 N
+ABORTADO: error(5, 'Input/output error')
+!!! NO SE PUDO RETORNAR EL EJE AUTOMATICAMENTE (error(5, 'Input/output error')): SUBIRLO A MANO / con MANUAL
+Motivo de cierre: ABORTADO: error(5, 'Input/output error') | log: control/telemetria/registros/2026-11-18_152354_fz.csv

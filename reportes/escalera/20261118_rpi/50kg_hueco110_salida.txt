@@ -1,0 +1,13 @@
+PLAN: escala 490 N (pico ~578 N), 6 ciclos, Kp=10.0, k_asumido=26.4 N/mm -> 3.03 pasos/N, tope 722.0 N, hueco 110.0 mm (descenso max 170 mm), v_max 9000.0 pasos/s, simulado=False
+Tara: f0 = -5.39 N (p5 -9.20, p95 -2.36). Debe estar SIN contacto y el eje quieto.
+Aproximando: rapido 20 mm/s hasta 80 mm, luego 5 mm/s; descenso maximo 170 mm.
+CONTACTO a 107.9 mm de descenso (hueco declarado 110): F = 14.9 N
+ciclo 0: RMS error = 45.06 N  (descenso ordenado acumulado 112.4 mm)
+ciclo 1: RMS error = 29.76 N  (descenso ordenado acumulado 110.0 mm)
+ciclo 2: RMS error = 25.97 N  (descenso ordenado acumulado 107.4 mm)
+ciclo 3: RMS error = 32.92 N  (descenso ordenado acumulado 106.7 mm)
+ciclo 4: RMS error = 22.15 N  (descenso ordenado acumulado 105.8 mm)
+ABORTADO: RuntimeError('lectura anomala (F=498.2 N, previa 547.2 N, umbral de salto 46 N)')
+Retorno: contador Y = -10309 pasos -> subiendo 10309 pasos
+Y final respecto al inicio: 0 pasos (debe ser ~0)
+Motivo de cierre: ABORTADO: RuntimeError('lectura anomala (F=498.2 N, previa 547.2 N, umbral de salto 46 N)') | log: control/telemetria/registros/2026-11-18_152133_fz.csv
