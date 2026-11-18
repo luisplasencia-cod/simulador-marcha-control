@@ -452,7 +452,7 @@ if __name__ == "__main__":
     ap.add_argument("--peso_sujeto_n", type=float, required=True,
                     help="escala de la curva objetivo [N]; para las primeras corridas usar valores BAJOS (p. ej. 100)")
     ap.add_argument("--n_ciclos", type=int, default=3)
-    ap.add_argument("--kp", type=float, default=15.0,
+    ap.add_argument("--kp", type=float, default=10.0,  # 2026-11-18: 10 (Ensayo B: margen 2-3x; 15 queda justo). Antes 15.
                      help="ganancia proporcional [1/s]. Default 15 = recomendacion de partida 2026-11-08 "
                           "(reportes/2026-11-08_avance_sin_rpi.md Sec.3); re-elegir con la latencia completa medida.")
     ap.add_argument("--fmax_n", type=float, required=True, help="tope de fuerza [N] (obligatorio): lo supera -> se detiene y retorna")
