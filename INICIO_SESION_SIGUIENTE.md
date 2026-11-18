@@ -12,6 +12,8 @@ Si eres Claude en una sesión nueva: lee este archivo completo, luego `CLAUDE.md
 ## 2. Qué está hecho y validado en hardware (2026-11-18)
 UART del ADC (R0–R5), Ensayo B (retardo ≈ 15–23 ms, tau ≈ 3–14 ms), lazo cerrado de Fz en Y con contacto, repetible, ILC converge (8 pisadas: 8.4 → 3.2 N a 60 N), tope de fuerza verificado, firmware v4, **escalera de carga 10/20/30/40 kg completa** (error final 3–4 % del pico; velocidad de Y hasta 57 mm/s; picos dentro de ±2 %), 50 kg abortó por el detector de saltos (corregido). Detalle: `reportes/2026-11-18_*.md`, `HISTORIAL.md` § 2026-11-18, figuras en `reportes/figuras/` y `reportes/escalera/20261118_124639/`.
 
+> ⚠️ **INTERFAZ VIGENTE = `~/Projects/gaitsim-control` (rama `main`)** — desde la tarde del 2026-11-18 la integración del lazo de Fz se hace AHÍ (pantalla «Control de Fz», tara automática, flujo post-HOME, primera pisada 3 ejes; último commit `88bfb34`, 17:35). **La copia `~/Projects/gaitsim-control-fz` (rama `integracion-fz`) está OBSOLETA: no abrirla ni usarla** (el 2026-11-18 17:41 la abrí por error y mandé un HOME desde ella). Estado vigente de la interfaz: su propio `CLAUDE.md` (bloques del 2026-11-18). Lo que dice abajo sobre `gaitsim-control-fz` es historia de la mañana.
+
 ## 3. Decisiones de Luis vigentes
 Varias pisadas seguidas tras un solo HOME, reutilizando el flujo de la app de la etapa 2 (punto inicial, regreso y repetición); talla **174**; escala **×6**; peso objetivo **80 kg** subiendo de a poco (10→20→…→90); visible en vivo en la pantalla del RPi y todo en el reporte; techo de velocidad de Y **9000 pasos/s** (12 000 fue brusco); autorizado modificar firmware de motores si se documenta; **la escala de tiempo para 80–90 kg la decide Luis** (cálculo: ×12 para 80 kg, ×14 para 90 kg, ver `reportes/2026-11-18_escalera_10_a_50kg_y_escala.md`).
 
@@ -37,4 +39,4 @@ Varias pisadas seguidas tras un solo HOME, reutilizando el flujo de la app de la
 - Lazo manual: `control/lazo_fz_tiempo_real.py --peso_sujeto_n <N> --fmax_n <1.25×pico> --hueco_mm 45 --extra_mm 60 --hueco_remedido --angulo_deg 0 --n_ciclos 6 --v_max <pasos/s> [--duracion_apoyo_s 0.615×escala] --fuente_fz uart --puerto_fz /dev/ttyAMA0 --ejecutar` (sin `--ejecutar` solo imprime el plan).
 - Graficar una corrida: `control/telemetria/graficar_corrida.py <csv> --titulo "…" --salida x.png --mostrar`.
 - Firmware: binarios en `control/firmware/binarios/` (v3, v4, original); respaldos en `control/firmware/respaldos_flash/`; restaurar con `esptool` (ver `control/firmware/README.md`).
-- Interfaz de la etapa 2 (copia): `cd ~/Projects/gaitsim-control-fz && ./venv/bin/python main.py` (necesita pantalla). El original `~/Projects/gaitsim-control` NO se toca.
+- Interfaz VIGENTE: `cd ~/Projects/gaitsim-control && ./venv/bin/python main.py` (necesita pantalla). ~~Copia `gaitsim-control-fz`~~: OBSOLETA, no usar.
