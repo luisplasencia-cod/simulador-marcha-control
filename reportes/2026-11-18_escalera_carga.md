@@ -31,3 +31,9 @@ Misma orden con `--n_ciclos 6`. Log `control/telemetria/registros/2026-11-18_123
 - **Error real RMS: 21.5 → 10.8 → 8.4 → 7.7 → 7.1 → 7.1 N** (3.1 % del pico de 231 N al final; en % es mejor que 10 kg).
 - Picos ≈ 225–236 N (objetivo 226/231; ver nota del sesgo max/min). |u| máx 2206 → 2740 pasos/s (34 mm/s), crece pisada a pisada (el ILC adelanta la acción).
 - **Sin anomalía en la carga inicial** (tiempo plano 10–20 ms salvo la pisada 0, 90 ms). Rigidez aparente en la carga inicial **23–28 N/mm** (19.8 en la pisada 0): casi igual que a 10 kg → hasta ≈200 N la prótesis NO se vuelve claramente más rígida.
+
+## Escalón 40 kg — intento 1 ABORTADO por el límite de descenso (12:37:56–12:38:23, reloj)
+`--peso_sujeto_n 392.4 --fmax_n 560 --n_ciclos 6 --v_max 9000 --hueco_mm 45 --extra_mm 30`. Log `control/telemetria/registros/2026-11-18_123756_fz.csv`; figura `reportes/figuras/2026-11-18_escalera_40kg_abortada.png`.
+- Abortó en la pisada 0 a t = 0.56 s con Fz ≈ 335 N: `descenso 75.0 mm >= maximo 75 mm`. Detuvo el eje y Y volvió a su inicio (contador relativo 0). |u| máx 4057 pasos/s.
+- **Causa (entendida): el límite de descenso total (hueco declarado 45 + margen 30 = 75 mm) era chico para esta carga**: contacto a 57.4 mm + compresión ≈ 13 mm hasta 335 N (rigidez aparente 23.8 N/mm) = ≈ 70 mm, y para el pico de 462 N harían falta ≈ 19 mm (≈ 76 mm total). Es la protección actuando como se diseñó, no una falla. El margen de 30 mm se había elegido con cargas bajas.
+- **Corrección:** `--extra_mm 60` (límite total 105 mm). Justificación: con 80 kg y ≈ 24 N/mm la compresión sería ≈ 40 mm; el tope de fuerza sigue siendo la protección principal (el pie no puede bajar más sin subir la fuerza). Elección de diseño, no medida.

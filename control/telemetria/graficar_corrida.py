@@ -16,7 +16,8 @@ for k in range(n):
     m = c == k; col = cmap(k / max(1, n - 1)); e = ref[m] - F[m]; rms.append(float(np.sqrt(np.mean(e ** 2))))
     ax[0].plot(t[m], F[m], color=col, lw=.9, label=f"ciclo {k} (RMS {rms[-1]:.2f} N)"); ax[1].plot(t[m], e, color=col, lw=.7); ax[2].plot(t[m], u[m], color=col, lw=.7)
     tm, Fm = t[m], F[m]
-    print(f"ciclo {k}: RMS(r-F) {rms[-1]:.2f} N | pico1 {Fm[(tm>.5)&(tm<1.3)].max():.1f} valle {Fm[(tm>1.4)&(tm<2.2)].min():.1f} pico2 {Fm[(tm>2.4)&(tm<3.3)].max():.1f} N | |u| max {abs(u[m]).max():.0f} pasos/s")
+    def _f(sel, fn): v = Fm[sel]; return f"{fn(v):.1f}" if v.size else "-"      # pisada abortada: tramos vacíos
+    print(f"ciclo {k}: RMS(r-F) {rms[-1]:.2f} N | pico1 {_f((tm>.5)&(tm<1.3), np.max)} valle {_f((tm>1.4)&(tm<2.2), np.min)} pico2 {_f((tm>2.4)&(tm<3.3), np.max)} N | |u| max {abs(u[m]).max():.0f} pasos/s | hasta t={tm.max():.2f} s")
 ax[0].plot(t[c == 0], ref[c == 0], "k--", lw=1.6, label="referencia r(t)"); ax[0].legend(ncol=2, fontsize=8); ax[0].set_ylabel("Fz [N]"); ax[0].grid(alpha=.3)
 ax[1].set_ylabel("error real r - F [N]"); ax[1].grid(alpha=.3); ax[2].set_ylabel("u = SET_VEL [pasos/s]\n(+ sube, - baja)"); ax[2].set_xlabel("t dentro del ciclo [s]"); ax[2].grid(alpha=.3)
 fig.suptitle((a.titulo or os.path.basename(a.csv)) + f"\nRMS real por ciclo: " + " → ".join(f"{x:.1f}" for x in rms) + " N", fontsize=11)
