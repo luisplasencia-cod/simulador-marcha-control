@@ -4,6 +4,8 @@ Si acabas de llegar a este repo (laptop o RPi): lee esto completo antes de hacer
 Contexto completo: `CLAUDE.md` (la entrada con fecha más reciente es la vigente).
 Reescrito el 2026-11-18 desde la laptop.
 
+## ▶▶ PUNTO DE ENTRADA VIGENTE: `INICIO_SESION_SIGUIENTE.md` (2026-11-18, mediodía)
+
 ## ▶ SIGUIENTE (2026-11-18, 12:10): integración con la interfaz → seguir `PLAN_INTEGRACION_LAZO_Y.md` en orden
 
 ## ▶ ACTUALIZACIÓN 2026-11-18 (~11:50, sesión en el RPi): ETAPA 2 R0–R5 HECHA + Ensayo B + primer lazo cerrado en Y

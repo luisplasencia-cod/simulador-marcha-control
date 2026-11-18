@@ -16,3 +16,8 @@ __pycache__/
 /1
 .venv/
 logs/
+
+# Salidas de corridas SIMULADAS (no son datos reales; una llego a pesar 66 MB)
+control/identificacion/resultados/*_SIM*
+control/telemetria/registros/*_SIM_*
+reportes/escalera/*_SIM/
