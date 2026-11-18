@@ -1,0 +1,16 @@
+{
+ "y0": 0,
+ "sube": {
+  "y_rel": 81,
+  "set_vel_ok": 29,
+  "envios": 29,
+  "rtt_ms_max": 7.095
+ },
+ "baja": {
+  "y_rel": 0,
+  "set_vel_ok": 29,
+  "envios": 29,
+  "rtt_ms_max": 7.084
+ },
+ "y_rel_final": 0
+}

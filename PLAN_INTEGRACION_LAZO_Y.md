@@ -11,9 +11,9 @@ Escrito el 2026-11-18 a pedido de Luis. Ejecutar **en orden**; cada paso tiene q
 | # | Qué | Criterio de paso | Estado |
 |---|---|---|---|
 | A1 | Compilar v4 (`SET_VEL` del eje Y permitido durante `RUN`) | compila; diff vs v3 = solo ese cambio | ✅ 2026-11-18 |
-| A2 | Respaldo de flash → grabar v4 → esperar 4 s → regresión (`PING`, `GET_POSITION`, `TRAJ_STATUS`) | todo responde igual que con v3 | pendiente |
-| A3 | Latencia: PING ×200, `GET_POSITION`, `SET_VEL:1:0` | RTT ≈ 6 ms (como v3), sin respuestas perdidas | pendiente |
-| A4 | `SET_VEL` de Y en el aire (sube 1 mm y vuelve) | el contador vuelve al inicial | pendiente |
+| A2 | Respaldo de flash → grabar v4 → esperar 4 s → regresión (`PING`, `GET_POSITION`, `TRAJ_STATUS`) | todo responde igual que con v3 | ✅ 12:04 (TODO OK; v3 respaldado y verificado byte a byte) |
+| A3 | Latencia: PING ×200, `GET_POSITION`, `SET_VEL:1:0` | RTT ≈ 6 ms (como v3), sin respuestas perdidas | ✅ PING 5.994 ms, GET_POSITION 4.925 ms (= v3) |
+| A4 | `SET_VEL` de Y en el aire (sube 1 mm y vuelve) | el contador vuelve al inicial | ✅ +81 → 0 pasos, 58/58 OK — reporte `reportes/2026-11-18_firmware_v4_grabado.md` |
 
 ### Fase B — Software en la copia `~/Projects/gaitsim-control-fz` (Claude; sin hardware salvo B2)
 | # | Qué | Criterio de paso |
