@@ -22,3 +22,12 @@ Cerrar el lazo de fuerza vertical (Fz) con la prótesis apoyada, con **X y el á
 
 ## Fuentes
 Log y figura citados arriba; Ensayo B: `reportes/2026-11-18_ensayo_B_respuesta_dinamica.md`; objetivo: `control/referencia_grf/` (Gutenberg 2021).
+
+## Repetición con NetForce a la vista (2026-11-18, 11:50:41–11:51:22)
+**Objetivo:** comprobar repetibilidad y tener una validación independiente de Fz con NetForce (que Luis observaba, en cero antes de empezar). **Metodología:** misma orden exacta que la corrida 1 (Kp 10, 3 ciclos, escala 60 N, plana 0°, tope 100 N, hueco declarado 45 mm). Log `control/telemetria/registros/2026-11-18_115042_fz.csv`; salida en `pruebas/resultados/etapa2/salidas/lazo_cerrado_run2_20261118_115042.txt`.
+**Resultado (medido):**
+- Completó sin abortar; contacto a 57.5 mm (corrida 1: 57.4); Y volvió a su inicio (contador relativo 0).
+- **Error real r−F (del log), corrida 2 vs corrida 1:** ciclo 0: 8.09 vs 8.54 N; ciclo 1: 5.52 vs 5.83 N; ciclo 2: 4.66 vs 4.71 N → **repetible dentro de ~5 %**, con la misma mejora ciclo a ciclo.
+- **Picos y valle medidos por el ADC (N):** pico 1 = 71.2 / 74.8 / 74.4, valle = 39.0 / 38.8 / 38.6, pico 2 = 72.8 / 73.7 / 74.4 (referencia 70.7 / 42.7 / 70.7). Los picos quedan 1–4 N sobre la referencia y el valle ≈ 4 N (≈ 9 %) bajo ella.
+- **NetForce (Luis, a ojo, mensaje textual: "si lo vi son 3 como emes"):** vio 3 ondas en forma de "M" = 3 ciclos de doble joroba, coherente con lo medido por el ADC. **Solo confirmación cualitativa (forma y número de ciclos): Luis no registró magnitudes, así que la escala en N sigue sin validarse contra NetForce.**
+**Limitaciones:** (1) no hay valores de NetForce → no se valida la calibración (el +1.8/+3.2 % de la laptop viene de una sola pesa); (2) una sola configuración (71 N de pico, plana 0°); (3) mi aviso "contacto" no llegó: la salida de Python iba a archivo con buffer y la línea de contacto apareció al final (usar `python -u` al lanzar en segundo plano); Luis igualmente vio la corrida.
