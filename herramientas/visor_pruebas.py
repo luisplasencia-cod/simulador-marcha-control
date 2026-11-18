@@ -56,7 +56,7 @@ def dibujar(_=None):
         ax1.set_xlim(t[i0], max(t1, t[i0] + 1))
         mov = abs(y[-1]) > 0
         ax1.set_title(f"Fz = {F[-1]:+.1f} N", fontsize=34, color="#b00020" if abs(F[-1]) > 20 else "black", loc="left")
-        ax2.set_title(f"Y (pasos emitidos) = {y[-1]}  ({y[-1]/80:+.1f} mm)", fontsize=14, loc="left")
+        ax2.set_title(f"Y (pasos emitidos) = {y[-1]}  ({y[-1]/80:+.1f} mm)" if any(y) else "Y: sin movimiento en esta prueba (reposo)", fontsize=14, loc="left")
         fig.suptitle(f"{msg[-1]}   [fase: {fase[-1]}]" + (f"   --  {fin}" if fin else ""), fontsize=22, fontweight="bold",
                      color="#b00020" if "ABORT" in (fin + msg[-1]).upper() else "#14532d")
     else:

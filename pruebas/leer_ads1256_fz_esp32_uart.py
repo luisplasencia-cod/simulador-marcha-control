@@ -16,6 +16,8 @@ Uso:
     (en la laptop, con adaptador USB-TTL en GPIO17: --puerto COMx)
 """
 import argparse
+import os
+import sys
 import csv
 import time
 
@@ -74,6 +76,7 @@ def main():
     ap.add_argument("--puerto", required=True, help="p.ej. /dev/ttyUSB1 — confirmar cual ANTES de correr (hay 2 ESP32)")
     ap.add_argument("--n", type=int, default=1000)
     ap.add_argument("--salida", default="lecturas_fz_esp32.csv")
+    ap.add_argument("--en_vivo", action="store_true", help="escribe logs/prueba_en_vivo.csv para el visor de pantalla")
     a = ap.parse_args()
 
     ser = serial.Serial(a.puerto, BAUD, timeout=0.1)
@@ -82,13 +85,23 @@ def main():
     time.sleep(2.5)
     ser.reset_input_buffer()
 
+    ev = None
+    if a.en_vivo:   # visor de pantalla (herramientas/visor_pruebas.py), decimado 1/10 para no saturar el archivo
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "herramientas"))
+        from en_vivo import EnVivo
+        os.makedirs("logs", exist_ok=True)
+        ev = EnVivo("R2: Fz cruda por UART (ESP32 de lectura, sin tara)")
     filas = []
     t0 = time.perf_counter()
     try:
         for i, fz in enumerate(leer_paquetes(ser, a.n)):
             filas.append([i, round(time.perf_counter() - t0, 6), round(fz, 3)])
+            if ev and i % 10 == 0:
+                ev.escribir("lectura", fz, 0, f"R2: {i + 1}/{a.n} muestras")
     finally:
         ser.close()
+        if ev:
+            ev.cerrar(f"fin R2: {len(filas)} lecturas")
 
     with open(a.salida, "w", newline="") as f:
         w = csv.writer(f)

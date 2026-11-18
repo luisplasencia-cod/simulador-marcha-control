@@ -99,6 +99,12 @@ son la referencia contra la que se compara en el RPi.
 **Atajo (2026-11-18): `pruebas/etapa2_rpi.sh preflight | r2 [N] | r3 [MIN] | r5 [vels]`** — revisa R0/R1 solo, guarda cada
 salida en `pruebas/resultados/etapa2/` y NO corre R2 si el preflight está en MAL. Puerto por defecto **`/dev/ttyAMA0`**
 (variable `PUERTO_FZ`). Ninguno probado aún con el ESP32 de lectura conectado.
+**Visualización (2026-11-18):** `r2`/`r3`/`r5` abren solos el visor en vivo en la pantalla del RPi (`herramientas/visor_pruebas.py`,
+se cierra por PID al terminar). Al terminar `r2` y `r3` sale la figura de resultados (`pruebas/graficar_etapa2.py`, PNG en
+`pruebas/resultados/etapa2/figuras/`); `r5` deja el estado final como figura. **Para el criterio de R2 ("σ en el RPi ≈ σ en L3"):**
+`CONTRA=<csv de L3 de la laptop> pruebas/etapa2_rpi.sh r2` superpone ambas corridas (mismo formato `intento,t_s,fz_n`). La figura
+da σ normal y **σ robusta (MAD)**: usar la robusta para comparar, porque unos pocos picos de error de bit (como el 2026-11-05)
+inflan σ sin cambiar el ruido típico. Probado con datos sintéticos y un puerto falso (pty), no con el ESP32 real.
 
 **R0. (Pi 5, YA APLICADO el 2026-11-18, verificado por el preflight):** `dtoverlay=uart0-pi5` en `/boot/firmware/config.txt`,
 sin `console=serial0` en `cmdline.txt`, reiniciado; `pinctrl get 14,15` → TXD0/RXD0. **En Pi 5 `/dev/serial0` apunta a
