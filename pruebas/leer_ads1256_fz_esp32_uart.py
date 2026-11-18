@@ -56,7 +56,7 @@ def leer_paquetes(ser, n, timeout_s=5.0):
     t_ultimo = time.monotonic()
     leidos = 0
     while leidos < n:
-        chunk = ser.read(256)
+        chunk = ser.read(ser.in_waiting or 1)   # NO read(256): bloquea hasta 256 B (~32 ms a 8 kB/s)
         if chunk:
             buf += chunk
             t_ultimo = time.monotonic()

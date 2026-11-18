@@ -210,7 +210,7 @@ class LectorFzUART:
         buf = b""
         while not self._parar:
             try:
-                chunk = self.ser.read(256)
+                chunk = self.ser.read(self.ser.in_waiting or 1)   # NO read(256): bloquea ~32 ms hasta juntar 256 B
             except Exception:
                 return          # puerto caido: leer_n lo detecta por falta de muestras nuevas
             if not chunk:

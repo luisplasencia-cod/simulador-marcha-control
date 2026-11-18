@@ -1,0 +1,4 @@
+20000 lecturas en 20.00 s -> 1000 muestras/s (esperado ~1000, si no se perdieron paquetes)
+Fz: min -10.06  media -1.77  max 83.09 N
+CSV: pruebas/resultados/etapa2/R2_lecturas_20261118_111911.csv
+Pendiente (ver CLAUDE.md 2026-11-17): validar esto contra el AMTI real antes de usarlo para el lazo de Fz.

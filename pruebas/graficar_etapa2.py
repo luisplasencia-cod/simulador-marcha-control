@@ -71,11 +71,11 @@ def r2(a):
     if o: ax[0, 1].hist(o[1], bins=bins, color="tab:orange", alpha=.5, density=True, label=f"{a.etiqueta_contra} σ={o[2]['sd']:.2f} N (robusta {o[2]['sd_rob']:.2f})")
     ax[0, 1].set(title="Histograma (vista 0.5-99.5 %; los picos cuentan en σ, no en σ robusta)",
                  xlabel="Fz [N]", ylabel="densidad"); ax[0, 1].legend()
-    fr, am = psd(f, FS_NOMINAL)
+    fr, am = psd(f, s['tasa'])
     ax[1, 0].loglog(fr[1:], am[1:], color="k", label="RPi")
     if o:
-        fr2, am2 = psd(o[1], FS_NOMINAL); ax[1, 0].loglog(fr2[1:], am2[1:], color="tab:orange", alpha=.7, label=a.etiqueta_contra)
-    ax[1, 0].set(title="Espectro (picos >50 N reemplazados; asume 1000 muestras/s)", xlabel="f [Hz]", ylabel="N/√Hz"); ax[1, 0].legend(); ax[1, 0].grid(alpha=.3, which="both")
+        fr2, am2 = psd(o[1], o[2]['tasa']); ax[1, 0].loglog(fr2[1:], am2[1:], color="tab:orange", alpha=.7, label=a.etiqueta_contra)
+    ax[1, 0].set(title="Espectro (picos >50 N reemplazados; fs = tasa medida de cada serie)", xlabel="f [Hz]", ylabel="N/√Hz"); ax[1, 0].legend(); ax[1, 0].grid(alpha=.3, which="both")
     dt = np.diff(t) * 1000
     ax[1, 1].plot(dt, lw=.5, color="k"); ax[1, 1].axhline(1.0, color="tab:red", ls="--", lw=1, label="1 ms nominal")
     ax[1, 1].set(title="Tiempo entre paquetes [ms] (llegada al RPi, no el ADC)", xlabel="muestra", ylabel="ms")

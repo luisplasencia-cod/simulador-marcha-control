@@ -66,7 +66,7 @@ while time.monotonic() < fin:
     t0 = time.monotonic()
     valores, corruptos = [], 0
     while time.monotonic() - t0 < 1.0:
-        chunk = ser.read(256)
+        chunk = ser.read(ser.in_waiting or 1)   # NO read(256): bloquea hasta 256 B (~32 ms a 8 kB/s)
         if chunk:
             buf += chunk
             t_ultimo_dato = time.monotonic()

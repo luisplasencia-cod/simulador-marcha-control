@@ -70,7 +70,7 @@ if os.path.exists(a.puerto) and not dueños:
         ser.reset_input_buffer()
         buf, val, corr, t0 = b"", [], 0, time.monotonic()
         while time.monotonic() - t0 < a.escuchar:
-            ch = ser.read(512)
+            ch = ser.read(ser.in_waiting or 1)
             if ch:
                 v, buf, c = extraer_paquetes(buf + ch)
                 val += v
