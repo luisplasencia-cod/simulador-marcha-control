@@ -14,3 +14,13 @@ Subir de a poco desde 6 kg hacia 80 kg (decisión de Luis) en la misma posición
 - **NetForce:** pendiente de lo que Luis leyó.
 **Limitaciones:** una corrida de 3 pisadas; el desplazamiento es el ORDENADO (no medido): sin sensor de posición no se puede separar holgura de deslizamiento.
 **Qué sigue (propuesta):** repetir 10 kg con más pisadas para ver si la anomalía se repite y con qué frecuencia, y que Luis mire el pie/adaptador y el carro vertical en la carga inicial, antes de subir a 20 kg. No subir de escalón con una anomalía sin entender.
+
+### Observación de Luis tras el primer 10 kg
+"con el 10 ha sido correcto y los motores normal … NetForce se ha visto bien": no vio nada anómalo (sin valores numéricos de NetForce).
+
+### Repetición 10 kg × 6 pisadas (12:35:13–12:36:08, reloj)
+Misma orden con `--n_ciclos 6`. Log `control/telemetria/registros/2026-11-18_123513_fz.csv`; figura `reportes/figuras/2026-11-18_escalera_10kg_6pisadas.png`; salida `pruebas/resultados/etapa2/salidas/escalera_10kg_6pisadas_20261118.txt`.
+- **Error real RMS: 11.5 → 6.8 → 5.9 → 5.2 → 4.6 → 4.5 N** (baja monótono; 3.9 % del pico al final). |u| máx ≤ 1319 pasos/s.
+- **La anomalía NO se repitió:** tiempo plano (<30 N) al inicio 120 ms en la pisada 0 (como toda primera pisada) y 50–70 ms en las demás; rigidez aparente en la carga inicial 21–25 N/mm (16 en la pisada 0). En total 1 caso fuerte en 9 pisadas a 10 kg; causa sin determinar.
+- **Corrección de método:** el "pico" (máximo) y el "valle" (mínimo) de una señal con ruido σ≈2.6 N salen sesgados ±≈2σ (picos 2–4 N sobre el objetivo, valle 4–5 N bajo él en todas las corridas): NO es un error del control; usar el RMS (o un ajuste suavizado) para juzgar.
+**Decisión:** pasar a 20 kg (pico 231 N, tope 280 N, v_max 5000, 6 pisadas).
