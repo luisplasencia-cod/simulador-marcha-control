@@ -96,32 +96,39 @@ son la referencia contra la que se compara en el RPi.
 
 ## ETAPA 2 — RPi (mismo ESP32 de lectura, ya validado)
 
-**R0.** `git pull`. Modelo del RPi: `cat /proc/device-tree/model`. Habilitar UART del header:
-`sudo raspi-config` → Interface → Serial: *login shell = NO*, *hardware = SÍ*; reiniciar.
-En Pi 3/4 el UART por defecto es el mini-UART (baudios atados al reloj del núcleo): si aparecen
-paquetes corruptos, usar el PL011 (`dtoverlay=disable-bt` en `config.txt`). Puerto: `/dev/serial0`.
+**Atajo (2026-11-18): `pruebas/etapa2_rpi.sh preflight | r2 [N] | r3 [MIN] | r5 [vels]`** — revisa R0/R1 solo, guarda cada
+salida en `pruebas/resultados/etapa2/` y NO corre R2 si el preflight está en MAL. Puerto por defecto **`/dev/ttyAMA0`**
+(variable `PUERTO_FZ`). Ninguno probado aún con el ESP32 de lectura conectado.
+
+**R0. (Pi 5, YA APLICADO el 2026-11-18, verificado por el preflight):** `dtoverlay=uart0-pi5` en `/boot/firmware/config.txt`,
+sin `console=serial0` en `cmdline.txt`, reiniciado; `pinctrl get 14,15` → TXD0/RXD0. **En Pi 5 `/dev/serial0` apunta a
+`ttyAMA10` (UART de depuración, NO el header): el puerto del ESP32 de lectura es `/dev/ttyAMA0`.** (El paso
+`raspi-config → Serial` y la nota del mini-UART de Pi 3/4 NO aplican.)
 
 **R1. Solo el ESP32 de lectura** (ESP32 de motores DESCONECTADO). GPIO17 del ESP32 → pin 10 del RPi
-(GPIO15 RXD); GND → pin 6. El TX del RPi no se conecta.
+(GPIO15 RXD); GND → pin 6. El TX del RPi no se conecta. Luego `pruebas/etapa2_rpi.sh preflight` → debe dar
+~1000 paquetes/s y Fz en reposo.
 
-**R2.** `python pruebas/leer_ads1256_fz_esp32_uart.py --puerto /dev/serial0 --n 5000` →
+**R2.** `pruebas/etapa2_rpi.sh r2` (= `leer_ads1256_fz_esp32_uart.py --puerto /dev/ttyAMA0 --n 5000`) →
 offset y σ iguales a L3 (± lo razonable). Si empeoran: el problema lo trae el RPi (tierra/fuente).
 
-**R3.** `python pruebas/vigilar_adc_esp32_uart.py --puerto /dev/serial0 --minutos 30` → 0 fallas.
+**R3.** `pruebas/etapa2_rpi.sh r3 30` (= `vigilar_adc_esp32_uart.py --puerto /dev/ttyAMA0 --minutos 30`) → 0 fallas.
 
 **R4. Conectar el ESP32 de motores (sin mover nada)** e identificar sus puertos con
 `ls -l /dev/serial/by-id/` (nombres fijos; `ttyUSBn` se renumera — pasó 60 veces el 2026-11-05).
 Repetir R3 10 min: ¿enchufar el otro ESP32 cambia algo?
 
-**R5. Servo Y en el aire** (con OK de Luis en ese momento): adaptar `pruebas/fuerza_vs_velocidad_y.py`
-a la ruta UART y repetir la prueba del 2026-11-10, con el vigilante corriendo. Esta es la prueba
+**R5. Servo Y en el aire** (con OK de Luis en ese momento): `pruebas/etapa2_rpi.sh r5` (ya adaptado:
+`fuerza_vs_velocidad_y.py --fuente_fz uart --puerto_fz /dev/ttyAMA0`; pide escribir SI antes de mover; sin probar en hardware)
+repite la prueba del 2026-11-10. El vigilante (R3) usa el MISMO puerto, así que no pueden correr a la vez: el script de R5
+ya registra la Fz antes/durante/después, y la caída se ve como silencio (aborta con 'Sin muestras nuevas de Fz por UART'). Esta es la prueba
 que de verdad dice si la nueva ruta resolvió las caídas.
 
 **R6. Validar contra el AMTI/NetForce** (RMSE, como el 2026-11-03 con 1.89 N).
 
-**R7. Lazo de Fz con contacto:** `control/lazo_fz_tiempo_real.py` todavía lee por SPI directo —
-adaptarlo a `leer_ads1256_fz_esp32_uart.py` antes (no hecho). Pie en plana, hueco remedido,
-`--peso_sujeto_n 100 --fmax_n 150`.
+**R7. Lazo de Fz con contacto:** `control/lazo_fz_tiempo_real.py --fuente_fz uart --puerto_fz /dev/ttyAMA0 [--signo_fz -1]`
+(ya adaptado 2026-11-18, probado solo con pty falso y `--simulado`). El signo de Fz se confirma en L3 (masa conocida sube Fz).
+Pie en plana, hueco remedido, `--peso_sujeto_n 100 --fmax_n 150`.
 
 ---
 
@@ -145,7 +152,7 @@ adaptarlo a `leer_ads1256_fz_esp32_uart.py` antes (no hecho). Pie en plana, huec
 | F14 | UART2 a 115200 casi lleno: con Fz ≥ 1000 N cada paquete son 10 bytes → 87 % de la capacidad | `elapsed_max_us` alto, `perdidas` > 0 al cargar | Si pasa: subir baudios (decisión de Luis, cambia ambos lados) |
 | F15 | El ADC se cae con la prueba en marcha | `ALERTA: 0 muestras en 1 s` cada segundo (el firmware NO reinicia el ADC solo) | Anotar qué se hacía; reset con botón EN del ESP32; ver si recupera |
 | F16 | Paquetes corruptos por el UART | `corruptos` > 0 en el vigilante | Cable corto, GND junto al TX; en RPi usar PL011 |
-| F17 | UART del RPi sin habilitar o con consola serie encima | Nada o basura en `/dev/serial0` | R0 |
+| F17 | UART del RPi sin habilitar o con consola serie encima | Nada o basura en `/dev/ttyAMA0` | R0 |
 | F18 | Adaptador USB-TTL a 5 V con su TX al GPIO16 | Puede dañar el ESP32 | L4: solo RX y GND, jumper 3.3 V |
 | F19 | Confundir el ESP32 de lectura con el de motores | Abrir el de motores lo reinicia (freno bloquea/libera); flashear el equivocado | Identificar por `by-id` y desconectando uno; nunca `ttyUSB0` a ciegas |
 | F20 | `ttyUSBn` cambia de número tras una desconexión | Script abre otro dispositivo | Usar `/dev/serial/by-id/...` |

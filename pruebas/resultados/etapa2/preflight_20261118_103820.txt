@@ -1,0 +1,24 @@
+========================================================================
+[OK   ] modelo
+         Raspberry Pi 5 Model B Rev 1.1
+[OK   ] config.txt: dtoverlay=uart0-pi5
+         habilita el UART0 en GPIO14/15
+[OK   ] cmdline.txt sin consola serie
+         console=tty1 root=PARTUUID=113eb14f-02 rootfstype=ext4 fsck.repair=yes rootwait quiet splash plymouth.ignore-serial-consoles ds=nocloud;i=rpi-imager-1783990518680 cfg80211.ieee80211_regdom=PE
+[OK   ] existe /dev/ttyAMA0
+[AVISO] /dev/serial0 -> /dev/ttyAMA10
+         NO es el UART del header en Pi 5: usar /dev/ttyAMA0 (no serial0)
+[OK   ] GPIO14/15 = TXD0/RXD0
+         14: a4    pn | hi // GPIO14 = TXD0 | 15: a4    pu | hi // GPIO15 = RXD0
+[OK   ] nadie mas usa /dev/ttyAMA0
+         libre
+[OK   ] puertos USB-serie (SIN abrir)
+         lrwxrwxrwx 1 root root 13 Nov 18 10:32 usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0 -> ../../ttyUSB0
+[OK   ] alimentacion del RPi
+         throttled=0x0
+[OK   ] hora / uptime
+         2026-11-18 10:38:20 | up 5 minutes
+[MAL  ] el ESP32 de lectura transmite
+         0 paquetes en 3 s: ver F17/F18 de INICIO_RPI.md (TX GPIO17 del ESP32 -> pin 10, GND comun al pin 6, ESP32 con energia y firmware cargado)
+========================================================================
+RESULTADO: 1 item(s) MAL: corregir antes de R2

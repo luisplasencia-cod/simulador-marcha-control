@@ -1,14 +1,26 @@
 """Fz medida con el eje Y EN EL AIRE a distintas velocidades (sin contacto). Pregunta: ¿el servo vertical corre la lectura?
 Sube/baja Y a 400/800/1600 pasos/s por 0.5 s (neto 0, <=10 mm; hueco >= ~100 mm), midiendo Fz en reposo, en movimiento y
 despues de parar. SIEMPRE repone Y al final (incluso si el ADC se cae). Todo en vivo en la pantalla (herramientas/en_vivo.py).
-Uso: .venv/bin/python pruebas/fuerza_vs_velocidad_y.py [vel1,vel2,...]   (default 400,800,1600 pasos/s)"""
+Uso: .venv/bin/python pruebas/fuerza_vs_velocidad_y.py [vel1,vel2,...] [--fuente_fz spi|uart] [--puerto_fz /dev/ttyAMA0] [--signo_fz 1|-1]
+     (default 400,800,1600 pasos/s, fuente spi). Etapa 2 / R5 de INICIO_RPI.md: --fuente_fz uart --puerto_fz /dev/ttyAMA0
+     (ESP32 de LECTURA por UART; NO PROBADO en hardware). Con uart se EXIGE --puerto_fz: no hay valor por defecto a proposito."""
+import argparse
 import sys, os, time, json, statistics as st
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "control"))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "herramientas"))
 import lazo_fz_tiempo_real as L
 from en_vivo import EnVivo
 
-ev = EnVivo("Fz vs velocidad de Y (en el aire, sin contacto)")
+ap = argparse.ArgumentParser()
+ap.add_argument("velocidades", nargs="?", default="400,800,1600", help="pasos/s separados por coma")
+ap.add_argument("--fuente_fz", choices=["spi", "uart"], default="spi")
+ap.add_argument("--puerto_fz", default=None)
+ap.add_argument("--signo_fz", type=float, default=1.0, choices=[1.0, -1.0])
+A = ap.parse_args()
+if A.fuente_fz == "uart" and not A.puerto_fz:
+    raise SystemExit("--fuente_fz uart exige --puerto_fz (p.ej. /dev/ttyAMA0)")
+VELS = tuple(int(x) for x in A.velocidades.split(","))
+ev = EnVivo("Fz vs velocidad de Y (en el aire, sin contacto) - fuente " + A.fuente_fz)
 e = l = None
 y = 0
 res, motivo = {}, "completada"
@@ -34,11 +46,12 @@ def mover(fase, vel, msg, seg=0.5):
 
 try:
     ev.escribir("inicio", 0, 0, "CONECTANDO (el ESP32 se reinicia al abrir el puerto: espera 6 s)")
-    l = L.LectorFzFiltrado(); e = L.ClienteVelocidadESP32()   # ADC PRIMERO (2026-11-10: iniciarlo despues de abrir el ESP32 fallo 3 veces)
+    l = L.LectorFzUART(A.puerto_fz, signo=A.signo_fz) if A.fuente_fz == "uart" else L.LectorFzFiltrado()
+    e = L.ClienteVelocidadESP32()   # ADC PRIMERO (2026-11-10: iniciarlo despues de abrir el ESP32 fallo 3 veces)
     ev.escribir("tara", 0, 0, "TARA: eje quieto y sin contacto")
     print("tara f0 =", round(l.tarar()[0], 1))
     v = leer("reposo", "REPOSO inicial (eje quieto)", 1.0); res["reposo_inicial"] = st.median(v)
-    for vel in (tuple(int(x) for x in sys.argv[1].split(',')) if len(sys.argv) > 1 else (400, 800, 1600)):
+    for vel in VELS:
         for signo, nombre in ((-1, "baja"), (1, "sube")):
             v = mover(f"{nombre} {vel}", signo * vel, f"{nombre.upper()} Y a {vel/80:.0f} mm/s (Y se esta moviendo)")
             p = leer("tras parar", f"Y detenido tras {nombre} {vel}: leyendo 0.5 s", 0.5)
@@ -61,4 +74,4 @@ finally:
         try: o.cerrar()
         except Exception: pass
     ev.cerrar(motivo)
-    json.dump(res, open("pruebas/resultados/fuerza_vs_velocidad_y_%s.json" % time.strftime("%Y%m%d_%H%M%S"), "w"), indent=1)
+    json.dump(res, open("pruebas/resultados/fuerza_vs_velocidad_y_%s_%s.json" % (A.fuente_fz, time.strftime("%Y%m%d_%H%M%S")), "w"), indent=1)
