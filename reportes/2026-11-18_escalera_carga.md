@@ -1,0 +1,16 @@
+# Escalera de carga del lazo de Fz en Y (misma posición, solo vertical) — 2026-11-18
+
+## Objetivo
+Subir de a poco desde 6 kg hacia 80 kg (decisión de Luis) en la misma posición (pie plano 0°, X y ángulo quietos), midiendo seguimiento, rigidez real a más carga y picos frente a NetForce, antes de integrarlo con la trayectoria.
+
+## Escalón 10 kg (12:32:42–12:33:22, reloj del RPi)
+**Metodología:** `control/lazo_fz_tiempo_real.py --peso_sujeto_n 98.1 --fmax_n 150 --hueco_mm 45 --extra_mm 30 --hueco_remedido --angulo_deg 0 --n_ciclos 3 --v_max 3000 --fuente_fz uart --puerto_fz /dev/ttyAMA0 --ejecutar` (Kp 10, k asumido 26.4 N/mm). Luis con NetForce en cero. Log `control/telemetria/registros/2026-11-18_123242_fz.csv`; salida `pruebas/resultados/etapa2/salidas/escalera_10kg_20261118.txt`; figura `reportes/figuras/2026-11-18_escalera_10kg.png`.
+**Resultado (medido):**
+- Completó las 3 pisadas sin abortar; contacto a 57.2 mm; Y volvió a su inicio. |u| máx 1027 / 2086 / 1320 pasos/s (bajo el tope de 3000).
+- **Error real r−F (RMS): 11.8 → 15.4 → 7.8 N** (10 → 13 → 6.7 % del pico): NO bajó de forma monótona.
+- **Picos del ADC:** pico 1 = 114.8 / 117.4 / 122.2 N, valle = 66.6 / 66.8 / 65.0 N, pico 2 = 118.3 / 119.0 / 118.1 N (objetivo 113 / 70 / 116). Zona media (1–3 s) dentro de ±5 N en las tres.
+- **Anomalía en la carga inicial (0–0.6 s), no repetible:** en la pisada 1, Fz se quedó plana en ≈25 N durante ≈370 ms mientras el lazo ordenaba bajar (hasta 2086 pasos/s): 8.7 mm de descenso ordenado subieron Fz solo de 29 a 83 N (≈6 N/mm), frente a 4.0 mm → de 19 a 117 N (≈24 N/mm) en la pisada 2 y 4.6 mm → 12 a 86 N en la pisada 0 (que tuvo 120 ms plana). Faltan ≈4–5 mm en la pisada 1. Como no se repite, el ILC aprendió de ella y **sobrecorrigió en la pisada 2** (Fz por encima del objetivo, hasta 122 N, error −20 N en 0.3–0.5 s).
+- **Causa NO determinada.** Candidatos (ninguno verificado): holgura mecánica del eje vertical o del adaptador del pie al invertir el sentido (cadena/husillo/pirámide), deslizamiento del pie sobre el plato, comportamiento del firmware al invertir el sentido (pero las tres pisadas empiezan tras una inversión similar, +836 y +944 pasos/s, y solo una muestra el efecto fuerte). Con las 60 N de la mañana el efecto era menor (atraso inicial 110→50 ms).
+- **NetForce:** pendiente de lo que Luis leyó.
+**Limitaciones:** una corrida de 3 pisadas; el desplazamiento es el ORDENADO (no medido): sin sensor de posición no se puede separar holgura de deslizamiento.
+**Qué sigue (propuesta):** repetir 10 kg con más pisadas para ver si la anomalía se repite y con qué frecuencia, y que Luis mire el pie/adaptador y el carro vertical en la carga inicial, antes de subir a 20 kg. No subir de escalón con una anomalía sin entender.
