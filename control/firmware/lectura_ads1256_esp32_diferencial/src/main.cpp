@@ -23,6 +23,8 @@
 //    linea por segundo: muestras, media/desviacion/min/max de Fz, periodo maximo, muestras
 //    perdidas, lecturas en cero exacto y saturadas. Antes no salia nada por USB.
 //  - Entorno "sin_bt" (platformio.ini) para comparar el ruido sin la radio Bluetooth.
+//  - Por el USB tambien sale "F,<valor>" a 100/s (1 de cada 10 muestras) para el visor
+//    en vivo de la laptop (pruebas/visor_fz_esp32_usb.py). El RPi no usa el USB.
 #include <Arduino.h>
 #include <SPI.h>
 #include <esp_system.h>
@@ -355,6 +357,14 @@ void loop(){
     if (sample_period > est_max_periodo) est_max_periodo = sample_period;
     if (sample_period > 1500) est_perdidas++;   // a 1000 SPS el periodo es 1000 us
     if (elapsed > est_max_elapsed) est_max_elapsed = elapsed;
+
+    // Copia de Fz por USB a 100/s (1 de cada 10) para el visor de la laptop
+    // (pruebas/visor_fz_esp32_usb.py). No toca el paquete del UART2.
+    static uint8_t div_usb = 0;
+    if (++div_usb >= 10){
+      div_usb = 0;
+      Serial.printf("F,%.3f\n", f);
+    }
 
 #ifndef SIN_BT
     sample++;

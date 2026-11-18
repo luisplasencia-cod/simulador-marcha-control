@@ -2,7 +2,30 @@
 
 Si acabas de llegar a este repo (laptop o RPi): lee esto completo antes de hacer nada.
 Contexto completo: `CLAUDE.md` (la entrada con fecha más reciente es la vigente).
-Reescrito el 2026-11-18 desde la laptop, **sin hardware**: nada de este plan se ha ejecutado.
+Reescrito el 2026-11-18 desde la laptop.
+
+## ▶ ESTADO AL 2026-11-18 (tarde) — EMPEZAR AQUÍ EN LA RPi
+- **Etapa 0 y Etapa 1 (laptop) HECHAS.** El ADC funciona por el ESP32 de lectura: 4/4 registros OK,
+  1000 muestras/s, ruido σ ≈ 0.75 N, signo correcto, escala +2–3 % con una pesa de 2.246 kg (sin comparar
+  con NetForce todavía). Detalle y números: `reportes/2026-11-18_etapa1_laptop_adc_esp32.md`.
+- **El ESP32 de lectura YA TIENE el firmware final grabado.** En la RPi **no hay que compilar ni flashear
+  nada** (la Fase A vieja ya no aplica). Respaldo del firmware anterior en
+  `control/firmware/respaldos_flash/esp32_lectura_adc_original_flash_0x0_0x400000_20261118.bin`.
+- **No hecho en la laptop:** L4 (UART2, no había adaptador USB-TTL) y la vigilancia larga (solo 5 min).
+  La ruta UART2 se prueba por primera vez en la RPi (R1–R3).
+- **Siguiente:** Etapa 2 desde **R0** (abajo). Cables a reconectar en la RPi (Luis los desconectó para la
+  laptop): **GPIO17 del ESP32 → pin 10 del RPi (GPIO15 RXD)** y **GND del ESP32 → pin 6 del RPi (GND)**.
+  El TX del RPi NO se conecta. **Decisión de Luis (2026-11-18): el ESP32 de lectura SIGUE alimentado por el USB
+  de la LAPTOP** (no por la RPi). Consecuencias: (1) en la laptop NADA puede abrir COM8 durante la prueba
+  (abrirlo reinicia el ESP32 y corta ≈2 s el UART a la RPi) — ojo con `C:\PB2\display\server.py`, que arranca
+  solo con la laptop y toma COM8; (2) la laptop no debe suspenderse; (3) GND de laptop, ESP32, RPi y ADC quedan
+  unidos: si el ruido en la RPi sale peor que σ ≈ 0.75 N, repetir con la laptop a batería.
+- **Ojo:** el ESP32 de lectura también aparece como `/dev/ttyUSBx` si se enchufa por USB a la RPi. **No
+  abrir ese puerto por error creyendo que es el de motores** (y viceversa): identificar con
+  `ls -l /dev/serial/by-id/` desenchufando uno a la vez.
+- **Por el USB del ESP32 sale diagnóstico** (`F,<valor>` a 100/s + resumen por segundo). En la RPi no hace
+  falta, pero si algo falla en R2 se puede ver con `pruebas/registrar_diag_esp32_usb.py --puerto /dev/ttyUSBx`
+  para saber si el problema es del ADC (sale ERROR/ALERTA ahí) o del cable UART (ahí todo OK).
 
 **Regla de orden (Luis):** todo es sobre Fz (eje vertical). **Escalonado:** primero se confirma
 en la LAPTOP que el ADC sensa bien (ESP32 por USB, sin RPi, sin motores); recién con eso
@@ -38,6 +61,8 @@ Pines ADS1256↔ESP32: CS=GPIO32, DRDY=GPIO33, SCLK=GPIO27, DOUT(MISO)=GPIO25, D
   CAIDO / CEROS / SATURADO / CONGELADO / PICOS / OK por segundo.
 - **Nuevo** `pruebas/registrar_diag_esp32_usb.py`: guarda el diagnóstico del USB del ESP32 (para
   la etapa laptop; no necesita adaptador).
+- **Nuevo** `pruebas/visor_fz_esp32_usb.py`: ventana en vivo de Fz por el USB del ESP32 (tara, marcas,
+  registro CSV). Sirve también en la RPi si hay pantalla.
 
 ---
 
