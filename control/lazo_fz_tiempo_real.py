@@ -87,6 +87,11 @@ SALTO_MAX_N = 30.0   # |dF| entre muestras consecutivas filtradas: mas que eso =
 F_NEG_MAX_N = -30.0
 
 
+class _EnVivoNulo:
+    def escribir(self, *a, **k): pass
+    def cerrar(self, *a, **k): pass
+
+
 class ClienteVelocidadESP32:
     """Cliente serial de SET_VEL. PROBADO 2026-11-10 (firmware v3 con espressif32 7.0.1): SET_VEL responde OK,
     RTT ~5.8-6.4 ms, + sube Y (confirmado por Luis), watchdog 80 ms (32 pasos tras un solo SET_VEL).
@@ -342,6 +347,18 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referen
 
     descenso_mm = 0.0   # integral de la velocidad ORDENADA (no medida) desde el inicio
     ultimo_chk = [time.monotonic()]
+    # 2026-11-18 (pedido de Luis): visor en vivo en la pantalla del RPi (herramientas/visor_pruebas.py lee este archivo):
+    # Fz grande, desplazamiento ORDENADO de Y (pasos, + = arriba, desde el inicio de la corrida) y la fase.
+    ev = _EnVivoNulo()
+    try:
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "herramientas"))
+        from en_vivo import EnVivo
+        _raiz = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+        os.makedirs(os.path.join(_raiz, "logs"), exist_ok=True)
+        ev = EnVivo(f"Lazo de Fz en Y: {peso_sujeto_n / 9.81:.0f} kg (pico {1.178 * peso_sujeto_n:.0f} N), {n_ciclos} pisadas, Kp {kp:g}, v_max {v_max:.0f} pasos/s",
+                    ruta=os.path.join(_raiz, "logs", "prueba_en_vivo.csv"))
+    except Exception as ex_ev:
+        print("(visor en vivo no disponible:", ex_ev, ")")
 
     def verificar_contador(forzar=False):
         """Contrasta lo ORDENADO (integral) con el contador de pasos del ESP32 cada 0.5 s: si el eje no sigue lo
@@ -375,6 +392,7 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referen
                 raise RuntimeError(f"lectura anomala en la aproximacion (F={f:.1f} N, previa {previa:.1f})")
             previa = f
             verificar_contador()
+            ev.escribir("aproximacion", f, -descenso_mm * PASOS_MM, f"APROXIMANDO a {v / PASOS_MM:.0f} mm/s - descenso {descenso_mm:.1f} mm")
             seguidas = seguidas + 1 if f > umbral_contacto_n else 0   # 5 seguidas: el ruido (sigma~3 N) da picos aislados
             if seguidas >= 5:
                 esp32.detener(EJE_VERTICAL)
@@ -386,7 +404,7 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referen
         # ---- LAZO CERRADO + ILC ----
         with open(nombre_log, "w", newline="") as f_csv:
             w = csv.writer(f_csv)
-            w.writerow(["t", "ciclo", "r", "delta", "r_corregida", "F_med", "e", "u"])
+            w.writerow(["t", "ciclo", "r", "delta", "r_corregida", "F_med", "e", "u", "y_mm", "v_mm_s"])
             previa = lector.leer_n()
             for ciclo in range(n_ciclos):
                 t_muestras, f_muestras = [], []
@@ -416,7 +434,10 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referen
                         raise RuntimeError(f"descenso {descenso_mm:.1f} mm >= maximo {hueco_mm + extra_mm:.0f} mm")
 
                     w.writerow([f"{t_rel:.4f}", ciclo, f"{r_n:.2f}", f"{delta_n:.2f}",
-                                f"{r_corregida:.2f}", f"{f_med:.2f}", f"{e:.2f}", f"{u_pasos_s:.1f}"])
+                                f"{r_corregida:.2f}", f"{f_med:.2f}", f"{e:.2f}", f"{u_pasos_s:.1f}",
+                                f"{-descenso_mm:.3f}", f"{u_pasos_s / PASOS_MM:.2f}"])
+                    ev.escribir(f"pisada {ciclo + 1}/{n_ciclos}", f_med, -descenso_mm * PASOS_MM,
+                                f"{peso_sujeto_n / 9.81:.0f} kg - pisada {ciclo + 1}/{n_ciclos} - objetivo {r_corregida:.0f} N - Y {-descenso_mm:+.1f} mm - v {u_pasos_s / PASOS_MM:+.0f} mm/s")
                     f_csv.flush()
                     t_muestras.append(t_rel)
                     f_muestras.append(f_med)
@@ -444,6 +465,7 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referen
         for obj in (esp32, lector):
             try: obj.cerrar()
             except Exception: pass
+        ev.cerrar(motivo)
         print("Motivo de cierre:", motivo, "| log:", nombre_log)
 
 

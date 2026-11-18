@@ -1,8 +1,13 @@
-PLAN: escala 392 N (pico ~462 N), 6 ciclos, Kp=10.0, k_asumido=26.4 N/mm -> 3.03 pasos/N, tope 560.0 N, hueco 45.0 mm (descenso max 75 mm), v_max 9000.0 pasos/s, simulado=False
-Tara: f0 = -1.38 N (p5 -5.18, p95 1.75). Debe estar SIN contacto y el eje quieto.
-Aproximando: rapido 20 mm/s hasta 15 mm, luego 5 mm/s; descenso maximo 75 mm.
-CONTACTO a 57.4 mm de descenso (hueco declarado 45): F = 19.3 N
-ABORTADO: RuntimeError('descenso 75.0 mm >= maximo 75 mm')
-Retorno: contador Y = -6019 pasos -> subiendo 6019 pasos
+PLAN: escala 392 N (pico ~462 N), 6 ciclos, Kp=10.0, k_asumido=26.4 N/mm -> 3.03 pasos/N, tope 560.0 N, hueco 45.0 mm (descenso max 105 mm), v_max 9000.0 pasos/s, simulado=False
+Tara: f0 = -1.39 N (p5 -5.36, p95 1.40). Debe estar SIN contacto y el eje quieto.
+Aproximando: rapido 20 mm/s hasta 15 mm, luego 5 mm/s; descenso maximo 105 mm.
+CONTACTO a 57.3 mm de descenso (hueco declarado 45): F = 19.1 N
+ciclo 0: RMS error = 42.47 N  (descenso ordenado acumulado 63.0 mm)
+ciclo 1: RMS error = 24.59 N  (descenso ordenado acumulado 60.5 mm)
+ciclo 2: RMS error = 19.38 N  (descenso ordenado acumulado 58.9 mm)
+ciclo 3: RMS error = 17.05 N  (descenso ordenado acumulado 57.8 mm)
+ciclo 4: RMS error = 15.67 N  (descenso ordenado acumulado 56.9 mm)
+ciclo 5: RMS error = 15.29 N  (descenso ordenado acumulado 56.3 mm)
+Retorno: contador Y = -4642 pasos -> subiendo 4642 pasos
 Y final respecto al inicio: 0 pasos (debe ser ~0)
-Motivo de cierre: ABORTADO: RuntimeError('descenso 75.0 mm >= maximo 75 mm') | log: control/telemetria/registros/2026-11-18_123756_fz.csv
+Motivo de cierre: completado | log: control/telemetria/registros/2026-11-18_123853_fz.csv

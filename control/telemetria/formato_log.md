@@ -16,9 +16,11 @@ visor pueda leer filas casi en cuanto se escriben (no esperar a cerrar el archiv
 | `r_corregida` | %BW o N | `r + delta` — lo que de verdad se persigue este ciclo | $r^*(t) = r(t) + \delta_j(t)$ |
 | `F_med` | %BW o N | fuerza medida (AMTI→ADS1256), ya retardada por el lazo real | $F_{med}(t) = F(t-T)$ |
 | `e` | %BW o N | error | $e(t) = r^*(t) - F_{med}(t)$ |
-| `u` | pasos/s | señal de control enviada como `SET_VEL` | $u(t) = K_p \cdot e(t)$ |
+| `u` | pasos/s | señal de control enviada como `SET_VEL` (+ = subir Y) | $u(t) = K_p \cdot e(t)$ |
+| `y_mm` | mm | **(desde 2026-11-18)** posición de Y ORDENADA (integral de `u`, no medida) respecto al inicio de la corrida; + = arriba | — |
+| `v_mm_s` | mm/s | **(desde 2026-11-18)** `u` en mm/s (`u` / 80); + = subir | — |
 
-Unidades de `r`/`delta`/`r_corregida`/`F_med`/`e`: **%BW**, igual que en `control/simulacion/` y en
+**Corrección 2026-11-18:** el lazo real (`control/lazo_fz_tiempo_real.py`) escribe `r`/`delta`/`r_corregida`/`F_med`/`e` en **newtons (N)**, no en %BW (para pasar a %BW: dividir por el peso en N y ×100). Lo que sigue era el diseño original: unidades **%BW**, igual que en `control/simulacion/` y en
 `DECISION_TIPO_CONTROL.md`, para poder comparar directo con esos números. `u` queda en pasos/s porque
 es literalmente el parámetro que manda `SET_VEL:eje:pasos_por_seg_con_signo` — convertir a N o a %BW
 necesitaría la ganancia `pasos_por_n` (sin medir, ver `control/ilc/README.md`), así que no se inventa.

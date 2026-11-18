@@ -1,0 +1,3 @@
+kg,pico_obj_N,tope_N,contacto_mm,pisadas,rms_primera_N,rms_ultima_N,rms_ultima_pct,F_max_N,v_max_mm_s,saturado_pct,compresion_max_mm,rigidez_aparente_N_mm,motivo,log
+10.0,116,144,40.5,1,10.7,10.7,9.2,114,10.5,0.0,4.0,23.7,completado,control/telemetria/registros/2026-11-18_124158_SIM_fz.csv
+20.0,231,289,40.5,1,21.6,21.6,9.3,229,21.6,0.0,8.6,24.4,completado,control/telemetria/registros/2026-11-18_124210_SIM_fz.csv
