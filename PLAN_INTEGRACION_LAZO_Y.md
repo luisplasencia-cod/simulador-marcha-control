@@ -54,6 +54,19 @@ Escrito el 2026-11-18 a pedido de Luis. Ejecutar **en orden**; cada paso tiene q
 3. **Talla:** propuesta 174 (apoyo 0.61 s ≈ 0.615 s de Gutenberg; el artículo usa 1.74 m).
 4. **Escala de tiempo:** la app trae 30× por defecto; la vigente es ×6. ¿Confirmas ×6?
 
+## Diseño de la pisada con lazo de Fz sobre el flujo de la app (B3–B5, 2026-11-18)
+Lo que la app YA hace en un ensayo (leído en `trajectory_screen._send_and_check` y `system_state`): una sola trayectoria fusionada = alinear ángulo → (si hay tara) despegue de 1 cm sobre la tara → apoyo desplazado al punto inicial → despegue de 5 cm (`END_LIFT_CM`), validada contra el espacio calibrado y las velocidades máximas; entre ensayos, `safe_return_to_position(inicial, piso)` (sube Y sobre el piso, ángulo a la referencia, mueve X, ángulo objetivo, baja — **X solo se mueve en el ángulo de referencia**, regla mecánica de la app).
+**Una pisada con lazo de Fz (se repite N veces tras un HOME):**
+1. `safe_return_to_position(punto inicial)` — **tal cual la app** (incluye su regla del ángulo de referencia).
+2. Enviar la trayectoria del ensayo **con Y plana** (columna Y = la del punto inicial; sin despegue sobre tara ni despegue final de Y, porque Y la maneja el lazo). Se envía con el pie en el aire.
+3. **Aproximación** (lazo, `SET_VEL` de Y en IDLE): baja hasta detectar contacto. Desde la 2.ª pisada baja rápido hasta ≈5 mm sobre la altura de contacto ya medida y lento el resto.
+4. `RUN` → X y ángulo siguen la trayectoria; **en el mismo instante arranca la pisada del lazo** (duración = duración del CSV × escala: 0.61 s × 6 = 3.66 s; la curva objetivo se estira a esa duración).
+5. Al terminar la pisada (`FINISHED`): el lazo **sube Y 5 cm** (como el despegue de la app) y para Y.
+6. El ILC actualiza su corrección y vuelve a 1.
+**Abortos:** tope de fuerza, lectura anómala, ADC sin datos, `SET_VEL` sin respuesta, descenso máximo → `PAUSE`/`ABORT` de la trayectoria (para X/ángulo), `SET_VEL` 0 y subir Y.
+**Código:** módulos sin Qt en `src/fz/` de la copia (ILC y curva objetivo copiados del repo de control con su commit de origen; lector del ADC por UART; `fz_loop.py` = aproximación/pisada/subida; `fz_ensayo.py` = la secuencia de N pisadas usando la máquina de estados de la app). La pantalla Qt solo muestra y lanza.
+**Lo que se ve en vivo y queda en el reporte:** Fz medida vs objetivo, error, velocidad ordenada a Y, posición X/Y/ángulo (contada por el firmware, vía `TRAJ_PROGRESS`), pisada y estado; log CSV por pisada + figura final.
+
 ## Riesgos conocidos
 - k cambia con el ángulo durante la trayectoria (C1): con la ganancia fija de la Etapa 1 el seguimiento del segundo pico (despegue) será pobre; el ILC compensa en parte lo repetible.
 - El retardo que añade la capa de comunicación de la app no está medido (B2).
