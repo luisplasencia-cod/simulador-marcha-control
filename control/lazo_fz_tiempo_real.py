@@ -317,10 +317,10 @@ class LectorSimulado:
 
 def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referencia="gutenberg",
                 puerto_esp32="/dev/ttyUSB0", fuente_fz="spi", puerto_fz=None, signo_fz=1.0, carpeta_log="control/telemetria/registros", v_max=V_MAX_PASOS_S,
-                umbral_contacto_n=8.0, extra_mm=20.0, simulado=False, angulo_deg=None):
+                umbral_contacto_n=8.0, extra_mm=20.0, simulado=False, angulo_deg=None, duracion_apoyo_s=3.69):
     k_asumido = cargar_k_asumido(protesis)
     pasos_por_n = PASOS_POR_MM_Y / k_asumido
-    ctrl = ControlFzILC(peso_sujeto_n, duracion_s=3.69, rigidez_n_por_mm=k_asumido, referencia=referencia)
+    ctrl = ControlFzILC(peso_sujeto_n, duracion_s=duracion_apoyo_s, rigidez_n_por_mm=k_asumido, referencia=referencia)
 
     marca = f"{datetime.now():%Y-%m-%d_%H%M%S}" + ("_SIM" if simulado else "")
     nombre_log = os.path.join(carpeta_log, f"{marca}_fz.csv")
@@ -347,6 +347,10 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referen
 
     descenso_mm = 0.0   # integral de la velocidad ORDENADA (no medida) desde el inicio
     ultimo_chk = [time.monotonic()]
+    # 2026-11-18: el umbral de salto entre bloques ESCALA con la carga. Fijo en 30 N (calibrado con 60 N) abortó a 50 kg por un
+    # salto de 39 N (el ruido entre bloques crece con la fuerza: p99 6.7 / 9.2 / 15.4 N a 10 / 20 / 40 kg). Elección de diseño
+    # (no medida): 8 % del pico de la referencia, mínimo 30 N -> 50 kg: 46 N; 80 kg: 74 N; 90 kg: 83 N.
+    salto_max_n = max(SALTO_MAX_N, 0.08 * 1.178 * peso_sujeto_n)
     # 2026-11-18 (pedido de Luis): visor en vivo en la pantalla del RPi (herramientas/visor_pruebas.py lee este archivo):
     # Fz grande, desplazamiento ORDENADO de Y (pasos, + = arriba, desde el inicio de la corrida) y la fase.
     ev = _EnVivoNulo()
@@ -388,7 +392,7 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referen
             esp32.set_vel(EJE_VERTICAL, -v)
             ahora = time.monotonic(); descenso_mm += v * (ahora - t_prev) / PASOS_MM; t_prev = ahora
             f = lector.leer_n()
-            if f < F_NEG_MAX_N or abs(f - previa) > SALTO_MAX_N:
+            if f < F_NEG_MAX_N or abs(f - previa) > salto_max_n:
                 raise RuntimeError(f"lectura anomala en la aproximacion (F={f:.1f} N, previa {previa:.1f})")
             previa = f
             verificar_contador()
@@ -421,8 +425,8 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referen
                     f_med = lector.leer_n()
                     if f_med > fmax_n:
                         raise RuntimeError(f"Fuerza {f_med:.1f} N > tope {fmax_n:.1f} N")
-                    if f_med < F_NEG_MAX_N or abs(f_med - previa) > SALTO_MAX_N:
-                        raise RuntimeError(f"lectura anomala (F={f_med:.1f} N, previa {previa:.1f} N)")
+                    if f_med < F_NEG_MAX_N or abs(f_med - previa) > salto_max_n:
+                        raise RuntimeError(f"lectura anomala (F={f_med:.1f} N, previa {previa:.1f} N, umbral de salto {salto_max_n:.0f} N)")
                     previa = f_med
                     e = r_corregida - f_med
                     u_pasos_s = SIGNO_ERROR_A_VELOCIDAD * kp * e * pasos_por_n
@@ -474,6 +478,9 @@ if __name__ == "__main__":
     ap.add_argument("--peso_sujeto_n", type=float, required=True,
                     help="escala de la curva objetivo [N]; para las primeras corridas usar valores BAJOS (p. ej. 100)")
     ap.add_argument("--n_ciclos", type=int, default=3)
+    ap.add_argument("--duracion_apoyo_s", type=float, default=3.69,
+                    help="duracion de la pisada [s] = 0.615 s (apoyo Gutenberg) x escala de tiempo; 3.69 = x6 (defecto). "
+                         "A mayor escala la velocidad de Y necesaria baja en proporcion (v ~ 1/escala).")
     ap.add_argument("--kp", type=float, default=10.0,  # 2026-11-18: 10 (Ensayo B: margen 2-3x; 15 queda justo). Antes 15.
                      help="ganancia proporcional [1/s]. Default 10 (Ensayo B 2026-11-18; antes 15 = recomendacion 2026-11-08, "
                           "(reportes/2026-11-08_avance_sin_rpi.md Sec.3); re-elegir con la latencia completa medida.")
@@ -504,4 +511,4 @@ if __name__ == "__main__":
         raise SystemExit("Falta --hueco_remedido: el hueco se mide de nuevo antes de CADA corrida (regla de Luis).")
     correr_lazo(a.peso_sujeto_n, a.n_ciclos, a.kp, a.protesis, a.fmax_n, a.hueco_mm, a.referencia, a.puerto_esp32,
                 v_max=a.v_max, umbral_contacto_n=a.umbral_contacto_n, extra_mm=a.extra_mm, simulado=a.simulado,
-                angulo_deg=a.angulo_deg, fuente_fz=a.fuente_fz, puerto_fz=a.puerto_fz, signo_fz=a.signo_fz)
+                angulo_deg=a.angulo_deg, duracion_apoyo_s=a.duracion_apoyo_s, fuente_fz=a.fuente_fz, puerto_fz=a.puerto_fz, signo_fz=a.signo_fz)

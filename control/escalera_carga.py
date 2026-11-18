@@ -16,6 +16,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--pesos", default="10,20,30,40,50,60,70,80,90")
 ap.add_argument("--n_ciclos", type=int, default=6)
 ap.add_argument("--v_max", type=int, default=9000)
+ap.add_argument("--escala", type=float, default=6.0, help="escala de tiempo (x6 = apoyo de 3.69 s). Duracion = 0.615 s x escala")
 ap.add_argument("--pausa_s", type=float, default=5.0)
 ap.add_argument("--si", action="store_true", help="no preguntar (Luis ya autorizó)")
 ap.add_argument("--simulado", action="store_true", help="prueba del script sin hardware (planta simulada del lazo)")
@@ -25,7 +26,7 @@ assert a.v_max <= 9000
 marca = time.strftime("%Y%m%d_%H%M%S")
 dir_out = os.path.join(R, "reportes", "escalera", marca + ("_SIM" if a.simulado else ""))
 os.makedirs(dir_out, exist_ok=True)
-print(f"ESCALERA {pesos} kg, {a.n_ciclos} pisadas, v_max {a.v_max}. Pie plano, solo Y. Salidas: {dir_out}")
+print(f"ESCALERA {pesos} kg, {a.n_ciclos} pisadas, v_max {a.v_max}, escala x{a.escala:g} (apoyo {0.615 * a.escala:.2f} s). Pie plano, solo Y. Salidas: {dir_out}")
 if not a.si and input("Escribe SI para empezar: ").strip() != "SI":
     sys.exit("cancelado")
 
@@ -37,7 +38,7 @@ try:
         peso_n = kg * 9.81; pico = 1.178 * peso_n; fmax = min(1.25 * pico, 1300.0)
         cmd = [PY, "-u", os.path.join(R, "control", "lazo_fz_tiempo_real.py"), "--peso_sujeto_n", f"{peso_n:.1f}",
                "--fmax_n", f"{fmax:.0f}", "--hueco_mm", "45", "--extra_mm", "60", "--hueco_remedido", "--angulo_deg", "0",
-               "--n_ciclos", str(a.n_ciclos), "--v_max", str(a.v_max), "--ejecutar"] + (
+               "--n_ciclos", str(a.n_ciclos), "--v_max", str(a.v_max), "--duracion_apoyo_s", f"{0.615 * a.escala:.3f}", "--ejecutar"] + (
                ["--simulado"] if a.simulado else ["--fuente_fz", "uart", "--puerto_fz", "/dev/ttyAMA0"])
         print(f"\n=== {kg:.0f} kg: pico {pico:.0f} N, tope {fmax:.0f} N — {time.strftime('%H:%M:%S')} ===", flush=True)
         salida = os.path.join(dir_out, f"{kg:.0f}kg_salida.txt")

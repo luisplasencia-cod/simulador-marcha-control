@@ -20,8 +20,9 @@ for k in range(n):
     ax[0].plot(t[m], F[m], color=col, lw=.9, label=f"ciclo {k} (RMS {rms[-1]:.2f} N)"); ax[1].plot(t[m], e, color=col, lw=.7)
     ax[2].plot(t[m], y[m], color=col, lw=.9); ax[3].plot(t[m], v[m], color=col, lw=.7)
     tm, Fm = t[m], F[m]
+    T = t.max() + 0.01                                                    # duración del ciclo (depende de la escala de tiempo)
     def _f(sel, fn): v = Fm[sel]; return f"{fn(v):.1f}" if v.size else "-"      # pisada abortada: tramos vacíos
-    print(f"ciclo {k}: RMS(r-F) {rms[-1]:.2f} N | pico1 {_f((tm>.5)&(tm<1.3), np.max)} valle {_f((tm>1.4)&(tm<2.2), np.min)} pico2 {_f((tm>2.4)&(tm<3.3), np.max)} N | |v| max {abs(v[m]).max():.0f} mm/s | Y {y[m].min():.1f}..{y[m].max():.1f} mm | hasta t={tm.max():.2f} s")
+    print(f"ciclo {k}: RMS(r-F) {rms[-1]:.2f} N | pico1 {_f((tm>.136*T)&(tm<.352*T), np.max)} valle {_f((tm>.38*T)&(tm<.6*T), np.min)} pico2 {_f((tm>.65*T)&(tm<.9*T), np.max)} N | |v| max {abs(v[m]).max():.0f} mm/s | Y {y[m].min():.1f}..{y[m].max():.1f} mm | hasta t={tm.max():.2f} s")
 ax[0].plot(t[c == 0], ref[c == 0], "k--", lw=1.6, label="referencia r(t)"); ax[0].legend(ncol=2, fontsize=8); ax[0].set_ylabel("Fz [N]"); ax[0].grid(alpha=.3)
 ax[1].set_ylabel("error real r - F [N]"); ax[1].grid(alpha=.3); ax[2].set_ylabel("Y ordenada [mm]\n(+ arriba, desde el inicio)"); ax[2].grid(alpha=.3)
 ax[3].set_ylabel("velocidad de Y [mm/s]\n(+ sube; 80 pasos/mm)"); ax[3].set_xlabel("t dentro del ciclo [s]"); ax[3].grid(alpha=.3)

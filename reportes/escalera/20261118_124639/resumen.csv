@@ -1,0 +1,6 @@
+kg,pico_obj_N,tope_N,contacto_mm,pisadas,rms_primera_N,rms_ultima_N,rms_ultima_pct,F_max_N,v_max_mm_s,saturado_pct,compresion_max_mm,rigidez_aparente_N_mm,motivo,log
+10.0,116,144,57.8,6,11.7,4.7,4.0,119,17.3,0.0,7.2,13.8,completado,control/telemetria/registros/2026-11-18_124639_fz.csv
+20.0,231,289,57.6,6,21.8,7.1,3.1,235,32.9,0.0,13.3,16.2,completado,control/telemetria/registros/2026-11-18_124740_fz.csv
+30.0,347,433,57.8,6,30.4,9.8,2.8,352,43.2,0.0,18.0,18.5,completado,control/telemetria/registros/2026-11-18_124841_fz.csv
+40.0,462,578,57.4,6,39.2,14.2,3.1,471,56.8,0.0,23.0,19.5,completado,control/telemetria/registros/2026-11-18_124942_fz.csv
+50.0,578,722,57.6,1,68.9,68.9,11.9,584,72.4,0.0,25.9,21.8,"ABORTADO: RuntimeError('lectura anomala (F=529.8 N, previa 569.0 N)')",control/telemetria/registros/2026-11-18_125043_fz.csv
