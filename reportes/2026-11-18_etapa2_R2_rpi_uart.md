@@ -21,3 +21,10 @@ Probar por primera vez la ruta ESP32 de lectura → UART2 (GPIO17→pin 10, GND�
 
 ## Fuentes
 Datos: `pruebas/resultados/etapa2/R2_lecturas_20261118_111801.csv`, `…111911.csv`, `L3_vacio_laptop_t10-24s.csv`; figura `pruebas/resultados/etapa2/figuras/R2_vs_L3_limpio.png`. Plan: `INICIO_RPI.md`; Etapa 1: `reportes/2026-11-18_etapa1_laptop_adc_esp32.md`.
+
+## R3 — vigilante del ADC por UART, 10 min en reposo (2026-11-18, 11:20:29–11:30:30)
+**Objetivo:** criterio de paso de la Etapa 2: 0 fallas del ADC/UART en reposo. **Duración acortada de 30 a 10 min por pedido de Luis (falta de tiempo):** el 30 era un número del plan, no una exigencia técnica; 10 min da evidencia más débil (las caídas históricas ocurrían unas pocas veces al día, y 10 min pueden no verlas).
+**Metodología:** `pruebas/etapa2_rpi.sh r3 30`, detenido con SIGINT por PID a los 600 s; figura generada del CSV (`pruebas/resultados/etapa2/figuras/r3_vigilar_adc_esp32_uart_20261118_112031.png`, mostrada en la pantalla del RPi). Plato vacío, sin ejes en movimiento, ESP32 de motores sin abrir.
+**Resultado (medido):** 600 s registrados; **0 CAIDO, 0 CEROS, 0 SATURADO, 0 CONGELADO**; 597 OK + 3 PICOS. Muestras/s entre 1000 y 1010 todos los segundos. Fuera de la intervención manual, mediana Fz estable (−2.41 N al inicio, −2.45 N al final: deriva −0.04 N en ~9 min), σ dentro de 1 s ≈ 2.6 N (la del 60 Hz, ver arriba).
+**Intervención manual (Luis, confirmado por él):** fuerzas sobre el plato ≈ 11:24:59–11:25:08 (~10 s, Fz hasta ≈60 N). Excluidas del criterio.
+**Limitaciones:** (1) 10 min, no 30. (2) El vigilante etiqueta PICOS por distancia a la mediana de cada segundo: una carga **sostenida** sale como OK (solo 3 de los ~10 s de intervención salieron PICOS) → "OK" ≠ "plato en reposo". Para este criterio (caídas/ceros/congelado/saturado) no afecta. (3) No cubre el caso crítico histórico: caídas **con el servo Y en marcha** (R5).

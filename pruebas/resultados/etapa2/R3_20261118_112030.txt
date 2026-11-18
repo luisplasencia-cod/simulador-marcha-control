@@ -1,0 +1,10 @@
+11:25:01 PICOS n=1002 med=+48.74 N ceros=0 sat=0 picos=111
+11:25:07 PICOS n=1000 med=+34.92 N ceros=0 sat=0 picos=146
+11:25:08 PICOS n=1003 med=+7.86 N ceros=1 sat=0 picos=82
+Traceback (most recent call last):
+  File "/home/simgaitlibra/simulador-marcha-control/pruebas/vigilar_adc_esp32_uart.py", line 69, in <module>
+    chunk = ser.read(ser.in_waiting or 1)   # NO read(256): bloquea hasta 256 B (~32 ms a 8 kB/s)
+  File "/usr/lib/python3/dist-packages/serial/serialposix.py", line 565, in read
+    ready, _, _ = select.select([self.fd, self.pipe_abort_read_r], [], [], timeout.time_left())
+                  ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
