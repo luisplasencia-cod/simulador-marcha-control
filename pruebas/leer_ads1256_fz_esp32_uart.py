@@ -13,6 +13,7 @@ con --puerto. Nunca asumir /dev/ttyUSB0.
 
 Uso:
     python leer_ads1256_fz_esp32_uart.py --puerto /dev/ttyUSB1 --n 1000 --salida lecturas_fz_esp32.csv
+    (en la laptop, con adaptador USB-TTL en GPIO17: --puerto COMx)
 """
 import argparse
 import csv
@@ -23,9 +24,32 @@ import serial
 BAUD = 115200
 
 
+def extraer_paquetes(buf):
+    """Saca todos los "<valor>" completos de buf. Devuelve (valores, resto, n_corruptos).
+    Corrige un bug de la version anterior: con buf = b'3.2><4.1' (se empieza a leer a mitad de un
+    paquete, lo normal al abrir el puerto) buscaba '>' DESPUES de '<', no lo hallaba y el lector
+    se caia con ValueError."""
+    valores, corruptos = [], 0
+    while True:
+        i = buf.find(b"<")
+        if i < 0:
+            return valores, b"", corruptos
+        j = buf.find(b">", i + 1)
+        if j < 0:
+            return valores, buf[i:], corruptos   # paquete incompleto: esperar el resto
+        crudo = buf[i + 1:j]
+        buf = buf[j + 1:]
+        if b"<" in crudo:                        # '<' perdido dentro: quedarse con el ultimo
+            crudo = crudo[crudo.rfind(b"<") + 1:]
+            corruptos += 1
+        try:
+            valores.append(float(crudo.decode("ascii")))
+        except (ValueError, UnicodeDecodeError):
+            corruptos += 1
+
+
 def leer_paquetes(ser, n, timeout_s=5.0):
-    """Generador: resincroniza por '<'...'>' y devuelve floats. Descarta basura entre paquetes
-    (paquete cortado, reinicio del ESP32 a mitad de transmision, etc. en vez de fallar)."""
+    """Generador de floats; descarta paquetes corruptos en vez de detenerse."""
     buf = b""
     t_ultimo = time.monotonic()
     leidos = 0
@@ -37,15 +61,8 @@ def leer_paquetes(ser, n, timeout_s=5.0):
         elif time.monotonic() - t_ultimo > timeout_s:
             raise TimeoutError(f"Sin datos del ESP32 en {timeout_s} s — revisar cableado UART2/GND o si el ESP32 se colgo")
 
-        while b"<" in buf and b">" in buf:
-            i = buf.index(b"<")
-            j = buf.index(b">", i)
-            crudo = buf[i + 1:j]
-            buf = buf[j + 1:]
-            try:
-                valor = float(crudo.decode("ascii"))
-            except (ValueError, UnicodeDecodeError):
-                continue  # paquete corrupto: se descarta, no se detiene la lectura
+        valores, buf, _ = extraer_paquetes(buf)
+        for valor in valores:
             leidos += 1
             yield valor
             if leidos >= n:
@@ -60,7 +77,9 @@ def main():
     a = ap.parse_args()
 
     ser = serial.Serial(a.puerto, BAUD, timeout=0.1)
-    time.sleep(2.5)  # el ESP32 se reinicia al abrir el puerto (igual que el de motores); esperar a que arranque
+    # Por el UART2 (pines del RPi o adaptador USB-TTL) el ESP32 NO se reinicia al abrir el puerto;
+    # la espera solo sirve si por error se abre el USB propio del ESP32 (ahi si se reinicia).
+    time.sleep(2.5)
     ser.reset_input_buffer()
 
     filas = []
