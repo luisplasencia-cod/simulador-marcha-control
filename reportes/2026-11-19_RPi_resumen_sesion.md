@@ -36,5 +36,5 @@ Dato: al abrir el puerto a las 11:45 el ESP32 NO se reinició (contador conserva
 3. R6: calibración con pesas vs NetForce (la escala en N de la ruta UART no está validada).
 4. Diagnóstico eléctrico del 60 Hz con Luis (tomas/tierra).
 5. Hacer que el script use la misma base de tiempo real que la interfaz.
-6. Push del commit `84b2413` de la interfaz (`~/Projects/gaitsim-control` main), cuando Luis lo decida; taras `data/tara/*.json` quedaron modificadas sin commit.
+6. ✅ Interfaz subida a GitHub (GAITSIM main `0110a13`: mejoras `84b2413` + taras del día). Solo queda sin seguimiento `data/positions/inicio.json` (no se subió).
 7. Umbral de error para pasar a Fy (< __ %BW): lo fija Luis; los resultados de hoy (1.2 % solo Y, 3.6 % 3 ejes antes de la mejora) sirven de base.
