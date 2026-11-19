@@ -1,5 +1,6 @@
-"""Diagrama de bloques del lazo de fuerza simulado (control hibrido: realimentacion + ILC).
-Reproduce EXACTAMENTE la estructura de control/simulacion/rt_vs_ilc_latencia.py.
+"""Diagrama de bloques del lazo de Fz en Y del EQUIPO REAL (control hibrido: P programado + ILC), unidades reales (N, pasos/s).
+Actualizado 2026-11-19 contra control/lazo_fz_tiempo_real.py y ~/Projects/gaitsim-control/src/fz/{fz_loop,fz_ilc,ilc_core}.py.
+X y angulo (K) van en lazo abierto y NO estan en este diagrama.
 Convencion: (n) = controlador (se puede cambiar); (Mn) = modelo de la planta (SIN MEDIR, se supone y se barre).
 Uso: python diagrama_lazo_hibrido.py [carpeta_de_salida]
 """
@@ -17,10 +18,10 @@ W, H, FY = 1400, 560, 240
 
 d = Lienzo(W, H)
 # --- ILC (arriba, lineas punteadas: actua entre ciclos, no dentro del ciclo)
-d.bloque("blk_ilc", 330, 40, 220, 70, "Aprendizaje ILC", r"$\gamma,\ Q,\ m$   (4)")
+d.bloque("blk_ilc", 330, 40, 220, 70, "Aprendizaje ILC", r"$\gamma,\ Q$   (4)")
 d.segs([(330, 75), (110, 75), (110, FY - 26)], punteada=True); d.txt(220, 96, r"$\delta(t)$", 20)
 d.segs([(70, FY), (70, 25), (440, 25), (440, 40)], punteada=True); d.txt(250, 47, r"$r(t)$", 20)
-d.segs([(1260, FY), (1260, 75), (552, 75)], punteada=True); d.txt(900, 52, r"$F(t)$", 20)
+d.punto(490, 480); d.segs([(490, 480), (490, 112)], punteada=True); d.txt(530, 398, r"$F_{med}(t)$", 20)
 # --- referencia, sumador 1 (r + delta)
 d.segs([(10, FY), (84, FY)]); d.txt(14, FY - 24, r"$r(t)$", 21, ha="left")
 d.punto(70, FY)
@@ -32,13 +33,13 @@ d.suma("blk_sum2", 240, FY, 26)
 d.txt(204, FY + 30, "+", 21); d.txt(262, FY + 58, "−", 24)
 d.segs([(266, FY), (328, FY)]); d.txt(297, FY - 24, r"$e(t)$", 21)
 # --- controlador P
-d.bloque("blk_kp", 330, FY - 30, 150, 60, "Proporcional", r"$K_p$   (3)")
+d.bloque("blk_kp", 330, FY - 30, 150, 60, "Proporcional", r"$K_p(F)$   (3)")
 d.segs([(480, FY), (560, FY)]); d.txt(514, FY - 46, r"$u(t)$", 21)
 # --- planta simulada (modelo)
-d.recuadro_punteado(535, 140, 660, 200, "Planta simulada")
+d.recuadro_punteado(535, 140, 660, 200, "Planta real (modelo)")
 d.bloque("blk_servo", 560, FY - 30, 140, 60, "Servo", r"$\tau_a$   (M1)")
 d.segs([(700, FY), (760, FY)]); d.txt(730, FY - 46, r"$v(t)$", 21)
-d.bloque("blk_k", 760, FY - 30, 120, 60, "Rigidez", r"$k$   (M2)")
+d.bloque("blk_k", 760, FY - 30, 120, 60, "Rigidez", r"$k(F)$   (M2)")
 d.segs([(880, FY), (940, FY)]); d.txt(910, FY - 46, r"$q(t)$", 21)
 d.suma("blk_sum3", 966, FY, 26)
 d.txt(930, FY + 30, "+", 21); d.txt(986, FY - 60, "+", 21)
@@ -51,38 +52,40 @@ d.segs([(1260, FY), (1375, FY)]); d.txt(1325, FY - 30, r"$F(t)$", 21)
 d.segs([(1260, FY), (1260, 480), (1042, 480)])
 d.bloque("blk_ret", 900, 450, 140, 60, "Retardo", r"$T$   (M4)")
 d.segs([(900, 480), (800, 480)]); d.txt(850, 456, r"$F_{r}(t)$", 21)
-d.bloque("blk_fil", 600, 450, 200, 60, "Filtro de medición", r"$N_m,\ N_p$   (5)")
+d.bloque("blk_fil", 600, 450, 200, 60, "Filtro de medición", r"$N_m$   (5)")
 d.segs([(600, 480), (240, 480), (240, FY + 28)]); d.txt(420, 456, r"$F_{med}(t)$", 21)
 
 hoja = [
-    (r"$r(t)$", "fuerza vertical objetivo (curva de Gutenberg, %BW)"),
-    (r"$\delta(t)$", "corrección aprendida por el ILC (%BW)"),
-    (r"$r^{*}(t)$", "objetivo corregido: $r(t)+\\delta(t)$"),
-    (r"$e(t)$", "error del lazo: $r^{*}(t)-F_{med}(t)$"),
-    (r"$u(t)$", "orden de velocidad al servo (%BW/s)"),
-    (r"$v(t)$", "velocidad del actuador (%BW/s)"),
-    (r"$q(t)$", "ritmo de cambio de fuerza por el movimiento: $k\\,v(t)$"),
-    (r"$d(t)$", "perturbación (pulso, %BW/s)"),
-    (r"$\dot{F}(t)$", "ritmo de cambio de la fuerza (%BW/s)"),
-    (r"$F(t)$", "fuerza vertical real (%BW)"),
-    (r"$F_{r}(t)$", "fuerza real retrasada $T$ (sin filtrar)"),
-    (r"$F_{med}(t)$", "fuerza medida y filtrada (entra al lazo)"),
+    (r"$r(t)$", "fuerza vertical objetivo [N] = %BW/100 · m · g (curva de Gutenberg)"),
+    (r"$\delta(t)$", "corrección aprendida por el ILC [N]"),
+    (r"$r^{*}(t)$", "objetivo corregido [N]: $r(t)+\\delta(t)$"),
+    (r"$e(t)$", "error del lazo [N]: $r^{*}(t)-F_{med}(t)$"),
+    (r"$u(t)$", "orden de velocidad de Y [pasos/s] (+ = subir)"),
+    (r"$v(t)$", "velocidad de Y [pasos/s] (80 pasos = 1 mm)"),
+    (r"$q(t)$", "ritmo de cambio de fuerza por el movimiento [N/s]: $-k(F)\\,v(t)/80$"),
+    (r"$d(t)$", "perturbación [N/s]"),
+    (r"$\dot{F}(t)$", "ritmo de cambio de la fuerza [N/s]"),
+    (r"$F(t)$", "fuerza vertical real [N] (0 = tara en el aire)"),
+    (r"$F_{r}(t)$", "fuerza real retrasada $T$ [N] (sin filtrar)"),
+    (r"$F_{med}(t)$", "fuerza medida y filtrada [N] (entra al lazo y al ILC)"),
     None,
-    (r"$K_p$", "ganancia proporcional (real: 8 a 50–60 kg, 5 a 70–90 kg; simulación: 10)"),
-    (r"$\gamma,\ Q,\ m$", "ILC: ganancia 0,5; filtro Hann 0,1 s; adelanto $m=T+1/K_p$; lee $F(t)$ sin filtrar"),
+    (r"$K_p(F)$", "ganancia programada: $K_p\\,\\min(1,\\,k_{asum}/k(F))$, $k_{asum}=26{,}4$ N/mm"),
+    (r"$\gamma,\ Q$", "ILC real: ganancia 0,5; Hann 10 % del ciclo; adelanto $m=0$"),
     (r"$\tau_a$", "constante del servo (MEDIDA, Ensayo B: 3–14 ms, poco determinada)"),
-    (r"$k$", "rigidez de contacto (MEDIDA 18–33 N/mm; no lineal, varía con prótesis y carga)"),
-    (r"$N_m,\ N_p$", "filtro de Fz (5): mediana $N_m=5$ y promedio $N_p=17$ (anula 60 Hz; ≈ 11 ms)"),
-    (r"$T$", "retardo comando a Fz (MEDIDO 15–23 ms; el filtro (5) suma ≈ 11 ms)"),
+    (r"$k(F)$", "rigidez medida [N/mm] (pie plano): 18 (<200 N); 35 (300); 48 (500); 54 (700)"),
+    (r"$N_m$", "mediana de 7 muestras nuevas (≈7 ms a 1 kHz); filtro 60 Hz apagado"),
+    (r"$T$", "retardo comando a Fz (MEDIDO 15–23 ms; el filtro (5) suma ≈ 7 ms)"),
+    None,
+    (r"$\mathrm{prot.}$", "tope de fuerza, detector de saltos (∝ Δt), límite de descenso: detienen Y"),
 ]
 ecs = [
     ("(1)", r"$r^{*}(t) = r(t) + \delta_j(t)$", "Objetivo corregido (ciclo $j$)", 40),
     ("(2)", r"$e(t) = r^{*}(t) - F_{med}(t)$", "Error del lazo", 40),
-    ("(3)", r"$u(t) = \mathrm{sat}\left[K_p\,e(t)\right],\ \ |u| \leq 9000\ \mathrm{pasos/s}$", "Proporcional con saturación de velocidad", 40),
-    ("(4)", r"$\delta_{j+1}(t) = Q\left[\delta_j(t) + \gamma\,\varepsilon_j(t+m)\right],\ \ \varepsilon_j(t)=r(t)-F(t)$", "ILC (entre ciclos)", 40),
-    ("(5)", r"$F_{med}(t) = \dfrac{1}{N_p}\sum_{i=0}^{N_p-1} \mathrm{med}_{N_m}\left[F_r(t-i\,\Delta t)\right]$", "Filtro de medición (60 Hz)", 62),
+    ("(3)", r"$u(t) = \mathrm{sat}\left[-K_p(F)\,e(t)\,p\right],\ \ p=80/26{,}4\ \mathrm{pasos/N},\ \ |u| \leq 9000\ \mathrm{pasos/s}$", "Proporcional programado con saturación (+ = subir Y)", 40),
+    ("(4)", r"$\delta_{j+1}(t) = Q\left[\delta_j(t) + \gamma\,\varepsilon_j(t+m)\right],\ \ \varepsilon_j(t)=r(t)-F_{med}(t)$", "ILC (entre ciclos)", 40),
+    ("(5)", r"$F_{med}(t) = \mathrm{med}_{N_m}\left[F_r(t-i\,\Delta t)\right]_{i=0}^{N_m-1},\ \ N_m=7$", "Filtro de medición (mediana de bloque)", 50),
     ("(M1)", r"$\tau_a\,\dfrac{dv}{dt} = u - v$", "Servo (primer orden)", 62),
-    ("(M2)", r"$q(t) = k\,v(t)$", "Rigidez de contacto", 40),
+    ("(M2)", r"$q(t) = -k(F)\,v(t)/80$", "Rigidez de contacto (no lineal; 80 pasos/mm)", 40),
     ("(M3)", r"$F(t) = \int_0^t \left[q(\tau) + d(\tau)\right]d\tau$", "Integrador (suma de $q$ y $d$)", 64),
     ("(M4)", r"$F_{r}(t) = F(t - T)$", "Retardo de medición (el filtro (5) va aparte)", 40),
 ]
