@@ -1,0 +1,3 @@
+# Pisadas 3 ejes desde la interfaz, 2026-11-19 11:12:44–11:14:59
+Interfaz vigente (~/Projects/gaitsim-control main, con los cambios del 11-19 sin commit: Kp programado, detector de saltos por tiempo real, referencia por tiempo real). Lanzada con herramientas/lanzar_interfaz_control.py; HOME sin prótesis 11:08:12–11:09:41 (OK de Luis); prótesis montada por Luis tras el HOME; tara automática (flujo de la pantalla); comando `fz Control_apoyo_talla170_montaje37 40 10 5` (40 kg, x10, 5 pisadas, Kp 8 programado, tope 578 N, v_max 9000).
+Archivos: *_p1..p5.csv (t_s, objetivo_N, delta_ilc_N, Fz_N, vel_pasos_s), log_interfaz.log. Figura: reportes/figuras/2026-11-19_pisadas_3ejes_40kg.png. Reporte: reportes/2026-11-19_pisadas_3ejes_interfaz_40kg.md

@@ -17,5 +17,5 @@ for f in archivos:
 ax[0].set_ylabel("Fz [N] (-- objetivo)"); ax[1].set_ylabel("error obj-Fz [N]")
 ax[2].set_ylabel("delta ILC [N]"); ax[3].set_ylabel("periodo del lazo [ms]"); ax[3].set_xlabel("t [s]")
 for a in ax: a.grid(alpha=.3); a.legend(fontsize=7)
-fig.suptitle("Pisadas desde la interfaz (75 kg, x10, Kp 5) — X y ángulo lazo abierto, Y lazo cerrado de Fz")
+fig.suptitle("Pisadas desde la interfaz (ver LEEME) — X y ángulo lazo abierto, Y lazo cerrado de Fz")
 fig.tight_layout(); fig.savefig(salida, dpi=110); print(salida)
