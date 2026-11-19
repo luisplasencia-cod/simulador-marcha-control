@@ -1,0 +1,8 @@
+tara f0 = -6.37 N (p5 -12.58, p95 -1.90)
+filtro_60hz=False: n=501 sigma 2.65 N, media -0.29 N
+filtro_60hz=True: n=501 sigma 0.23 N, media -0.29 N
+filtro_60hz=False: n=501 sigma 2.61 N, media -0.39 N
+filtro_60hz=True: n=501 sigma 0.24 N, media -0.35 N
+
+TOTAL sin filtro sigma 2.63 N | con filtro sigma 0.24 N | diferencia de media 0.02 N
+PASA
