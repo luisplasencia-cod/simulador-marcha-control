@@ -1,0 +1,17 @@
+PLAN: escala 785 N (pico ~924 N), 10 ciclos, Kp=5.0, k_asumido=26.4 N/mm -> 3.03 pasos/N, tope 1156.0 N, hueco 40.0 mm (descenso max 93 mm), v_max 9000.0 pasos/s, simulado=False
+Tara: f0 = -2.40 N (p5 -8.81, p95 1.89). Debe estar SIN contacto y el eje quieto.
+Aproximando: rapido 20 mm/s hasta 10 mm, luego 5 mm/s; descenso maximo 93 mm.
+CONTACTO a 33.1 mm de descenso (hueco declarado 40): F = 29.3 N
+ciclo 0: RMS error = 81.85 N  (descenso ordenado acumulado 39.9 mm)
+ciclo 1: RMS error = 46.04 N  (descenso ordenado acumulado 36.5 mm)
+ciclo 2: RMS error = 35.53 N  (descenso ordenado acumulado 34.2 mm)
+ciclo 3: RMS error = 30.36 N  (descenso ordenado acumulado 32.7 mm)
+ciclo 4: RMS error = 27.18 N  (descenso ordenado acumulado 31.9 mm)
+ciclo 5: RMS error = 24.91 N  (descenso ordenado acumulado 31.3 mm)
+ciclo 6: RMS error = 24.16 N  (descenso ordenado acumulado 30.8 mm)
+ciclo 7: RMS error = 24.37 N  (descenso ordenado acumulado 30.4 mm)
+ciclo 8: RMS error = 24.38 N  (descenso ordenado acumulado 30.3 mm)
+ciclo 9: RMS error = 26.48 N  (descenso ordenado acumulado 28.4 mm)
+Retorno: contador Y = -2544 pasos -> subiendo 2544 pasos
+Y final respecto al inicio: 0 pasos (debe ser ~0)
+Motivo de cierre: completado | log: control/telemetria/registros/2026-11-19_105938_fz.csv
