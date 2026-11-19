@@ -4,6 +4,7 @@ Fecha: 2026-11-19. Documento de planificación: **nada de esto está ejecutado n
 
 > 🛑 **Regla (Luis, 2026-11-19): las fases Y-1, CoP-1 y AD7606 NO se empiezan hasta terminar
 > el lazo cerrado de Fz.** Hasta entonces este documento es solo consulta.
+> Usar el ADS1256 multiplexado (en vez de esperar el AD7606) **está PENDIENTE de decisión**.
 
 ## Objetivo
 Avanzar los lazos horizontal (Fy) y sagital (CoP) sin esperar al AD7606, leyendo los
