@@ -15,6 +15,7 @@ Si eres Claude y Luis dijo «continuar»: lee ESTE bloque primero; lo de más ab
 **Cambios de código del 2026-11-19 (laptop, solo probados en simulación/datos sintéticos):**
 - `control/lazo_fz_tiempo_real.py`: por defecto `--fuente_fz uart --puerto_fz /dev/ttyAMA0` (antes `spi`, cableado que ya no existe); filtro de 60 Hz en `LectorFzUART` (activo por defecto, `--sin_filtro_60hz` lo apaga); el `.meta.txt` ahora registra `fuente_fz` y `filtro_60hz`.
 - Nuevos: `control/telemetria/espectro_corrida.py`, `pruebas/ruido_60hz_filtro.py`, `control/filtro_fz/notch_fz.py` (NO conectado), análisis en `control/simulacion/`.
+- **Reporte consolidado del día: `reportes/2026-11-19_reporte_dia.md`** (leerlo primero). Pendiente de diagrama: agregar el estimador de k al diagrama de bloques SOLO cuando esté integrado y validado.
 - Reportes del día: `reportes/2026-11-19_*.md` (simulación de resonancia, notch, protocolo, causa raíz, estimador de k).
 - Causa raíz probable de la oscilación (solo simulación): modo de ~7 Hz dentro del lazo + rigidez alta a carga alta; **interpretar la prueba Kp 3 vs 5 con la tabla corregida del protocolo (5d)**. El CSV ahora trae `t_real`; los CSV viejos tienen tiempo nominal (frecuencias ≈1.35× altas).
 - **Reglas fijas nuevas (CLAUDE.md):** verificar que un archivo es el vigente ANTES de modificarlo; lo superado se elimina (se borró `control/diagramas/implementacion/` y el esquema del 2-nov). Vigentes: esquema eléctrico `esquemas/amti_ads1256_rpi/salida/esquema_protecciones_ads1256.png`; bloques `control/diagramas/salida/`.
