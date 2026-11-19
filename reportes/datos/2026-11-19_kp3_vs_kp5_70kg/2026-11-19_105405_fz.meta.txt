@@ -1,0 +1,1 @@
+kp_programado=True peso_sujeto_n=588.6 n_ciclos=10 kp=8.0 protesis=pie_pasivo_1 (la unica probada hasta ahora) k_asumido=26.4 pasos_por_n=3.030 fmax_n=867.0 hueco_mm=40.0 angulo_deg=0.0 v_max=9000.0 umbral_contacto_n=8.0 extra_mm=39.0 simulado=False fuente_fz=uart filtro_60hz=False
