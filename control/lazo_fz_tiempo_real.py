@@ -346,16 +346,18 @@ def kp_programado(kp, f_n, k_asumido):
 
 def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referencia="gutenberg",
                 puerto_esp32="/dev/ttyUSB0", fuente_fz="uart", puerto_fz="/dev/ttyAMA0", signo_fz=1.0, carpeta_log="control/telemetria/registros", v_max=V_MAX_PASOS_S,
-                umbral_contacto_n=8.0, extra_mm=20.0, simulado=False, angulo_deg=None, duracion_apoyo_s=3.69, filtro_60hz=True, kp_prog=False):
+                umbral_contacto_n=8.0, extra_mm=20.0, simulado=False, angulo_deg=None, duracion_apoyo_s=3.69, filtro_60hz=True, kp_prog=False, ff=0.0, ilc_adelanto_ms=0.0):
     k_asumido = cargar_k_asumido(protesis)
     pasos_por_n = PASOS_POR_MM_Y / k_asumido
     ctrl = ControlFzILC(peso_sujeto_n, duracion_s=duracion_apoyo_s, rigidez_n_por_mm=k_asumido, referencia=referencia)
+    # 2026-11-19: adelanto del ILC (muestras de su malla) = retardo efectivo del lazo; antes m = 0
+    ctrl.ilc.m = int(round(ilc_adelanto_ms / 1000.0 / (ctrl.duracion_s / ctrl.n)))
 
     marca = f"{datetime.now():%Y-%m-%d_%H%M%S}" + ("_SIM" if simulado else "")
     nombre_log = os.path.join(carpeta_log, f"{marca}_fz.csv")
     os.makedirs(carpeta_log, exist_ok=True)
     with open(nombre_log.replace(".csv", ".meta.txt"), "w") as m:
-        m.write(f"kp_programado={kp_prog} peso_sujeto_n={peso_sujeto_n} n_ciclos={n_ciclos} kp={kp} protesis={protesis} k_asumido={k_asumido} "
+        m.write(f"ff={ff} ilc_adelanto_ms={ilc_adelanto_ms} ilc_m={ctrl.ilc.m} kp_programado={kp_prog} peso_sujeto_n={peso_sujeto_n} n_ciclos={n_ciclos} kp={kp} protesis={protesis} k_asumido={k_asumido} "
                 f"pasos_por_n={pasos_por_n:.3f} fmax_n={fmax_n} hueco_mm={hueco_mm} angulo_deg={angulo_deg} "
                 f"v_max={v_max} umbral_contacto_n={umbral_contacto_n} extra_mm={extra_mm} simulado={simulado} fuente_fz={fuente_fz} filtro_60hz={filtro_60hz}\n")
 
@@ -444,6 +446,10 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referen
                 t_ciclo0 = time.monotonic()
                 t_prev = t_ciclo0
                 n_muestras = int(round(ctrl.duracion_s / DT_CONTROL_S))
+                # feedforward (2026-11-19): derivada del objetivo corregido de ESTE ciclo [N/s, en tiempo nominal]
+                import numpy as _np
+                r_corr_ciclo = ctrl.ref_bw / 100.0 * peso_sujeto_n + ctrl.ilc.delta
+                dr_corr_ciclo = _np.gradient(r_corr_ciclo, ctrl.duracion_s / ctrl.n)
                 for i in range(n_muestras):
                     t_rel = i * DT_CONTROL_S
                     idx = int(i * ctrl.n / n_muestras)
@@ -460,6 +466,11 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referen
                     e = r_corregida - f_med
                     kp_ef = kp_programado(kp, f_med, k_asumido) if kp_prog else kp
                     u_pasos_s = SIGNO_ERROR_A_VELOCIDAD * kp_ef * e * pasos_por_n
+                    if ff > 0:
+                        # v_ff = -(dr*/dt) * 80 / k(r*) [pasos/s]; dr*/dt pasa de tiempo nominal a real con el periodo medido
+                        escala_t = DT_CONTROL_S * (i + 1) / max(time.monotonic() - t_ciclo0, DT_CONTROL_S * (i + 1)) if i > 0 else 1.0
+                        k_r = float(_np.interp(max(r_corregida, 0.0), K_DIN_TABLA_F, K_DIN_TABLA_K))
+                        u_pasos_s += SIGNO_ERROR_A_VELOCIDAD * ff * dr_corr_ciclo[idx] * escala_t * PASOS_POR_MM_Y / k_r
                     u_pasos_s = max(-v_max, min(v_max, u_pasos_s))
                     esp32.set_vel(EJE_VERTICAL, u_pasos_s)
                     ahora = time.monotonic(); descenso_mm += -u_pasos_s * (ahora - t_prev) / PASOS_MM; t_prev = ahora
@@ -515,6 +526,8 @@ if __name__ == "__main__":
                      help="ganancia proporcional [1/s]. Default 10 (Ensayo B 2026-11-18; antes 15 = recomendacion 2026-11-08, "
                           "(reportes/2026-11-08_avance_sin_rpi.md Sec.3); re-elegir con la latencia completa medida.")
     ap.add_argument("--kp_programado", action="store_true", help="Kp*min(1,k_asumido/k(F)) con la tabla de rigidez dinamica medida el 2026-11-19 (solo pie_pasivo_1 plano)")
+    ap.add_argument("--ff", type=float, default=0.0, help="fraccion 0-1 de anticipacion de la rampa: -(dr*/dt)*80/k(r*) (2026-11-19)")
+    ap.add_argument("--ilc_adelanto_ms", type=float, default=0.0, help="adelanto del error en el ILC [ms] (retardo efectivo del lazo; 2026-11-19)")
     ap.add_argument("--fmax_n", type=float, required=True, help="tope de fuerza [N] (obligatorio): lo supera -> se detiene y retorna")
     ap.add_argument("--hueco_mm", type=float, required=True, help="hueco suela->plataforma, MEDIDO por Luis para ESTA corrida")
     ap.add_argument("--hueco_remedido", action="store_true", help="confirma que el hueco se midio de nuevo antes de esta corrida")
@@ -547,4 +560,4 @@ if __name__ == "__main__":
     correr_lazo(a.peso_sujeto_n, a.n_ciclos, a.kp, a.protesis, a.fmax_n, a.hueco_mm, a.referencia, a.puerto_esp32,
                 v_max=a.v_max, umbral_contacto_n=a.umbral_contacto_n, extra_mm=a.extra_mm, simulado=a.simulado,
                 angulo_deg=a.angulo_deg, duracion_apoyo_s=a.duracion_apoyo_s, fuente_fz=a.fuente_fz, puerto_fz=a.puerto_fz, signo_fz=a.signo_fz,
-                filtro_60hz=not a.sin_filtro_60hz, kp_prog=a.kp_programado)
+                filtro_60hz=not a.sin_filtro_60hz, kp_prog=a.kp_programado, ff=a.ff, ilc_adelanto_ms=a.ilc_adelanto_ms)

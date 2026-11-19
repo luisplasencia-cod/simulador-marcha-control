@@ -1,0 +1,8 @@
+PLAN: escala 785 N (pico ~924 N), 8 ciclos, Kp=5.0, k_asumido=26.4 N/mm -> 3.03 pasos/N, tope 1156.0 N, hueco 40.0 mm (descenso max 93 mm), v_max 9000.0 pasos/s, simulado=False
+Tara: f0 = -3.41 N (p5 -9.99, p95 0.76). Debe estar SIN contacto y el eje quieto.
+Aproximando: rapido 20 mm/s hasta 10 mm, luego 5 mm/s; descenso maximo 93 mm.
+CONTACTO a 32.3 mm de descenso (hueco declarado 40): F = 14.3 N
+ABORTADO: RuntimeError('descenso 93.2 mm >= maximo 93 mm')
+Retorno: contador Y = -7506 pasos -> subiendo 7506 pasos
+Y final respecto al inicio: 0 pasos (debe ser ~0)
+Motivo de cierre: ABORTADO: RuntimeError('descenso 93.2 mm >= maximo 93 mm') | log: control/telemetria/registros/2026-11-19_114334_fz.csv
