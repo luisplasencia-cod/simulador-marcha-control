@@ -2,6 +2,23 @@
 
 Si eres Claude y Luis dijo «continuar»: lee ESTE bloque primero; lo de más abajo (desde «HISTORIA») es de la mañana y queda solo como referencia. **Reglas de Luis: todo se documenta (Objetivo → Metodología → Resultado → Limitaciones → Fuentes), sin suponer ni inventar; horas con `date`; respuestas cortas, un tema por intercambio.**
 
+## 🔴 00. ACTUALIZACIÓN 2026-11-19 (laptop, sin RPi) — MANDA SOBRE § 0.2 DONDE CHOQUEN
+**Al decir «continuar» en la RPi: `git pull` y seguir `reportes/2026-11-19_protocolo_proxima_sesion_rpi.md` paso a paso.** Resumen del orden:
+1. Paso 1: preflight, identificar los 2 ESP32, PING (sin mover).
+2. Paso 1b: **ruido de 60 Hz** — `pruebas/ruido_60hz_filtro.py` (filtro nuevo, sin mover motores) + diagnóstico eléctrico (tomas/regletas/tierra) con Luis.
+3. Paso 2: **prueba Kp 5 → Kp 3 → Kp 5** a 70 kg x10, 10 pisadas, con `--sin_filtro_60hz`, + 1 corrida Kp 5 con filtro. Decisión con `control/telemetria/espectro_corrida.py`: **frecuencia del pico igual → resonancia mecánica; cambia → la crea el lazo.** Va ANTES del HOME porque el script reinicia el ESP32 de motores y borra el HOME (por eso § 0.2 paso 2 se pasa a después).
+4. Paso 3: HOME SIN prótesis → flujo de 3 ejes en la interfaz (§ 0.2 pasos 2–5 siguen valiendo desde aquí, incluido arreglar el hueco de 82 ms).
+5. Paso 4: copiar TODOS los CSV de telemetría a `reportes/datos/` (están en `.gitignore`; sin ellos la laptop no puede analizar).
+
+**Regla nueva de Luis (2026-11-19, en CLAUDE.md):** no se toca Fy/CoP hasta que el lazo de Fz esté listo para pasar (Y cerrado + X/K con trayectoria en la interfaz, varias pisadas, 80 kg, repetible con error < __ %BW).
+
+**Cambios de código del 2026-11-19 (laptop, solo probados en simulación/datos sintéticos):**
+- `control/lazo_fz_tiempo_real.py`: por defecto `--fuente_fz uart --puerto_fz /dev/ttyAMA0` (antes `spi`, cableado que ya no existe); filtro de 60 Hz en `LectorFzUART` (activo por defecto, `--sin_filtro_60hz` lo apaga); el `.meta.txt` ahora registra `fuente_fz` y `filtro_60hz`.
+- Nuevos: `control/telemetria/espectro_corrida.py`, `pruebas/ruido_60hz_filtro.py`, `control/filtro_fz/notch_fz.py` (NO conectado), análisis en `control/simulacion/`.
+- Reportes del día: `reportes/2026-11-19_*.md` (simulación de resonancia, notch, protocolo, causa raíz, estimador de k).
+- Causa raíz probable de la oscilación (solo simulación): modo de ~7 Hz dentro del lazo + rigidez alta a carga alta; **interpretar la prueba Kp 3 vs 5 con la tabla corregida del protocolo (5d)**. El CSV ahora trae `t_real`; los CSV viejos tienen tiempo nominal (frecuencias ≈1.35× altas).
+- **Reglas fijas nuevas (CLAUDE.md):** verificar que un archivo es el vigente ANTES de modificarlo; lo superado se elimina (se borró `control/diagramas/implementacion/` y el esquema del 2-nov). Vigentes: esquema eléctrico `esquemas/amti_ads1256_rpi/salida/esquema_protecciones_ads1256.png`; bloques `control/diagramas/salida/`.
+
 ## 0. DÓNDE TRABAJAR (no confundirse de proyecto)
 - **Abrir Claude SIEMPRE en `~/simulador-marcha-control`.** La interfaz vigente se alcanza sin salir de aquí: `./interfaz` → enlace a `~/Projects/gaitsim-control` (rama `main`, repo GitHub `GAITSIM`). Ahí está integrado el lazo de Fz (pantalla «Control de Fz», tara automática, flujo post-HOME, pisadas con 3 ejes). Su estado detallado: `interfaz/CLAUDE.md`.
 - **NO ENTRAR:** `~/Projects/gaitsim-control-fz_OBSOLETA_NO_USAR` (copia de la mañana, superada), `~/Projects/gaitsim-control-*backup*`, y las partes de la etapa 2 que no tocan el lazo (matriz de variabilidad, «Ir a Posición Inicial» manual, firmware viejo en `interfaz/firmware/`).
@@ -45,16 +62,19 @@ UART del ADC (R0–R5), Ensayo B (retardo ≈ 15–23 ms, tau ≈ 3–14 ms), la
 Varias pisadas seguidas tras un solo HOME, reutilizando el flujo de la app de la etapa 2 (punto inicial, regreso y repetición); talla **174**; escala **×6**; peso objetivo **80 kg** subiendo de a poco (10→20→…→90); visible en vivo en la pantalla del RPi y todo en el reporte; techo de velocidad de Y **9000 pasos/s** (12 000 fue brusco); autorizado modificar firmware de motores si se documenta; **la escala de tiempo para 80–90 kg la decide Luis** (cálculo: ×12 para 80 kg, ×14 para 90 kg, ver `reportes/2026-11-18_escalera_10_a_50kg_y_escala.md`).
 
 ## 4. Qué sigue, EN ORDEN (cada paso con el OK de Luis)
+0. **✅ ACTUALIZADO (ver `reportes/2026-11-18_escalera_50_a_90kg_x10_y_abortos.md`): la escalera de carga YA ESTÁ COMPLETA, 10 a 90 kg** (10–40 kg a ×6; 50–90 kg a ×10, Kp 8 hasta 60 kg, Kp 5 desde 70 kg). Error final 3–4 % del pico en todos los escalones. Los pasos 2 y 3 de abajo (retomar desde 50 kg, analizar rigidez/velocidad) ya NO aplican tal como estaban escritos por la mañana — lo que sigue pendiente de esa tanda es la oscilación del punto 5.
 1. **Preflight (sin mover):** `pruebas/etapa2_rpi.sh preflight` → debe decir «LISTO».
-2. **Retomar la escalera desde 50 kg** (decisión pendiente de Luis entre «50→70 kg a ×6» o «directo a 80/90 con ×12/×14»; mi recomendación: lo primero). Comando: `.venv/bin/python -u control/escalera_carga.py --si --pesos 50,60,70 --escala 6` (abre el visor en vivo, guarda en `reportes/escalera/<fecha>/` gráficas de fuerza, error, desplazamiento y velocidad de Y y una tabla; se detiene al primer aborto). Para 80/90 kg: `--pesos 80 --escala 12` y `--pesos 90 --escala 14`. Luis lee NetForce (picos y valle, **con números**: aún no hay una validación en N contra NetForce).
-3. **Analizar** cada escalón (rigidez aparente, velocidad, oscilaciones; ver hipótesis del 50 kg).
-4. **Integración con la interfaz de la etapa 2** (`~/Projects/gaitsim-control-fz`, rama `integracion-fz`, también subida a GitHub): hecho B1–B3 (`SET_VEL` en la app, latencia 3.9 ms, `src/fz/` con el lazo, probado en simulación). Falta B4 (enviar la trayectoria con **columna Y constante**), B5 (máquina de estados del flujo con lazo), B6 (pantalla «Control de Fz» con peso en kg y gráficas en vivo), luego Fase C (Ensayo A a −10/−20/−30°, pesas vs NetForce) y Fase D (sesión con HOME **sin pie**, trayectoria X/K con Y en lazo cerrado). Ver `PLAN_INTEGRACION_LAZO_Y.md`.
+2. **Reconectar hardware** (USB del ESP32 de motores y del ESP32 del ADC, desconectados al cerrar) y **HOME sin la prótesis puesta** (se perdió al aliviar la carga en los dos cortes USB de la escalera de 80 kg).
+3. **Arreglar el hueco de 82 ms en el lazo de 3 ejes** (el que abortó la pisada 2 en la prueba de 75 kg×10 con los 3 ejes) antes de correr más pisadas con X/ángulo activos.
+4. **Decidir con Luis si se investiga la oscilación de 6–8 Hz** (punto 5) antes de seguir con más pisadas de 3 ejes o más escalones de carga — Luis exige que el lazo no oscile con ningún material, así que probablemente bloquea avanzar a comparar prótesis.
+5. **Integración con la interfaz de la etapa 2** (`~/Projects/gaitsim-control-fz`, rama `integracion-fz`, también subida a GitHub): hecho B1–B3 (`SET_VEL` en la app, latencia 3.9 ms, `src/fz/` con el lazo, probado en simulación). Falta B4 (enviar la trayectoria con **columna Y constante**), B5 (máquina de estados del flujo con lazo), B6 (pantalla «Control de Fz» con peso en kg y gráficas en vivo), luego Fase C (Ensayo A a −10/−20/−30°, pesas vs NetForce) y Fase D (sesión con HOME **sin pie**, trayectoria X/K con Y en lazo cerrado). Ver `PLAN_INTEGRACION_LAZO_Y.md`.
 
 ## 5. Abierto / sin explicar (no ocultar)
+- **🔴 Oscilación de 6–8 Hz que CRECE con la carga y con las pisadas** (escalera 50–90 kg x10: 60 kg 7.9→15 N rms en 10 pisadas; 90 kg hasta 31 N rms ≈3 % del pico): no es falta de filtro (el Hanning del ILC ya existe). Hipótesis: resonancia estructural/actuador excitada por el propio lazo. Prueba propuesta, sin hacer: misma carga con Kp 3 vs Kp 5 — si la amplitud a ~7 Hz no cambia, confirma resonancia (remedio: filtro de muesca o perfil de velocidad más suave). Luis exige que no oscile con ningún material (residual limb más blando/rígido, silicona 30) — **probable bloqueo antes de comparar prótesis**. Ver `reportes/2026-11-18_escalera_50_a_90kg_x10_y_abortos.md`.
+- **Dos cortes de USB por EMI durante la escalera cargada** (`disabled by hub`, pie a 505 N y 554 N; el auto-retorno falló ambas veces, se alivió a mano): cable ya revisado por Luis, no repitió después de la 2.ª vez, causa no demostrada.
 - **60 Hz** en Fz (σ 2.6 N, 2.4 N rms a 60 Hz; no lo causan los drivers quietos): origen sin determinar; prueba barata pendiente: laptop a batería.
 - **Calibración en N contra NetForce:** solo validada la forma (3 «M»); falta leer magnitudes y pesas conocidas.
 - **Anomalía del 10 kg (pisada 1):** Fz plana ≈ 370 ms al cargar; no se repitió en 9 pisadas; causa sin determinar.
-- **Aborto de 50 kg:** salto de 39 N; ruido vs transitorio mecánico indistinguible; el umbral ahora escala con la carga (decisión de diseño, no medida).
 - **Velocidad alta sin rampa:** 12 000 pasos/s fue brusco (Luis); el firmware no tiene rampa de aceleración (se podría suavizar desde el RPi); no se midió si el servo sigue el salto.
 - **Contador de Y arranca en 4500 (no 0) tras abrir el puerto:** causa sin investigar (usar siempre `pos_y_rel()`).
 - **«7 cm del suelo»:** no se sabe si es el suelo del laboratorio o la superficie del plato.

@@ -67,6 +67,17 @@ EJE_VERTICAL = 1  # ENTERO: eje 0=X, 1=Y (vertical), 2=K. NO usar texto: el firm
 DT_CONTROL_S = 0.010  # 10 ms -- bien menor al watchdog de 80 ms del firmware; AJUSTAR si hace falta
 N_BLOQUE = 7  # lecturas por ciclo de control (mediana de bloque); ver LectorFzFiltrado.leer_n
 N_MEDIANA = 5  # filtro de errores de bit SPI con el servo activo (ver bloqueo 5 arriba)
+# Ruido de 60 Hz de la red en el RPi (2026-11-18: sigma 2.67 N vs 0.78 N en la laptop). Promedio de 17 muestras a
+# ~1000/s = ~1 periodo de 60 Hz -> ceros en 58.8/117.6/... Hz (-34 dB a 60 y 120 Hz). Cuesta ~6 ms mas que la mediana
+# de 7 (≈2° de margen de fase en el cruce 0.5-0.9 Hz). Antes del promedio, mediana deslizante de 5 contra picos.
+N_VENTANA_60HZ = 17
+
+
+def filtrar_60hz(muestras):
+    """Mediana deslizante de N_MEDIANA y luego promedio de las ultimas N_VENTANA_60HZ medianas."""
+    med = [sorted(muestras[i - N_MEDIANA + 1:i + 1])[N_MEDIANA // 2] for i in range(N_MEDIANA - 1, len(muestras))]
+    ult = med[-N_VENTANA_60HZ:]
+    return sum(ult) / len(ult)
 # SIGNO (2026-11-10): en el firmware, SET_VEL usa la misma convencion que MANUAL:
 # signo + sobre Y = SUBIR (medido en el Ensayo 0, <MANUAL:1:4000> = +50 mm hacia arriba).
 # Para AUMENTAR la fuerza hay que BAJAR el eje => velocidad NEGATIVA cuando e = r - F > 0.
@@ -201,8 +212,9 @@ class LectorFzUART:
     El signo (+ = carga) NO esta verificado para la entrada diferencial: se confirma en L3 de INICIO_RPI.md
     (masa conocida debe SUBIR Fz) y, si sale invertido, se pasa signo=-1."""
 
-    def __init__(self, puerto, signo=1.0, n_bloque=N_BLOQUE):
+    def __init__(self, puerto, signo=1.0, n_bloque=N_BLOQUE, filtro_60hz=True):
         import threading
+        self.filtro_60hz = filtro_60hz
         import serial
         sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "pruebas"))
         from leer_ads1256_fz_esp32_uart import BAUD, extraer_paquetes
@@ -260,7 +272,11 @@ class LectorFzUART:
         if len(set(raw)) == 1:
             raise RuntimeError(f"Sensor de Fz congelado/desconectado: {self.n_bloque} lecturas identicas "
                                f"({raw[0]:.2f} N). Se aborta y se detiene el eje.")
-        return sorted(raw)[len(raw) // 2] - self.f0
+        if not self.filtro_60hz:
+            return sorted(raw)[len(raw) // 2] - self.f0
+        with self._lock:
+            hist = [self.signo * v for v in list(self._muestras)[-(N_VENTANA_60HZ + N_MEDIANA - 1):]]
+        return filtrar_60hz(hist) - self.f0
 
     def cerrar(self):
         self._parar = True
@@ -316,8 +332,8 @@ class LectorSimulado:
 
 
 def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referencia="gutenberg",
-                puerto_esp32="/dev/ttyUSB0", fuente_fz="spi", puerto_fz=None, signo_fz=1.0, carpeta_log="control/telemetria/registros", v_max=V_MAX_PASOS_S,
-                umbral_contacto_n=8.0, extra_mm=20.0, simulado=False, angulo_deg=None, duracion_apoyo_s=3.69):
+                puerto_esp32="/dev/ttyUSB0", fuente_fz="uart", puerto_fz="/dev/ttyAMA0", signo_fz=1.0, carpeta_log="control/telemetria/registros", v_max=V_MAX_PASOS_S,
+                umbral_contacto_n=8.0, extra_mm=20.0, simulado=False, angulo_deg=None, duracion_apoyo_s=3.69, filtro_60hz=True):
     k_asumido = cargar_k_asumido(protesis)
     pasos_por_n = PASOS_POR_MM_Y / k_asumido
     ctrl = ControlFzILC(peso_sujeto_n, duracion_s=duracion_apoyo_s, rigidez_n_por_mm=k_asumido, referencia=referencia)
@@ -328,7 +344,7 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referen
     with open(nombre_log.replace(".csv", ".meta.txt"), "w") as m:
         m.write(f"peso_sujeto_n={peso_sujeto_n} n_ciclos={n_ciclos} kp={kp} protesis={protesis} k_asumido={k_asumido} "
                 f"pasos_por_n={pasos_por_n:.3f} fmax_n={fmax_n} hueco_mm={hueco_mm} angulo_deg={angulo_deg} "
-                f"v_max={v_max} umbral_contacto_n={umbral_contacto_n} extra_mm={extra_mm} simulado={simulado}\n")
+                f"v_max={v_max} umbral_contacto_n={umbral_contacto_n} extra_mm={extra_mm} simulado={simulado} fuente_fz={fuente_fz} filtro_60hz={filtro_60hz}\n")
 
     if simulado:
         planta = _PlantaSimulada(contacto_mm=hueco_mm - 5.0)   # el hueco declarado sobreestima 5 mm (como paso en el ensayo real)
@@ -340,7 +356,7 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referen
                                  "nunca asumir cual de los DOS ESP32 es.")
             if puerto_fz == puerto_esp32:
                 raise SystemExit("--puerto_fz y --puerto_esp32 son el MISMO puerto: uno es el ESP32 de lectura y otro el de motores.")
-            lector = LectorFzUART(puerto_fz, signo=signo_fz)
+            lector = LectorFzUART(puerto_fz, signo=signo_fz, filtro_60hz=filtro_60hz)
         else:
             lector = LectorFzFiltrado()
         esp32 = ClienteVelocidadESP32(puerto_esp32)   # ADC PRIMERO (ver reporte 2026-11-10)
@@ -408,7 +424,7 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referen
         # ---- LAZO CERRADO + ILC ----
         with open(nombre_log, "w", newline="") as f_csv:
             w = csv.writer(f_csv)
-            w.writerow(["t", "ciclo", "r", "delta", "r_corregida", "F_med", "e", "u", "y_mm", "v_mm_s"])
+            w.writerow(["t", "ciclo", "r", "delta", "r_corregida", "F_med", "e", "u", "y_mm", "v_mm_s", "t_real"])
             previa = lector.leer_n()
             for ciclo in range(n_ciclos):
                 t_muestras, f_muestras = [], []
@@ -439,7 +455,7 @@ def correr_lazo(peso_sujeto_n, n_ciclos, kp, protesis, fmax_n, hueco_mm, referen
 
                     w.writerow([f"{t_rel:.4f}", ciclo, f"{r_n:.2f}", f"{delta_n:.2f}",
                                 f"{r_corregida:.2f}", f"{f_med:.2f}", f"{e:.2f}", f"{u_pasos_s:.1f}",
-                                f"{-descenso_mm:.3f}", f"{u_pasos_s / PASOS_MM:.2f}"])
+                                f"{-descenso_mm:.3f}", f"{u_pasos_s / PASOS_MM:.2f}", f"{ahora - t_ciclo0:.4f}"])
                     ev.escribir(f"pisada {ciclo + 1}/{n_ciclos}", f_med, -descenso_mm * PASOS_MM,
                                 f"{peso_sujeto_n / 9.81:.0f} kg - pisada {ciclo + 1}/{n_ciclos} - objetivo {r_corregida:.0f} N - Y {-descenso_mm:+.1f} mm - v {u_pasos_s / PASOS_MM:+.0f} mm/s")
                     f_csv.flush()
@@ -494,10 +510,14 @@ if __name__ == "__main__":
     ap.add_argument("--protesis", default="pie_pasivo_1 (la unica probada hasta ahora)")
     ap.add_argument("--referencia", default="gutenberg")
     ap.add_argument("--puerto_esp32", default="/dev/ttyUSB0")
-    ap.add_argument("--fuente_fz", choices=["spi", "uart"], default="spi",
-                    help="spi = ADS1256 directo por SPI del RPi (camino anterior, defecto); uart = ESP32 de lectura por UART2 (Fase G, NO probado)")
-    ap.add_argument("--puerto_fz", default=None, help="puerto del ESP32 de lectura (solo --fuente_fz uart)")
+    ap.add_argument("--fuente_fz", choices=["spi", "uart"], default="uart",
+                    help="uart = ESP32 de lectura por UART2 (vigente desde 2026-11-17, usado en todas las corridas reales del 2026-11-18, defecto); "
+                         "spi = ADS1256 directo por SPI del RPi (camino ANTERIOR, cableado ya no existe)")
+    ap.add_argument("--puerto_fz", default="/dev/ttyAMA0",
+                    help="puerto del ESP32 de lectura (UART del header del Pi 5, GPIO14/15; NO es /dev/serial0 = ttyAMA10)")
     ap.add_argument("--signo_fz", type=float, default=1.0, choices=[1.0, -1.0], help="-1 si en L3 Fz BAJA al poner masa")
+    ap.add_argument("--sin_filtro_60hz", action="store_true",
+                    help="vuelve a la mediana de 7 muestras (lo usado el 2026-11-18), para comparar; solo afecta a uart")
     ap.add_argument("--simulado", action="store_true", help="planta y ESP32 simulados: prueba la logica SIN hardware")
     ap.add_argument("--ejecutar", action="store_true", help="sin esto solo imprime el plan y sale (no abre puertos)")
     a = ap.parse_args()
@@ -511,4 +531,5 @@ if __name__ == "__main__":
         raise SystemExit("Falta --hueco_remedido: el hueco se mide de nuevo antes de CADA corrida (regla de Luis).")
     correr_lazo(a.peso_sujeto_n, a.n_ciclos, a.kp, a.protesis, a.fmax_n, a.hueco_mm, a.referencia, a.puerto_esp32,
                 v_max=a.v_max, umbral_contacto_n=a.umbral_contacto_n, extra_mm=a.extra_mm, simulado=a.simulado,
-                angulo_deg=a.angulo_deg, duracion_apoyo_s=a.duracion_apoyo_s, fuente_fz=a.fuente_fz, puerto_fz=a.puerto_fz, signo_fz=a.signo_fz)
+                angulo_deg=a.angulo_deg, duracion_apoyo_s=a.duracion_apoyo_s, fuente_fz=a.fuente_fz, puerto_fz=a.puerto_fz, signo_fz=a.signo_fz,
+                filtro_60hz=not a.sin_filtro_60hz)

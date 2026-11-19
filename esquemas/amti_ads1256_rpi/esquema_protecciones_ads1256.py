@@ -123,8 +123,8 @@ T((ads.DGND.x - 1.5, ads.DGND.y - 0.6), 'PUNTO ÚNICO DE GND:\nsoldar AQUÍ todo
 
 # --- titulo y leyenda ---
 TOP = yt + 7
-T((AX - 8, TOP), 'PROTECCIONES DECIDIDAS para el ADS1256 — host ESP32 + entrada DIFERENCIAL AIN1/AIN0, 2026-11-17', size=F_TIT)
-T((AX - 8, TOP - 2.6), 'Hipótesis de foros + razonamiento propio; sigue sin confirmarse con medición directa. NADA cableado todavía (confirmado por Luis).', size=F_NOTE, color=RED)
+T((AX - 8, TOP), 'PROTECCIONES DECIDIDAS para el ADS1256 — host ESP32 + entrada DIFERENCIAL AIN1/AIN0, 2026-11-17 (textos de estado actualizados 2026-11-19)', size=F_TIT)
+T((AX - 8, TOP - 2.6), 'ESTADO 2026-11-19: YA CABLEADO y FUNCIONANDO (Etapa 1 laptop: 4/4 registros, 1000 muestras/s, σ≈0.75 N; Etapa 2 RPi: UART 1000/s sin corruptos, R3 10 min 0 caídas). Las protecciones siguen siendo hipótesis (foros + razonamiento propio), sin confirmar con medición directa.', size=F_NOTE, color=RED)
 y0 = ads.DGND.y - 9.5
 T((AX - 8, y0),
   '①  100 Ω en serie en SCLK, DIN y CS (antes 47 Ω — TI recomienda ~100 Ω). Rango permitido: 47–220 Ω (a 500 kHz no afecta el tiempo). DOUT y DRDY directos.\n'
@@ -145,7 +145,9 @@ T((AX - 8, y0),
 T((AX - 8, y0 - 15),
   'PENDIENTE (no bloquea cablear esto): con el ADC caído, medir PDWN y el 5V/3.3V de la placa ANTES de reiniciar, para saber si realmente era PDWN o alimentación.\n'
   'Dato ya conocido: quitar y poner el 5V no SIEMPRE arregla la caída (a veces sí, a veces no) — no asumir que es solo un bajón pasajero de tensión. El cambio de\n'
-  'host (RPi→ESP32) NO ataca esta causa si es analógica/alimentación — es independiente de quién lee el SPI; se hace por preferencia de Luis, no como arreglo.\n'
+  'host (RPi→ESP32) NO ataca esta causa si es analógica/alimentación — es independiente de quién lee el SPI; se hizo por preferencia de Luis, no como arreglo.\n'
+  'Desde el cambio NO hubo caídas medidas (R3: 10 min en reposo; R5: servo Y en el aire, 1 corrida), pero la evidencia es limitada (las caídas del 2026-11-10 aparecían tras\n'
+  'SESIONES con movimiento) y 5 cambios de cableado coincidieron: NO se sabe cuál ayudó. Con carga real aún no hay datos de caídas por esta ruta.\n'
   'El corte de los 4 puertos USB del RPi (2026-11-10, 16:57) fue un evento APARTE, coincidente con manipulación de cables — NO se confirmó relación con las\n'
   'caídas previas del ADC (esas ya pasaban antes, sin ese evento). No tratar ambos como la misma causa.',
   size=F_NOTE, color=RED)
@@ -156,13 +158,13 @@ T((AX - 8, y0 - 24),
   '5) Cable/adaptador USB-serie o usar el header UART del RPi (GPIO14/15) para recibir el ESP32 — decidir cuál antes de cablear ⑥.',
   size=F_NOTE, color=GREEN)
 T((AX - 8, y0 - 33),
-  'QUÉ HACER DESPUÉS, EN LA RPi (nada de esto existe todavía):\n'
-  '1) Decidir el puerto de recepción: header UART (GPIO14/15, directo, sin USB) o un adaptador USB-serie — y reservarlo aparte del puerto del ESP32 de motores.\n'
-  '2) Escribir el lector Python del protocolo "<valor>" (framing por < >, detectar paquete cortado/corrupto — el firmware no numera ni verifica paquetes).\n'
-  '3) Corregir en el firmware ESP32 la escala: 1.7631→1.7665 mV/N (único cambio de código; el MUX diferencial ya coincide), ANTES de usarlo con el cableado real.\n'
-  '4) Medir la latencia real ESP32→UART→RPi (igual que medir_latencia_ping_pong.py) — no asumir que es mejor que los 1.6-2.4 ms del SPI directo sin medirlo.\n'
-  '5) Validar contra el AMTI real (como ya se hizo el 2026-11-03 con el lector directo: RMSE, correlación) antes de confiar en esta ruta para el lazo de Fz.\n'
-  '6) Repetir el vigilante de caídas (vigilar_adc.py, adaptado a leer del UART en vez de SPI) para ver si cambiar de host realmente reduce las caídas o no.',
-  size=F_NOTE, color=BLUE)
+  'ESTADO Y ABIERTO (2026-11-19):\n'
+  'HECHO: puerto de recepción = /dev/ttyAMA0 (UART del header del Pi 5 con dtoverlay=uart0-pi5; NO /dev/serial0 = ttyAMA10); lector pruebas/leer_ads1256_fz_esp32_uart.py;\n'
+  '       firmware grabado (escala 1.7665 mV/N; manda también F,valor por USB solo para diagnóstico, UART2 sin cambios); validado con UNA masa: +1.8 / +3.2 % (sin comparar con NetForce).\n'
+  'ABIERTO: ruido de 60 Hz en el RPi (σ 2.67 N vs 0.78 N en la laptop; origen eléctrico SIN determinar; el filtro de software solo se probó con datos sintéticos). Diagnóstico propuesto, sin hacer:\n'
+  '       otra toma/regleta; tierra común con el amplificador del AMTI; cable GND del ESP32 corto y lejos del servo.   Calibración con varias masas vs NetForce (R6) pendiente.\n'
+  '       POR VERIFICAR: las 1 kΩ en serie podrían dar ≈1 % de error de ganancia (la predicción de −1 % no se cumplió con 1 masa); Fz < ≈−57 N queda fuera del rango de entrada.\n'
+  '       Latencia ESP32→UART→RPi y comportamiento con carga: ver reportes del 2026-11-18 (escalera 10–90 kg), no se repite aquí.',
+  size=F_NOTE, color=RED)
 d.save(OUT + '.png', dpi=100, transparent=False); d.save(OUT + '.svg', transparent=False)
 print("guardado", OUT + ".png")

@@ -50,7 +50,9 @@ d.segs([(1260, FY), (1375, FY)]); d.txt(1325, FY - 30, r"$F(t)$", 21)
 # --- realimentacion: medida retrasada por abajo
 d.segs([(1260, FY), (1260, 480), (1042, 480)])
 d.bloque("blk_ret", 900, 450, 140, 60, "Retardo", r"$T$   (M4)")
-d.segs([(900, 480), (240, 480), (240, FY + 28)]); d.txt(570, 456, r"$F_{med}(t)$", 21)
+d.segs([(900, 480), (800, 480)]); d.txt(850, 456, r"$F_{r}(t)$", 21)
+d.bloque("blk_fil", 600, 450, 200, 60, "Filtro de medición", r"$N_m,\ N_p$   (5)")
+d.segs([(600, 480), (240, 480), (240, FY + 28)]); d.txt(420, 456, r"$F_{med}(t)$", 21)
 
 hoja = [
     (r"$r(t)$", "fuerza vertical objetivo (curva de Gutenberg, %BW)"),
@@ -63,23 +65,26 @@ hoja = [
     (r"$d(t)$", "perturbación (pulso, %BW/s)"),
     (r"$\dot{F}(t)$", "ritmo de cambio de la fuerza (%BW/s)"),
     (r"$F(t)$", "fuerza vertical real (%BW)"),
-    (r"$F_{med}(t)$", "fuerza medida, retrasada T"),
+    (r"$F_{r}(t)$", "fuerza real retrasada $T$ (sin filtrar)"),
+    (r"$F_{med}(t)$", "fuerza medida y filtrada (entra al lazo)"),
     None,
-    (r"$K_p$", "ganancia proporcional (diseño; 10 1/s en la simulación)"),
-    (r"$\gamma,\ Q,\ m$", "ILC (diseño): ganancia 0,5; filtro Hann 0,1 s; adelanto $m=T+1/K_p$"),
-    (r"$\tau_a$", "constante del servo (SIN MEDIR; 20 ms de partida, se barre 10–50 ms)"),
-    (r"$k$", "rigidez de contacto (SIN MEDIR; 0,8 de partida, se barre 0,5–1,5)"),
-    (r"$T$", "latencia total (se barre 0–160 ms; medida en parte: ≈ 8–9 ms)"),
+    (r"$K_p$", "ganancia proporcional (real: 8 a 50–60 kg, 5 a 70–90 kg; simulación: 10)"),
+    (r"$\gamma,\ Q,\ m$", "ILC: ganancia 0,5; filtro Hann 0,1 s; adelanto $m=T+1/K_p$; lee $F(t)$ sin filtrar"),
+    (r"$\tau_a$", "constante del servo (MEDIDA, Ensayo B: 3–14 ms, poco determinada)"),
+    (r"$k$", "rigidez de contacto (MEDIDA 18–33 N/mm; no lineal, varía con prótesis y carga)"),
+    (r"$N_m,\ N_p$", "filtro de Fz (5): mediana $N_m=5$ y promedio $N_p=17$ (anula 60 Hz; ≈ 11 ms)"),
+    (r"$T$", "retardo comando a Fz (MEDIDO 15–23 ms; el filtro (5) suma ≈ 11 ms)"),
 ]
 ecs = [
     ("(1)", r"$r^{*}(t) = r(t) + \delta_j(t)$", "Objetivo corregido (ciclo $j$)", 40),
     ("(2)", r"$e(t) = r^{*}(t) - F_{med}(t)$", "Error del lazo", 40),
-    ("(3)", r"$u(t) = K_p\,e(t)$", "Proporcional", 40),
+    ("(3)", r"$u(t) = \mathrm{sat}\left[K_p\,e(t)\right],\ \ |u| \leq 9000\ \mathrm{pasos/s}$", "Proporcional con saturación de velocidad", 40),
     ("(4)", r"$\delta_{j+1}(t) = Q\left[\delta_j(t) + \gamma\,\varepsilon_j(t+m)\right],\ \ \varepsilon_j(t)=r(t)-F(t)$", "ILC (entre ciclos)", 40),
+    ("(5)", r"$F_{med}(t) = \dfrac{1}{N_p}\sum_{i=0}^{N_p-1} \mathrm{med}_{N_m}\left[F_r(t-i\,\Delta t)\right]$", "Filtro de medición (60 Hz)", 62),
     ("(M1)", r"$\tau_a\,\dfrac{dv}{dt} = u - v$", "Servo (primer orden)", 62),
     ("(M2)", r"$q(t) = k\,v(t)$", "Rigidez de contacto", 40),
     ("(M3)", r"$F(t) = \int_0^t \left[q(\tau) + d(\tau)\right]d\tau$", "Integrador (suma de $q$ y $d$)", 64),
-    ("(M4)", r"$F_{med}(t) = F(t - T)$", "Retardo de medición", 40),
+    ("(M4)", r"$F_{r}(t) = F(t - T)$", "Retardo de medición (el filtro (5) va aparte)", 40),
 ]
 guardar(d.fig, SALIDA, "diagrama")
 guardar(tabla_variables(hoja), SALIDA, "leyenda_variables")

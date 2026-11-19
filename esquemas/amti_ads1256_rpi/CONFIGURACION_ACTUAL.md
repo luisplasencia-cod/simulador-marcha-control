@@ -1,6 +1,8 @@
 # Configuración actual — AMTI → ADS1256 → Raspberry Pi
 
-Esquema: `salida/esquema_amti_ads1256_rpi.png` (generado por `esquema_amti_ads1256_rpi.py`).
+**Estado 2026-11-19:** ya cableado y funcionando por la ruta ESP32 de lectura → UART2 → RPi `/dev/ttyAMA0` (Etapa 1 laptop y Etapa 2 RPi, 2026-11-18; 10 min sin caídas, evidencia limitada). Abierto: ruido de 60 Hz en el RPi (σ 2.67 vs 0.78 N, causa sin determinar), calibración con varias masas vs NetForce (R6). Detalle en el esquema vigente y en `reportes/2026-11-18_etapa1_laptop_adc_esp32.md`, `reportes/2026-11-18_etapa2_R2_rpi_uart.md`.
+
+Esquema VIGENTE: `salida/esquema_protecciones_ads1256.png` (generado por `esquema_protecciones_ads1256.py`). El esquema del 2026-11-02 (RPi leyendo el ADS1256 por SPI directo) se ELIMINÓ el 2026-11-19 por desactualizado; el texto de abajo conserva su historia.
 
 ## Estado (2026-11-02)
 - Conectado hoy: solo el canal **Fz** del AMTI.
