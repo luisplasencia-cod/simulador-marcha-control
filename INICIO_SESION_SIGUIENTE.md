@@ -2,6 +2,13 @@
 
 Si eres Claude y Luis dijo «continuar»: lee ESTE bloque primero; lo de más abajo (desde «HISTORIA») es de la mañana y queda solo como referencia. **Reglas de Luis: todo se documenta (Objetivo → Metodología → Resultado → Limitaciones → Fuentes), sin suponer ni inventar; horas con `date`; respuestas cortas, un tema por intercambio.**
 
+## 🟢 000. ESTADO AL CERRAR LA SESIÓN RPi DEL 2026-11-19 (11:55) — MANDA SOBRE LO DE ABAJO
+- **Leer primero `reportes/2026-11-19_RPi_resumen_sesion.md`** (resultados, figuras, incidentes y pendientes en orden).
+- Hecho: Kp 5/3/5, ganancia programada k(F), 3 ejes desde la interfaz 40–80 kg (ILC aprende, 80 kg 3.6 %), anticipación + adelanto ILC (solo Y 80 kg: **1.2 %, r 0.999**), diagrama alineado con el lazo real.
+- Interfaz (`./interfaz` = `~/Projects/gaitsim-control` main): commit local `84b2413` con todas las mejoras (sin push). Exporta sola la gráfica en vivo por pisada (`logs/fz/*_grafica.png`).
+- **Siguiente:** HOME sin prótesis → 3 ejes desde la interfaz con las mejoras (ya activas por defecto): 40 → 60 → 80 kg, 5–10 pisadas; analizar con `herramientas/analizar_pisadas_interfaz.py`.
+- Estado físico al cerrar: prótesis montada, pie plano 0° (acomodado a mano por Luis), HOME perdido/no verificado, interfaz cerrada.
+
 ## 🔴 00. ACTUALIZACIÓN 2026-11-19 (laptop, sin RPi) — MANDA SOBRE § 0.2 DONDE CHOQUEN
 **Al decir «continuar» en la RPi: `git pull` y seguir `reportes/2026-11-19_protocolo_proxima_sesion_rpi.md` paso a paso.** Resumen del orden:
 1. Paso 1: preflight, identificar los 2 ESP32, PING (sin mover).
