@@ -255,23 +255,23 @@ def main():
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    fig = plt.figure(figsize=(15, 8))
+    fig = plt.figure(figsize=(16, 9.5))
     gs = fig.add_gridspec(2, 3, height_ratios=[1, 1.1])
     for col, nombre in enumerate(("lineal 23", "lineal 33", "no lineal 12->42")):
         ax = fig.add_subplot(gs[0, col])
-        for m, estilo in (("M0", dict(color="#9e9e9e", lw=1.8, label="M0 k fijo 26.4 (hoy)")),
-                          ("Md", dict(color="#1565c0", lw=1.4, label="Md precarga + k rigido aprendido"))):
+        for m, estilo in (("M0", dict(color="#9e9e9e", lw=1.8, label="Rigidez fija 26,4 N/mm (como hoy)")),
+                          ("Md", dict(color="#1565c0", lw=1.4, label="Precarga + rigidez alta aprendida (elegido)"))):
             if (90, nombre, m) in curvas:
                 t, fz, ref = curvas[(90, nombre, m)]
                 ax.plot(t, fz, **estilo)
-        ax.plot(np.linspace(0, DUR_X10, len(ref), endpoint=False), ref, color="black", lw=1.0, ls="--", label="objetivo")
-        ax.set_title(f"90 kg x10, protesis {nombre} N/mm, pisada {N_PISADAS}", fontsize=10)
-        ax.set_xlabel("t en el apoyo [s]"); ax.grid(alpha=0.3)
-        if col == 0: ax.set_ylabel("Fz [N]"); ax.legend(fontsize=8, loc="lower center")
+        ax.plot(np.linspace(0, DUR_X10, len(ref), endpoint=False), ref, color="black", lw=1.2, ls="--", label="Objetivo de fuerza")
+        ax.set_title("Carga 90 kg, escala x10, pisada %d\nprótesis %s N/mm" % (N_PISADAS, {"lineal 23": "lineal de 23", "lineal 33": "lineal de 33", "no lineal 12->42": "no lineal de 12 a 42"}[nombre]), fontsize=11)
+        ax.set_xlabel("Tiempo dentro del apoyo (s)", fontsize=11); ax.grid(alpha=0.3); ax.tick_params(labelsize=10)
+        if col == 0: ax.set_ylabel("Fuerza vertical (N)", fontsize=11); ax.legend(fontsize=10, loc="lower center")
     ax = fig.add_subplot(gs[1, :])
     etiquetas = [(kg, c) for kg in (50, 90) for c in ("lineal 23", "lineal 33", "no lineal 12->42")]
     colores = {"M0": "#9e9e9e", "Ma": "#ef6c00", "Mb": "#6a1b9a", "Mc": "#2e7d32", "Md": "#1565c0"}
-    nombres = {"M0": "M0 k fijo (hoy)", "Ma": "Ma solo precarga", "Mb": "Mb RLS en linea", "Mc": "Mc tabla k(F)", "Md": "Md precarga + k rigido (elegido)"}
+    nombres = {"M0": "Rigidez fija (como hoy)", "Ma": "Solo precarga", "Mb": "Estimador recursivo en línea", "Mc": "Tabla rigidez vs fuerza", "Md": "Precarga + rigidez alta aprendida (elegido)"}
     for j, m in enumerate(("M0", "Ma", "Mb", "Mc", "Md")):
         ys = []
         for kg, c in etiquetas:
@@ -279,14 +279,15 @@ def main():
             ys.append(np.nanmedian(fila["kp_ef_rama"]) if fila["kp_ef_rama"] else np.nan)
         ax.plot(np.arange(len(etiquetas)) + (j - 2) * 0.12, ys, "o", ms=9, color=colores[m], label=nombres[m])
     ax.axhline(KP_NORM, color="black", lw=1, ls="--")
-    ax.text(len(etiquetas) - 0.5, KP_NORM + 0.15, f"Kp de diseno = {KP_NORM:g} 1/s", ha="right", fontsize=9)
-    ax.set_xticks(range(len(etiquetas))); ax.set_xticklabels([f"{kg} kg, {c}" for kg, c in etiquetas], fontsize=9)
-    ax.set_ylabel("Kp efectivo [1/s]\n(Kp * k_real / k_usado)")
-    ax.set_ylim(0, 11); ax.grid(alpha=0.3, axis="y"); ax.legend(fontsize=8, ncol=5, loc="upper left")
-    ax.set_title("Cuan agresivo queda el lazo con cada metodo: por encima de la linea = mas agresivo de lo disenado", fontsize=10)
-    fig.suptitle("Simulacion (sin hardware): lazo de Fz con rigidez k desconocida. Planta: retardo 20 ms, tau 8 ms, histeresis 19 %, ruido de la RPi", fontsize=11)
-    fig.tight_layout()
-    salida = os.path.join(AQUI, "..", "..", "reportes", "figuras", "2026-11-19_sim_k_desconocida.png")
+    ax.text(-0.45, KP_NORM + 0.2, f"Ganancia de diseño: Kp = {KP_NORM:g} 1/s", ha="left", fontsize=10)
+    ax.set_xticks(range(len(etiquetas))); ax.set_xticklabels([f"{kg} kg\n" + {"lineal 23": "lineal 23", "lineal 33": "lineal 33", "no lineal 12->42": "no lineal 12 a 42"}[c] + " N/mm" for kg, c in etiquetas], fontsize=10)
+    ax.set_ylabel("Ganancia efectiva Kp (1/s)\n= Kp × rigidez real / rigidez usada", fontsize=11)
+    ax.set_ylim(0, 13.5); ax.grid(alpha=0.3, axis="y"); ax.legend(fontsize=10, ncol=3, loc="upper left")
+    ax.set_title("Qué tan agresivo queda el lazo con cada método (por encima de la línea = más agresivo de lo diseñado)", fontsize=11)
+    fig.suptitle("Simulación (sin hardware): control de fuerza vertical cuando no se conoce la rigidez de la prótesis\nCon rigidez fija (gris) el lazo supera su ganancia de diseño en 5 de 6 casos; con precarga + rigidez aprendida (azul), en ninguno", fontsize=12)
+    fig.text(0.5, 0.005, "Kp = ganancia del lazo (velocidad ordenada por cada newton de error). Rigidez = N de fuerza por mm que se comprime la prótesis. Supuestos: retardo 20 ms, constante del servo 8 ms, histéresis 19 %, ruido medido en la RPi. Es simulación, no medición.", ha="center", fontsize=9)
+    fig.tight_layout(rect=(0, 0.03, 1, 0.955))
+    salida = os.path.join(AQUI, "..", "..", "reportes", "figuras", "2026-11-19_sim_k_desconocida_claro.png")
     fig.savefig(salida, dpi=130, facecolor="white")
     print("figura:", os.path.normpath(salida))
 

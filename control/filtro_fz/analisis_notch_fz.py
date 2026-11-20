@@ -27,10 +27,10 @@ K_ASUMIDO = 26.4           # tabla_k_por_protesis.json (pie_pasivo_1)
 T_LAZO_S = (0.020, 0.028)  # retardo efectivo del lazo: Ensayo B 15-23 ms + ~5 ms de muestreo
 
 OPCIONES = [
-    ("Notch 7 Hz, Q=5 (angosto)", [(7.0, 5.0)], "-"),
-    ("Notch 7 Hz, Q=2 (ancho)", [(7.0, 2.0)], "--"),
-    ("Notch 6-8 Hz (6.93 Hz, Q=3.46)", [(math.sqrt(48), math.sqrt(48) / 2)], "-."),
-    ("2 notches 6.4 + 8.3 Hz, Q=4", [(6.4, 4.0), (8.3, 4.0)], ":"),
+    ("Notch 7 Hz, angosto (Q=5)", [(7.0, 5.0)], "-"),
+    ("Notch 7 Hz, ancho (Q=2)", [(7.0, 2.0)], "--"),
+    ("Notch 6–8 Hz centrado (6,93 Hz, Q=3,46)", [(math.sqrt(48), math.sqrt(48) / 2)], "-."),
+    ("Dos notches, 6,4 y 8,3 Hz (Q=4)", [(6.4, 4.0), (8.3, 4.0)], ":"),
 ]
 
 out = []
@@ -129,7 +129,7 @@ with open(os.path.join(AQUI, "salida_analisis_notch_fz.txt"), "w", encoding="utf
 # ---------- figura ----------
 f = np.logspace(-1, np.log10(49), 800)
 colores = ["#2a6fdb", "#d1495b", "#2e7d32", "#7b3fa0"]
-fig, ax = plt.subplots(3, 1, figsize=(9, 10), sharex=True)
+fig, ax = plt.subplots(3, 1, figsize=(11, 12), sharex=True)
 for (nombre, secc, ls, _), col in zip(filas, colores):
     nf = FiltroNotchFz(secc, FS)
     h = nf.respuesta(f)
@@ -143,18 +143,19 @@ for a in ax:
     a.axvspan(0.1, 3.0, color="#a8dadc", alpha=0.18, lw=0)
     a.grid(True, which="both", color="#dddddd", lw=0.6)
 ax[0].set_ylim(-45, 3)
-ax[0].set_ylabel("Magnitud [dB]")
-ax[0].set_title("Notch para Fz a la tasa del lazo (fs = 100 Hz) -- propuesta, NO conectada")
-ax[0].legend(loc="lower left", fontsize=8, frameon=False)
-ax[0].text(9.0, -30,"oscilacion medida\n6.4-8.3 Hz", fontsize=8, color="#9c4a00")
-ax[1].set_ylabel("Atraso de fase [deg]\n(+ = atraso)")
+ax[0].set_ylabel("Ganancia del filtro (dB)\n(0 = pasa igual, −40 = casi eliminado)", fontsize=11)
+ax[0].set_title("Filtro notch para la fuerza vertical (muestreo 100 Hz): propuesta, NO conectada al lazo\nLectura clave: el notch angosto (azul) quita la banda de 6–8 Hz con solo ~5 ms de retardo; los anchos suman 7–12 ms", fontsize=11)
+ax[0].legend(loc="lower left", fontsize=10, frameon=True)
+ax[0].text(9.0, -30,"Oscilación medida\n6,4–8,3 Hz", fontsize=10, color="#9c4a00")
+ax[1].set_ylabel("Atraso de fase (grados)\n(positivo = atraso)", fontsize=11)
 ax[1].set_ylim(-95, 95)
-ax[1].text(fc_min * 1.02, 70, f"cruce del P\n{fc_min:.2f}-{fc_max:.2f} Hz", fontsize=8, color="#444444")
-ax[1].text(0.12, 70, "banda util del GRF\na x10 (<3 Hz)", fontsize=8, color="#1d6f78")
-ax[2].set_ylabel("Retardo equivalente [ms]\n(se suma a 20-28 ms del lazo)")
-ax[2].set_xlabel("Frecuencia [Hz]")
+ax[1].text(fc_min * 1.02, 70, f"Frecuencia de cruce del\nlazo: {fc_min:.2f}–{fc_max:.2f} Hz", fontsize=10, color="#444444")
+ax[1].text(0.12, 70, "Banda útil de la fuerza\nde marcha a x10 (< 3 Hz)", fontsize=10, color="#1d6f78")
+ax[2].set_ylabel("Retardo que añade el filtro (ms)\n(se suma a los 20–28 ms del lazo)", fontsize=11)
+ax[2].set_xlabel("Frecuencia (Hz)", fontsize=11)
+fig.text(0.5, 0.005, "Notch = filtro que elimina una banda estrecha de frecuencias. Q = qué tan angosto es (mayor Q = más angosto). Es un cálculo del filtro, no una medición.", ha="center", fontsize=9)
 ax[2].set_ylim(0, 20)
-fig.tight_layout()
-dest = os.path.join(RAIZ, "reportes", "figuras", "2026-11-19_notch_fz_bode.png")
+fig.tight_layout(rect=(0, 0.02, 1, 1))
+dest = os.path.join(RAIZ, "reportes", "figuras", "2026-11-19_notch_fz_bode_claro.png")
 fig.savefig(dest, dpi=150, facecolor="white")
 print("figura:", dest)

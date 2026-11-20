@@ -247,22 +247,22 @@ def figura(ruta):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    fig, ax = plt.subplots(2, 2, figsize=(12, 8.5))
+    fig, ax = plt.subplots(2, 2, figsize=(14, 12))
     # (a) filtro Q real del ILC
     ctrl = ControlFzILC(687.0, 6.15, rigidez_n_por_mm=K_ASUMIDO)
     nq = ctrl.ilc.ancho_q
     w = np.hanning(2 * nq + 1); w /= w.sum()
     f = np.linspace(0.05, 10, 400)
-    for dur, et in ((6.15, "malla nominal (x10)"), (615 * 0.0135, "malla real (iteracion 13.5 ms)")):
+    for dur, et in ((6.15, "Tiempo nominal (10 ms por muestra)"), (615 * 0.0135, "Tiempo real (13,5 ms por iteración)")):
         Ts = dur / ctrl.n
         H = [abs(np.sum(w * np.exp(-2j * np.pi * fi * Ts * np.arange(-nq, nq + 1)))) for fi in f]
         ax[0, 0].semilogy(f, np.maximum(H, 1e-5), label=et)
     ax[0, 0].axvspan(6, 8, color="0.9"); ax[0, 0].set_ylim(1e-4, 2)
-    ax[0, 0].set_xlabel("frecuencia (Hz)"); ax[0, 0].set_ylabel("|Q|")
-    ax[0, 0].set_title("(a) Filtro Q del ILC real: no deja pasar 6-8 Hz"); ax[0, 0].legend(fontsize=8); ax[0, 0].grid(alpha=.3)
+    ax[0, 0].set_xlabel("Frecuencia (Hz)", fontsize=11); ax[0, 0].set_ylabel("Ganancia del filtro del ILC (escala log)", fontsize=11)
+    ax[0, 0].set_title("(a) El filtro del ILC no deja pasar 6–8 Hz (zona gris)", fontsize=11); ax[0, 0].legend(fontsize=10); ax[0, 0].grid(alpha=.3)
     # (b) margen de ganancia vs ganancia efectiva
     kps = np.linspace(1, 10, 40)
-    for modo, z, et in ((False, 0, "sin modo (solo retardo 29 ms)"), (True, 0.10, "modo 7 Hz, zeta 0.10"), (True, 0.15, "modo 7 Hz, zeta 0.15")):
+    for modo, z, et in ((False, 0, "Sin modo mecánico (solo retardo de 29 ms)"), (True, 0.10, "Con modo de 7 Hz, amortiguamiento 0,10"), (True, 0.15, "Con modo de 7 Hz, amortiguamiento 0,15")):
         x, y = [], []
         for kp in kps:
             r = lineal(kp, z, F=1.178 * 70 * G, modo=modo)
@@ -271,25 +271,26 @@ def figura(ruta):
     for kg, kp in ((60, 8), (70, 8), (70, 5), (90, 5)):
         r = lineal(kp, 0.10, F=1.178 * kg * G)
         ax[0, 1].plot(r["k_eff"], r["mg"], "ko", ms=4)
-        ax[0, 1].annotate(f"{kg} kg Kp{kp}", (r["k_eff"], r["mg"]), fontsize=7, xytext=(3, 3), textcoords="offset points")
-    ax[0, 1].axhline(1, color="r", lw=1); ax[0, 1].set_ylim(0, 6)
-    ax[0, 1].set_xlabel("ganancia efectiva en el pico = Kp * k_tangente / k_asumido (1/s)")
-    ax[0, 1].set_ylabel("margen de ganancia"); ax[0, 1].legend(fontsize=8); ax[0, 1].grid(alpha=.3)
-    ax[0, 1].set_title("(b) Lazo lineal en el pico: <1 = inestable (a ~5.7 Hz)")
+        ax[0, 1].annotate(f"{kg} kg, Kp {kp}", (r["k_eff"], r["mg"]), fontsize=7, xytext=(3, 3 if kp != 8 or kg != 70 else -10), textcoords="offset points")
+    ax[0, 1].axhline(1, color="r", lw=1.5, label="Límite de estabilidad (margen = 1)"); ax[0, 1].set_ylim(0, 6)
+    ax[0, 1].set_xlabel("Ganancia efectiva en el pico = Kp × rigidez tangente / rigidez asumida (1/s)", fontsize=10)
+    ax[0, 1].set_ylabel("Margen de ganancia (menor que 1 = inestable)", fontsize=11); ax[0, 1].legend(fontsize=10, loc="upper right"); ax[0, 1].grid(alpha=.3)
+    ax[0, 1].set_title("(b) Estabilidad del lazo en el pico de fuerza (oscila a ~5,7 Hz si < 1)", fontsize=11)
     # (c),(d) crecimiento pisada a pisada y mejoras
     for k, (kg, kp) in enumerate(((60, 8), (70, 8))):
         a = ax[1, k]
-        for nombre, kw in (("actual", {}), ("r/delta interpolados", dict(interp=True, dur_apoyo=8.37)),
-                           ("rampa 1000 mm/s2", dict(a_max=1000)), ("rampa 400 mm/s2", dict(a_max=400)),
-                           ("ILC olvido 0.95", dict(alfa=0.95)), ("Kp programado por k_tan", dict(kp_sched=True))):
+        for nombre, kw in (("Lazo actual", {}), ("Referencia y corrección interpoladas", dict(interp=True, dur_apoyo=8.37)),
+                           ("Rampa de aceleración 1000 mm/s²", dict(a_max=1000)), ("Rampa de aceleración 400 mm/s²", dict(a_max=400)),
+                           ("ILC con olvido 0,95", dict(alfa=0.95)), ("Kp programado según la rigidez", dict(kp_sched=True))):
             res = correr(kg=kg, kp=kp, pisadas=10, zeta=0.10, **kw)
             a.plot(range(1, 11), [r["rms_3_15"] for r in res], "o-", ms=3, label=nombre)
-        a.set_yscale("log"); a.set_xlabel("pisada"); a.set_ylabel("RMS del error en 3-15 Hz (N)")
-        a.set_title(f"({'cd'[k]}) {kg} kg x10, Kp {kp}, modo 7 Hz zeta 0.10"); a.grid(alpha=.3); a.legend(fontsize=7)
-    fig.suptitle("Oscilacion 6-8 Hz: simulacion con modo mecanico + ILC real (hipotesis, parametros del modo NO medidos)", fontsize=10)
-    fig.tight_layout(); fig.savefig(ruta, dpi=130)
+        a.set_yscale("log"); a.set_xlabel("Número de pisada", fontsize=11); a.set_ylabel("Tamaño de la oscilación 3–15 Hz\ndel error (N rms, escala log)", fontsize=11)
+        a.set_title(f"({'cd'[k]}) Carga {kg} kg, escala x10, Kp {kp}: ¿qué mejora reduce la oscilación?", fontsize=11); a.grid(alpha=.3); a.legend(fontsize=10, loc="upper center", bbox_to_anchor=(0.5, -0.2), ncol=2)
+    fig.suptitle("Oscilación de 6–8 Hz del lazo de fuerza vertical: simulación con un modo mecánico SUPUESTO (parámetros no medidos)\nLectura clave: con Kp alto el lazo queda al borde de la inestabilidad; programar Kp según la rigidez (marrón) es lo que más reduce la oscilación", fontsize=12)
+    fig.text(0.5, 0.005, "ILC = aprendizaje pisada a pisada. Kp = ganancia del lazo. Modo mecánico = vibración propia de la estructura (supuesta en 7 Hz). Es simulación, no medición.", ha="center", fontsize=9)
+    fig.tight_layout(rect=(0, 0.02, 1, 0.955)); fig.savefig(ruta, dpi=110, facecolor="white")
     print("figura:", ruta)
 
 
 if __name__ == "__main__" and "--figura" in sys.argv:
-    figura(os.path.join(AQUI, "oscilacion_causa_2026-11-19.png"))
+    figura(os.path.join(AQUI, "..", "..", "reportes", "figuras", "2026-11-19_oscilacion_causa_claro.png"))

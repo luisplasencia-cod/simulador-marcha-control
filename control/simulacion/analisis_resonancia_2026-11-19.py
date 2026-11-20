@@ -99,7 +99,7 @@ if __name__ == "__main__":
         print(f"{nombre}: f_pico en [{fmin:.2f}, {fmax:.2f}] Hz ; sobreimpulso resonante pico/DC en [{pmin:.2f}, {pmax:.2f}]")
 
     # Figura: |F/Fref| vs frecuencia para los 2 casos, usando el PUNTO MEDIO de cada rango medido
-    fig, ax = plt.subplots(1, 2, figsize=(11, 4.5))
+    fig, ax = plt.subplots(1, 2, figsize=(15, 6.2))
     T_mid, tau_mid = np.mean(T_RANGO), np.mean(TAU_RANGO)
     colores = {"50-60 kg (Kp=8)": "tab:blue", "70-90 kg (Kp=5)": "tab:red"}
     for nombre, kp in CASOS:
@@ -107,11 +107,11 @@ if __name__ == "__main__":
             ratio = k_din / K_ASUMIDO
             r = analizar(kp, tau_mid, T_mid, ratio)
             ax[0].plot(r["w"] / (2 * np.pi), 20 * np.log10(r["mag"] / r["mag_dc"]), ls, color=colores[nombre],
-                       label=f"{nombre}, k_din={k_din} N/mm")
-    ax[0].axvspan(6, 8, color="gray", alpha=0.2, label="banda observada 6-8 Hz")
-    ax[0].set_xlim(0, 20); ax[0].set_xlabel("frecuencia [Hz]"); ax[0].set_ylabel("|F/Fref| relativo a DC [dB]")
-    ax[0].set_title(f"(a) Respuesta en frecuencia del lazo cerrado\nT={T_mid*1e3:.1f} ms, tau_a={tau_mid*1e3:.1f} ms (punto medio Ensayo B)")
-    ax[0].legend(fontsize=7); ax[0].grid(alpha=0.3)
+                       label=f"{nombre.replace('Kp=', 'Kp ')}, rigidez dinámica {k_din} N/mm")
+    ax[0].axvspan(6, 8, color="gray", alpha=0.2, label="Banda de oscilación observada (6–8 Hz)")
+    ax[0].set_xlim(0, 20); ax[0].set_xlabel("Frecuencia (Hz)", fontsize=11); ax[0].set_ylabel("Fuerza medida / fuerza objetivo,\nrelativa a frecuencia 0 (dB)", fontsize=11)
+    ax[0].set_title(f"(a) Respuesta en frecuencia del lazo cerrado\nretardo T={T_mid*1e3:.1f} ms, constante del servo={tau_mid*1e3:.1f} ms (punto medio, Ensayo B)", fontsize=11)
+    ax[0].legend(fontsize=9, loc="upper right"); ax[0].grid(alpha=0.3)
 
     # (b) f_pico vs tau_a, para los 2 extremos de T, Kp=8 y Kp=5, k_ratio medio
     k_ratio_medio = np.mean(K_DIN_RANGO) / K_ASUMIDO
@@ -119,13 +119,14 @@ if __name__ == "__main__":
     for nombre, kp in CASOS:
         for T, ls in zip(T_RANGO, ("-", "--")):
             fs = [analizar(kp, tau, T, k_ratio_medio)["f_pico_hz"] for tau in taus_plot]
-            ax[1].plot(taus_plot * 1e3, fs, ls, color=colores[nombre], label=f"{nombre}, T={T*1e3:.0f} ms")
-    ax[1].axhspan(6, 8, color="gray", alpha=0.2, label="banda observada 6-8 Hz")
-    ax[1].set_xlabel("tau_a [ms]"); ax[1].set_ylabel("frecuencia del pico de resonancia [Hz]")
-    ax[1].set_title("(b) f_pico vs tau_a (rango Ensayo B)")
-    ax[1].legend(fontsize=7); ax[1].grid(alpha=0.3)
-    fig.suptitle("Analisis 2026-11-19: ¿el margen de fase/ganancia del lazo predice la resonancia 6-8 Hz?", fontsize=10)
-    fig.tight_layout()
-    out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resonancia_6_8hz_2026-11-19.png")
+            ax[1].plot(taus_plot * 1e3, fs, ls, color=colores[nombre], label=f"{nombre.replace('Kp=', 'Kp ')}, retardo {T*1e3:.0f} ms")
+    ax[1].axhspan(6, 8, color="gray", alpha=0.2, label="Banda de oscilación observada (6–8 Hz)"); ax[1].text(8.5, 3.0, "Todas las curvas valen 0 Hz:\nel modelo NO tiene pico de resonancia", ha="center", fontsize=11, color="darkred")
+    ax[1].set_xlabel("Constante de tiempo del servo (ms)", fontsize=11); ax[1].set_ylabel("Frecuencia del pico de resonancia (Hz)", fontsize=11)
+    ax[1].set_title("(b) Frecuencia de resonancia según la constante del servo", fontsize=11)
+    ax[1].legend(fontsize=9, loc="upper left"); ax[1].grid(alpha=0.3)
+    fig.suptitle("¿El modelo lineal del lazo cerrado explica la oscilación de 6–8 Hz? No: no predice ningún pico de resonancia\n(modelo con los retardos y la rigidez medidos en el Ensayo B)", fontsize=12)
+    fig.text(0.5, 0.005, "T = retardo total del lazo; Kp = ganancia del lazo; rigidez dinámica = N de fuerza por mm (Ensayo B). Es un cálculo con el modelo, no una medición.", ha="center", fontsize=9)
+    fig.tight_layout(rect=(0, 0.03, 1, 0.93))
+    out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "reportes", "figuras", "2026-11-19_resonancia_6_8hz_claro.png")
     fig.savefig(out, dpi=130)
     print(f"\nFigura guardada: {out}")

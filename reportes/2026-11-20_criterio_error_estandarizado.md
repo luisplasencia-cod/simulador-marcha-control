@@ -5,6 +5,8 @@ Reemplazar el umbral "< __ %BW" fijado a mano por un criterio apoyado en métric
 
 ## Metodología
 Búsqueda web (WebSearch/WebFetch, Crossref para DOI) el 2026-11-20. Solo se anota lo que se leyó o vio en el resultado; lo que vino de un resumen de buscador se marca. Ninguna fuente fue leída por Luis (regla del proyecto: "DOI verificado, lectura sin confirmar").
+**Aclaración (decisión de Luis, 2026-11-20): RMSE y r se calculan sobre TODA la curva de Fz de la pisada, no solo en los picos** (así lo hace `analizar_pisadas_interfaz.py`: `e` y Pearson sobre todas las muestras de la pisada).
+
 Definición en nuestros datos (`herramientas/analizar_pisadas_interfaz.py`): `e = objetivo_N − Fz_N`; `RMSE_N = sqrt(mean(e²))` sobre la pisada; `RMSE_pct_pico = 100·RMSE_N/max(objetivo)`; `r` = Pearson(objetivo, Fz). Conversión a %BW: RMSE_N/(80 kg·9.81 N/kg = 785 N); el pico del objetivo de 80 kg ≈ 950 N (deducido de 11.4 N = 1.2 %), valor aproximado.
 
 ## Resultado
