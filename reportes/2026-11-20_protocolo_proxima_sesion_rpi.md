@@ -19,7 +19,7 @@ Lectura de `2026-11-19_RPi_resumen_sesion.md` y de los reportes `prueba_kp5_kp3_
 **NO validado / sin hacer:**
 1. La mejora ff 0.7 + adelanto 30 ms **no se ha probado en la interfaz con hardware** (el 1.2 % es solo Y con el script; en el script la pisada dura 8.1 s, en la interfaz 6.0 s: la rampa es 1.35× más rápida). La cifra de 3 ejes sigue siendo 3.6 %.
 2. **Escala:** todo se probó a x10; CLAUDE.md dice x6 vigente. A x6 la velocidad de Y sube (con x10 la velocidad ordenada máx. fue ≈65 mm/s a 80 kg frente al techo de trabajo de 112 mm/s; el cálculo previo para 80 kg a x6 daba ≈116 mm/s, extrapolación no medida). La escala a usar la decide Luis.
-3. Criterio de pasar a Fy: falta el **umbral de error (< __ %BW)**, lo fija Luis. Mientras tanto no se toca Fy/CoP.
+3. Criterio de pasar a Fy: el umbral de error se toma de `reportes/2026-11-20_criterio_error_estandarizado.md` (propuesta: r ≥ 0.95 + RMSE normalizado; unidad y valor a decidir por Luis/asesora). Mientras tanto no se toca Fy/CoP.
 4. Tabla k(F) solo en pie plano: a 11° (talón) el pie es mucho más blando (400 N tras 60 mm, 2 abortos seguros); Kp programado y ff usan k(F) de plano pero el pie pasa por otros ángulos en la trayectoria.
 5. R6: la escala en N de la ruta UART no está validada con pesas contra NetForce (solo confirmación cualitativa de forma y número de ciclos el 11-18; un escalón de 2.246 kg dio +1.8/+3.2 %).
 6. Estimador de k en línea (`control/identificacion/estimador_k_en_linea.py`) y notch: diseñados, NO conectados al lazo; no dibujarlos en el diagrama hasta integrarlos.
@@ -32,9 +32,9 @@ Lectura de `2026-11-19_RPi_resumen_sesion.md` y de los reportes `prueba_kp5_kp3_
 **Estado físico al cerrar (11-19, 11:55):** prótesis montada, pie plano 0° (acomodado a mano por Luis tras el incidente de K), HOME perdido/no verificado, interfaz cerrada. Interfaz en GitHub GAITSIM `main` `0110a13`; `data/positions/inicio.json` sin subir.
 
 ### B. Pendientes priorizados (qué falta para poder pasar a Fy)
-1. **Validar en la interfaz (3 ejes) ff 0.7 + adelanto 30 ms** a 40 → 60 → 80 kg, 5–10 pisadas (ya son el defecto de la pantalla). Medir con `analizar_pisadas_interfaz.py`.
-2. **Umbral de error con Luis** (< __ %BW) y **escala** (x10 probado; x6 pedido; ver A.2). Con eso queda definido el criterio.
-3. **Repetibilidad:** repetir la serie de 80 kg ≥ 2 veces (otro arranque, idealmente otro día) y reportar dispersión de RMSE/r.
+1. **(Requiere la RPi) Tras aplicar las mejoras en la interfaz, volver a probar 40 → 60 → 80 kg y comparar contra el criterio (r y RMSE). Validar en la interfaz (3 ejes) ff 0.7 + adelanto 30 ms** a 40 → 60 → 80 kg, 5–10 pisadas (ya son el defecto de la pantalla). Medir con `analizar_pisadas_interfaz.py`.
+2. **Umbral de error según `reportes/2026-11-20_criterio_error_estandarizado.md`** y **escala** (x10 probado; x6 pedido; ver A.2). Con eso queda definido el criterio.
+3. **Repetibilidad (requiere la RPi):** repetir la serie de 80 kg ≥ 2 veces y documentarlo (otro arranque, idealmente otro día) y reportar dispersión de RMSE/r.
 4. **HOME + 3 ejes a 80 kg** con la mejora, como un flujo continuo (HOME sin prótesis → montar → trayectoria → varias pisadas).
 5. **R6** (pesas vs NetForce) y **60 Hz** (diagnóstico eléctrico con Luis).
 6. k(F) por ángulo (al menos talón y punta) si el error por fases lo exige.
@@ -63,3 +63,6 @@ Documento hecho solo con lectura de reportes (sin repetir cálculos ni ver los C
 
 ## Fuentes
 `reportes/2026-11-19_RPi_resumen_sesion.md`, `reportes/2026-11-19_{prueba_kp5_kp3_kp5_70kg,pruebas_3ejes_cargas_y_trayectorias,pisadas_3ejes_interfaz_40kg,mejora_anticipacion_y_adelanto_ilc,analisis_delta_ilc_interfaz,ganancia_programada_k_vs_carga}.md`, `INICIO_SESION_SIGUIENTE.md` (§ 0.2, § 6), CLAUDE.md (reglas 2026-11-19).
+
+
+**Todo lo que requiera la RPi (repetibilidad 80 kg, re-prueba 40→60→80 kg con las mejoras, comparación contra el criterio) queda PENDIENTE hasta tenerla.**
