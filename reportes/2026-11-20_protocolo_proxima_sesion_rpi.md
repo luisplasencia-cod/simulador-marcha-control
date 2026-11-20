@@ -66,3 +66,4 @@ Documento hecho solo con lectura de reportes (sin repetir cálculos ni ver los C
 
 
 **Todo lo que requiera la RPi (repetibilidad 80 kg, re-prueba 40→60→80 kg con las mejoras, comparación contra el criterio) queda PENDIENTE hasta tenerla.**
+- Pendiente: protocolo estándar de identificación de k(F) por prótesis/calzado (script con --simulado, sin hardware): `reportes/2026-11-20_protocolo_identificacion_rigidez_estandar.md`.
