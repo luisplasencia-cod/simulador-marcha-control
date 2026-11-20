@@ -265,6 +265,7 @@ Sí — antecedente: Raheema et al. 2021, ANFIS+PID para control de fuerza en pr
 - Esta carpeta es el material fuente. El razonamiento/comparación entre referencias sigue en `HISTORIAL.md`; el estado vigente (confirmada / DOI sin lectura / no citar) sigue en este archivo.
 
 ## Pendiente de definir
+- **(2026-11-20) Protocolo de rigidez k(F): respaldados por Turner 2022/Tacca 2024/Major 2022: 3 ciclos (1.o de acondicionamiento), rampa, pico 1.15 BW, definicion de histeresis, calzado = entrada nueva; SIN RESPALDO (validar en banco): tolerancia 15 %, franjas 50 N, recorrido 80 mm, p70+15 %. Tabla de parametros dependientes de la protesis y fuentes (sin confirmar por Luis): `reportes/2026-11-20_protocolo_identificacion_rigidez_estandar.md`.**
 - **(2026-11-19) PENDIENTE DE DIAGRAMA: agregar el estimador de k en línea al diagrama de bloques (`control/diagramas/diagrama_lazo_hibrido.py`: bloque «Estimador de k» que alimenta `Kp` y `pasos_por_n`, con su ecuación (6)) SOLO cuando esté integrado al lazo y validado en la RPi.** No dibujarlo antes: el diagrama debe reflejar lo implementado. Ver `reportes/2026-11-19_reporte_dia.md` § 5.
 - (2026-11-19) Criterio para pasar al lazo de Fy: DEFINIDO (ver regla fija arriba), salvo el umbral de error (< __ %BW) y la escala para 80 kg.
 - (2026-11-19) Uso del ADS1256 actual para Fy/CoP (multiplexado) vs. esperar el AD7606 — se decide al terminar Fz.

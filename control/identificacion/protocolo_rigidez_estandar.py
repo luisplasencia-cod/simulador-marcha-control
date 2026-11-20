@@ -15,10 +15,13 @@ sys.path.insert(0, str(Path(__file__).parent))
 from ajuste_k import pendiente
 
 PASOS_POR_MM_Y = 80.0
-V_RAMPA_MM_S = 2.0        # lenta: el retardo de ~20 ms de la fuerza queda < 0.04 mm (eleccion de diseno)
+V_RAMPA_MM_S = 2.0        # eleccion de diseno: a k=18-58 N/mm da 36-116 N/s (literatura: 100 N/s Tacca 2024, 200 N/s Major 2022,
+                          # 100-250 N/s estatico ISO 22675 (copia sin confirmar edicion), 20 mm/s Turner 2022); retardo ~20 ms -> <0.04 mm
 ANCHO_N = 50.0            # franja de fuerza
 MARGEN = 0.15             # k_usado = k_rigido_carga * 1.15 (como Md)
-TOL_REPET = 0.15          # tolerancia entre 2 corridas: PROPUESTA, la decide Luis
+TOL_REPET = 0.15          # SIN RESPALDO en literatura (Turner 2022: duplicados 2.4+-1.3 %); validar con la 1.a corrida real
+N_CICLOS = 3              # 1.o = acondicionamiento (descartado), 2.o y 3.o analizados (Turner 6 ciclos/ultimos 3; Tacca 4/ultimos 3; Major 2/2.o)
+F_REF_INI_N = 50.0        # k lineal de 50 N al pico (Turner 2022, Tacca 2024)
 MIN_PTS = 5
 
 def planta_sintetica(rng, k0=18.0, k1=0.04, hist=0.18, ruido=0.8):
@@ -57,6 +60,11 @@ def k_franjas(z, f, fase, f_pico):
         out.append(fila)
     return out
 
+def k_lineal_50_pico(z, f, fase, f_pico):
+    """k de regresion lineal en carga entre 50 N y el pico (definicion de Turner 2022 / Tacca 2024; aqui por minimos cuadrados)."""
+    m = (fase == "carga") & (f >= F_REF_INI_N)
+    return round(abs(float(pendiente(list(z[m]), list(f[m])))), 2) if m.sum() >= MIN_PTS else None
+
 def histeresis(z, f, fase):
     """Fraccion de la energia de carga no devuelta (area entre ramas / area de carga)."""
     c, d = fase == "carga", fase == "descarga"
@@ -94,16 +102,17 @@ def main():
     f_pico = 1.15 * a.peso_kg * 9.81          # pico Gutenberg ~115 %BW; la carga se sube por escalones en hardware
     rng = np.random.default_rng(1)
     runs = []
-    for _ in range(2):
+    for _ in range(N_CICLOS):
         z, f, fase, motivo = corrida(planta_sintetica(rng), f_pico)
         if motivo == "demasiado_blanda":
             sys.exit("ABORTA: no llega a la fuerza objetivo dentro del recorrido maximo")
-        runs.append((k_franjas(z, f, fase, f_pico), histeresis(z, f, fase), motivo))
+        runs.append((k_franjas(z, f, fase, f_pico), histeresis(z, f, fase), motivo, k_lineal_50_pico(z, f, fase, f_pico)))
+    runs = runs[1:]                      # se descarta el ciclo de acondicionamiento
     rep = repetibilidad(runs[0][0], runs[1][0])
     valido = rep <= TOL_REPET
     reg = {"id": a.id, "fecha": datetime.now().isoformat(timespec="seconds"), "angulo_deg": a.angulo_deg,
            "calzado": a.calzado, "peso_objetivo_kg": a.peso_kg, "f_pico_n": round(f_pico, 1),
-           "hueco_mm": a.hueco_mm, "v_rampa_mm_s": V_RAMPA_MM_S, "origen": "SIMULADO",
+           "hueco_mm": a.hueco_mm, "v_rampa_mm_s": V_RAMPA_MM_S, "n_ciclos": N_CICLOS, "k_lineal_50_pico_n_mm": runs[0][3], "origen": "SIMULADO",
            "k_franjas_corrida1": runs[0][0], "histeresis_energia": round(runs[0][1], 3),
            "repetibilidad_max_dk_rel": round(rep, 3), "tolerancia": TOL_REPET, "valido": bool(valido),
            "lazo": tabla_lazo(runs[0][0])}
