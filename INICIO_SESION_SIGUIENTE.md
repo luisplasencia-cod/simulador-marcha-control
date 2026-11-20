@@ -2,6 +2,8 @@
 
 Si eres Claude y Luis dijo «continuar»: lee ESTE bloque primero; lo de más abajo (desde «HISTORIA») es de la mañana y queda solo como referencia. **Reglas de Luis: todo se documenta (Objetivo → Metodología → Resultado → Limitaciones → Fuentes), sin suponer ni inventar; horas con `date`; respuestas cortas, un tema por intercambio.**
 
+## ⭐ 0000. AL DECIR «CONTINUAR»: `git pull` y seguir **`reportes/2026-11-20_protocolo_proxima_sesion_rpi.md`** (estado validado vs no validado, pendientes para pasar a Fy, pasos con comandos, frase exacta). Manda sobre §000, §00 y §0.2 donde choquen.
+
 ## 🟢 000. ESTADO AL CERRAR LA SESIÓN RPi DEL 2026-11-19 (11:55) — MANDA SOBRE LO DE ABAJO
 - **Leer primero `reportes/2026-11-19_RPi_resumen_sesion.md`** (resultados, figuras, incidentes y pendientes en orden).
 - Hecho: Kp 5/3/5, ganancia programada k(F), 3 ejes desde la interfaz 40–80 kg (ILC aprende, 80 kg 3.6 %), anticipación + adelanto ILC (solo Y 80 kg: **1.2 %, r 0.999**), diagrama alineado con el lazo real.
