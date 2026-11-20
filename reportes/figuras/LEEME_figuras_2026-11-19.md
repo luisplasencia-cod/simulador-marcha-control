@@ -3,6 +3,8 @@
 Regeneradas con `herramientas/figuras_claras_2026-11-19.py` a partir de los CSV ya guardados en `reportes/datos/` (sin hardware). Las originales siguen al lado, sin cambios.
 Convención: continua = fuerza medida, rayada = objetivo. Error = objetivo − medida (positivo = falta fuerza). Eje vertical "ordenado" = lo mandado al motor (contador), no medido por sensor.
 
+**Glosario:** ILC = aprendizaje pisada a pisada (corrige la referencia con el error de la pisada anterior); Kp = ganancia del lazo (cuánta velocidad se manda por cada newton de error); anticipación = ayuda que sube la fuerza antes de que aparezca el error; adelanto del ILC = la corrección aprendida se aplica unos 30 ms antes.
+
 | Figura | Qué muestra | Cómo leerla |
 |---|---|---|
 | `2026-11-19_mejora_ff_ilc_80kg_20261119_114846_pisadas_claro.png` | 80 kg, con anticipación + adelanto del ILC: 8 pisadas, solo eje vertical | Las 8 curvas de fuerza casi se superponen al objetivo; el error de la pisada 1 (oscura) es el mayor |

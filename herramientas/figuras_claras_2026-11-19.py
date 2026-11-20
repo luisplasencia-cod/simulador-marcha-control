@@ -196,7 +196,7 @@ def fig_delta(out):
     for c, nom in ((0, "pisada 1 (sin corrección aún)"), (1, "pisada 2"), (9, "pisada 10")):
         m = s["ciclo"] == c
         ax[1, 1].plot(s["t"][m], s["delta"][m], label=nom)
-    ax[1, 1].set_title("Script 19-nov, 70 kg, Kp 5: la corrección también arranca grande", fontsize=10)
+    ax[1, 1].set_title("Prueba del 19-nov (lazo por script), 70 kg, Kp 5: la corrección también arranca grande", fontsize=10)
     ax[1, 1].set_xlabel("Tiempo nominal (s)")
     ax[1, 1].set_ylabel("Corrección del ILC (N)")
     ax[1, 1].legend(fontsize=7)
