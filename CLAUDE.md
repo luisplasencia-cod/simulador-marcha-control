@@ -222,6 +222,7 @@ Biomédico, PUCP, Biomechanics and Applied Robotics Research Laboratory.
 - Limitaciones (2 viñetas, análisis propio): misma base de tiempo AMTI+sensores (resuelto leyendo todo con un ADC de ≥8 canales); bloque rígido → P≈0 detecta errores de signo/geometría.
 
 ## Prácticas
+- **(2026-11-21) Índice de prácticas e ideas nuevas: carpeta `practicas/` (`README.md` = estado de las existentes; `IDEAS_futuras.md` = 7 propuestas con títulos, criterios y recomendación; NO decididas ni presentadas).** Regla de Luis: las consultas exploratorias no se guardan en git hasta que él lo pida.
 - **Solo una práctica formal de 15 semanas**: *"Desarrollo y caracterización de un arreglo de sensores resistivos de fuerza (FSR) para captura de presión plantar en simuladores de marcha protésica."* Cubre: diseño/fabricación/calibración del arreglo FSR con salida analógica; caracterización completa (linealidad, histéresis, repetibilidad, corrección de error por curvatura, ref. Ahmadizadeh & Menon 2019); verificación cruzada con IMU del simulador; integración física con primeras lecturas en marcha real. No diseña el lazo de control sagital.
 - **Integración AMTI→Raspberry Pi en tiempo real**: ya no es práctica formal — la hace Luis mismo o un voluntario.
 - Diseño/simulación del control vertical+horizontal puede empezar **ya**, independiente de la práctica — nada lo bloquea.
