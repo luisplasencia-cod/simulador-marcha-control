@@ -60,6 +60,18 @@ Una prótesis activa no recibe "órdenes": **mide con sus sensores lo que le pas
 - **El simulador no puede hacer apoyo y balanceo seguidos** (espacio) → ensayos por fase, separados.
 - La integración "por la física" (§3b) sigue siendo la idea final para prótesis con sensores (comerciales o una versión futura de la del lab).
 
+## 3b-ter. Documentos de la activa del lab (leídos 2026-11-26; tesis de otro autor, ROS 2 Jazzy)
+Fuentes: `Downloads\Informacion de electronica y arquitectura de control.docx` (capítulos 3–4 de esa tesis) y `12. Diseño del tobillo robótico` (manual de producción + planos; CAD de 510 MB no abierto). Notion del autor: sin acceso aún.
+- **Mecanismo 2SPU-1RU, 3 GDL** (plantar/dorsiflexión, inversión/eversión, abd/aducción): 2 actuadores lineales PA-14P-2-50 (carrera 50 mm, potenciómetro) + servo DS3240 (rotación). **La plataforma proximal está diseñada para unirse al simulador de marcha.**
+- **Electrónica:** Raspberry Pi 5 (Ubuntu + ROS 2) → MCP3008 por SPI (posición de actuadores) + Arduino UNO por USB-serie (PWM a 2 BTS7960 y al servo). IMU BNO055 previsto, **no implementado**. Batería 3S2P 11.1 V o fuente 12 V.
+- **Control:** PID + feedforward de posición de los actuadores a 100 Hz sobre ciclos de marcha cargados de CSV; cinemática inversa; repite el ciclo en bucle. **Única entrada externa: tópico `/locomotion_mode` (entero, publicado a mano).** Sin detección de fase ni de intención. → confirma: trayectorias predefinidas.
+- **Limitaciones declaradas por el autor:** actuadores 21.1 mm/s con carga vs ≈125 mm/s pico de la marcha real; carga 222.4 N vs 294.3 N calculados ("probablemente no cumplirá… ni para el peso de una persona promedio").
+- **Consecuencias para la integración (análisis propio, sin probar):**
+  1. **La escala x10 ayuda:** 125 mm/s ÷ 10 = 12.5 mm/s < 21.1 mm/s → a x10 sí podría seguir la marcha; a x6 (20.8 mm/s) queda al límite.
+  2. **La carga es el riesgo principal:** a 80 kg el simulador impone ≈925 N de Fz; con actuadores de 222 N el apoyo con carga real probablemente no es posible → apoyo con carga reducida y subida por escalones, o actuadores nuevos (fuera de una práctica).
+  - Plano "Plataforma Proximal" (DPB4, M. C. Casanova Araujo, 23/03/2026): Al 6061-T6, 150 × 150 mm, agujeros 4× Ø6.6, 8× Ø5.5, 4× Ø4.5 (patrones de 120 mm y otros, sin verificar contra el soporte del simulador). Ensamble: plataformas de Al 7075, arco del pie y elástico en TPU.
+  3. **Comunicación:** ambos lados son Raspberry Pi → sincronía posible por ROS 2 en red (el simulador publica fase/inicio) o por una señal digital; hay que añadir al ejecutor de la activa un "inicio" externo y un factor de escala de tiempo (hoy solo cambia de modo y repite en bucle).
+
 ## 3c. EMG: no descartado, en investigación (2026-11-26)
 - La literatura lo trata como **línea abierta y prometedora**, no como algo fallido: el control autónomo funciona en marcha cíclica, pero no sabe lo que la persona QUIERE hacer (subir escaleras, cambiar de ritmo, ponerse de puntas); el EMG da esa intención (control "volitivo").
 - Lo más probable a futuro (opinión, coincide con trabajos recientes): **control híbrido** = autónomo por fases + EMG que modula (Posh et al. 2023, impedancia por estados + mioeléctrico directo; https://arxiv.org/pdf/2309.15955 control volitivo híbrido con variable de fase). Con interfaz neural quirúrgica, el grupo de Herr reporta marcha más natural (Song et al. 2024, Nature Medicine; no leído aquí).
@@ -67,6 +79,7 @@ Una prótesis activa no recibe "órdenes": **mide con sus sensores lo que le pas
 - Para el simulador: una prótesis con EMG necesitaría además un canal de EMG emulado (nivel C). Queda como idea futura, compatible con la integración "por la física" (se suma, no la reemplaza).
 
 ## 4. Para preguntar al grupo de la activa
+⏸ **En espera del acceso al Notion del autor** (ver `PLAN_DE_TESIS.md`, Pendiente). Ya respondido por los docs: 1 (no detecta fases; trayectorias CSV en bucle; IMU sin implementar), 4 (sin EMG). Falta: 3 (señal externa de inicio/escala) y si se probó con carga.
 1. ¿Cómo detecta hoy las fases (qué sensores: carga, encoder, IMU) y con qué umbrales?
 2. ¿Esos umbrales dependen del tiempo o de la velocidad (afectados por x10)?
 3. ¿Acepta una señal externa de fase/sincronía?
