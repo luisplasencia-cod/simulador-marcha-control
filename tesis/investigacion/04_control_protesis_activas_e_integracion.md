@@ -55,6 +55,11 @@ Una prótesis activa no recibe "órdenes": **mide con sus sensores lo que le pas
 3. **La escala x10 es el límite para "cualquier prótesis":** un controlador que estima la velocidad de marcha o usa umbrales de velocidad/tiempo (p. ej., el Empower ajusta el empuje a la velocidad; inferencia, sin documentación técnica) verá una marcha 10× más lenta y responderá como tal. Con la activa del lab se pueden reescalar sus umbrales (es modificable); con una comercial, no. Para que valga para cualquier prótesis hace falta tiempo real (x1) o, mientras tanto, declararlo y usar prótesis con parámetros ajustables.
 4. **Canal digital opcional** (no obligatorio): señal de sincronía/fase y marca de tiempo desde la RPi, para registrar junto al AMTI y como respaldo si un prototipo no detecta sus fases.
 
+## 3b-bis. Dato real de la activa del lab (Luis, 2026-11-26)
+- Se mueve con **trayectorias predefinidas, sin sensor que las actualice** (no reacciona a la carga). → Hoy sus "entradas" son de tiempo: cuándo arrancar, a qué escala de tiempo y qué trayectoria (apoyo o balanceo). La integración actual = **sincronizar el arranque de su trayectoria con la fase del simulador** (nivel B de la tabla).
+- **El simulador no puede hacer apoyo y balanceo seguidos** (espacio) → ensayos por fase, separados.
+- La integración "por la física" (§3b) sigue siendo la idea final para prótesis con sensores (comerciales o una versión futura de la del lab).
+
 ## 3c. EMG: no descartado, en investigación (2026-11-26)
 - La literatura lo trata como **línea abierta y prometedora**, no como algo fallido: el control autónomo funciona en marcha cíclica, pero no sabe lo que la persona QUIERE hacer (subir escaleras, cambiar de ritmo, ponerse de puntas); el EMG da esa intención (control "volitivo").
 - Lo más probable a futuro (opinión, coincide con trabajos recientes): **control híbrido** = autónomo por fases + EMG que modula (Posh et al. 2023, impedancia por estados + mioeléctrico directo; https://arxiv.org/pdf/2309.15955 control volitivo híbrido con variable de fase). Con interfaz neural quirúrgica, el grupo de Herr reporta marcha más natural (Song et al. 2024, Nature Medicine; no leído aquí).
