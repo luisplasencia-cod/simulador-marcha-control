@@ -129,6 +129,10 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--salida", required=True, help="prefijo de salida (ruta sin extensión)")
     ap.add_argument("--titulo", default="Pisadas desde la interfaz (Y lazo cerrado de Fz)")
+    ap.add_argument("--peso_kg", type=float, default=None,
+                    help="peso del sujeto usado en la serie; si se da, reporta RMSE en %%BW y el criterio de cierre de Fz")
+    ap.add_argument("--umbral_bw", type=float, default=5.0, help="umbral de RMSE en %%BW (propuesta Fukuchi, por decidir)")
+    ap.add_argument("--r_min", type=float, default=0.986, help="r mínimo (propuesta Fukuchi, por decidir)")
     ap.add_argument("entradas", nargs="+", help="CSV, patrones o carpetas")
     a = ap.parse_args()
     series = recolectar(a.entradas)
@@ -141,6 +145,9 @@ def main():
         for p, tray, f in lista:
             d = leer(f)
             m, e, v, z = metricas(d)
+            if a.peso_kg:
+                m["RMSE_pct_BW"] = 100.0 * m["RMSE_N"] / (a.peso_kg * 9.81)
+                m["cumple"] = "SI" if (m["RMSE_pct_BW"] <= a.umbral_bw and m["r_pearson"] >= a.r_min) else "NO"
             items.append((p, d, e, v, z))
             filas.append({"serie": serie, "trayectoria": tray, "pisada": p, **m})
         print(figura_serie(serie, items, a.salida, a.titulo))
@@ -159,6 +166,10 @@ def main():
                   f"{fl['error_max_abs_N']:7.1f}    {fl['F_max_N']:6.1f}/{fl['objetivo_max_N']:6.1f}  "
                   f"{fl['desplaz_ordenado_max_abs_mm']:7.1f}  {fl['vel_ordenada_max_abs_mm_s']:7.1f}   | " +
                   " ".join(f"{fl[f'RMSE_fase_{x}_{y}_N']:5.1f}" for x, y in FASES))
+        if a.peso_kg:
+            print(f"Criterio (RMSE <= {a.umbral_bw} %BW y r >= {a.r_min}, peso {a.peso_kg} kg):")
+            for fl in filas:
+                print(f"  p{fl['pisada']:2d}  {fl['RMSE_pct_BW']:5.2f} %BW  r {fl['r_pearson']:.3f}  {fl['cumple']}")
         resumen[serie] = filas
 
     fig, ax = plt.subplots(1, 3, figsize=(15, 4.5))

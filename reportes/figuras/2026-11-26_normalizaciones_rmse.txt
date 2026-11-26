@@ -1,0 +1,42 @@
+Error estabilizado (mediana de las últimas pisadas) por serie
+serie | kg | n | RMSE_N | pct_BW | pct_pico | pct_rango | pct_media | pct_DE | r | pico_obj %BW
+interfaz 3 ejes 40 kg 111244 | 40 | 5 | 17.76 | 4.53 | 3.84 | 3.97 | 5.43 | 16.24 | 0.987 | 117.8
+interfaz 3 ejes 60 kg 112242 | 60 | 5 | 22.68 | 3.85 | 3.27 | 3.38 | 4.64 | 13.69 | 0.991 | 117.8
+interfaz 3 ejes 75 kg 112547 | 75 | 5 | 35.83 | 4.87 | 4.13 | 4.27 | 5.84 | 17.42 | 0.985 | 117.8
+interfaz 3 ejes 80 kg 113006 | 80 | 10 | 33.44 | 4.26 | 3.62 | 3.73 | 5.11 | 15.50 | 0.988 | 117.8
+interfaz 3 ejes 80 kg t174 113607 | 80 | 6 | 33.75 | 4.30 | 3.65 | 3.77 | 5.18 | 15.32 | 0.988 | 117.8
+solo Y base 80 kg 114714 | 80 | 8 | 19.59 | 2.50 | 2.12 | 2.19 | 3.00 | 8.89 | 0.996 | 117.8
+solo Y ff0.7+30ms 80 kg 114846 | 80 | 8 | 11.33 | 1.44 | 1.23 | 1.27 | 1.73 | 5.14 | 0.999 | 117.8
+escalera solo Y Kp8.0 152829 | 50 | 6 | 11.17 | 2.28 | 1.93 | 2.00 | 2.73 | 8.11 | 0.997 | 117.8
+escalera solo Y Kp8.0 153832 | 60 | 10 | 16.07 | 2.73 | 2.32 | 2.39 | 3.28 | 9.72 | 0.995 | 117.8
+escalera solo Y Kp5.0 154240 | 70 | 10 | 18.83 | 2.74 | 2.33 | 2.40 | 3.29 | 9.77 | 0.995 | 117.8
+escalera solo Y Kp5.0 155042 | 80 | 10 | 23.11 | 2.94 | 2.50 | 2.58 | 3.53 | 10.49 | 0.995 | 117.8
+escalera solo Y Kp5.0 155241 | 90 | 10 | 26.73 | 3.03 | 2.57 | 2.65 | 3.63 | 10.78 | 0.994 | 117.8
+solo Y Kp5.0 103942 | 70 | 10 | 19.93 | 2.90 | 2.46 | 2.54 | 3.48 | 10.34 | 0.995 | 117.8
+solo Y Kp3.0 104134 | 70 | 10 | 22.75 | 3.31 | 2.81 | 2.90 | 3.98 | 11.80 | 0.993 | 117.8
+solo Y Kp5.0 104323 | 70 | 10 | 20.03 | 2.92 | 2.48 | 2.56 | 3.50 | 10.39 | 0.995 | 117.8
+solo Y Kp5.0prog 104824 | 70 | 10 | 18.23 | 2.66 | 2.25 | 2.33 | 3.19 | 9.46 | 0.996 | 117.8
+solo Y Kp5.0prog 105019 | 90 | 10 | 21.93 | 2.48 | 2.11 | 2.18 | 2.98 | 8.84 | 0.996 | 117.8
+solo Y Kp8.0prog 105405 | 60 | 10 | 13.11 | 2.23 | 1.89 | 1.95 | 2.67 | 7.93 | 0.997 | 117.8
+solo Y Kp5.0prog 105938 | 80 | 10 | 20.99 | 2.68 | 2.27 | 2.34 | 3.21 | 9.53 | 0.996 | 117.8
+
+Dependencia con la carga (series de un mismo tipo a distintas cargas): pendiente de un ajuste lineal metrica~kg
+y CV entre cargas [%]. Una métrica que no depende de la carga deja comparar 40 kg con 80 kg.
+  interfaz_3ejes_t170 (cargas [np.int64(40), np.int64(60), np.int64(75), np.int64(80)]):
+    RMSE_N    pendiente +0.4537 /kg  (cambio 40->80 kg +66 % de la media)  CV 31 %
+    pct_BW    pendiente +0.0021 /kg  (cambio 40->80 kg +2 % de la media)  CV 10 %
+    pct_pico  pendiente +0.0018 /kg  (cambio 40->80 kg +2 % de la media)  CV 10 %
+    pct_rango pendiente +0.0019 /kg  (cambio 40->80 kg +2 % de la media)  CV 10 %
+    pct_media pendiente +0.0026 /kg  (cambio 40->80 kg +2 % de la media)  CV 10 %
+    pct_DE    pendiente +0.0110 /kg  (cambio 40->80 kg +3 % de la media)  CV 10 %
+    r         pendiente -0.0000 /kg  (cambio 40->80 kg -0 % de la media)  CV 0 %
+  soloY_escalera (cargas [np.int64(50), np.int64(60), np.int64(70), np.int64(80), np.int64(90)]):
+    RMSE_N    pendiente +0.3817 /kg  (cambio 40->80 kg +80 % de la media)  CV 32 %
+    pct_BW    pendiente +0.0172 /kg  (cambio 40->80 kg +25 % de la media)  CV 11 %
+    pct_pico  pendiente +0.0146 /kg  (cambio 40->80 kg +25 % de la media)  CV 11 %
+    pct_rango pendiente +0.0150 /kg  (cambio 40->80 kg +25 % de la media)  CV 11 %
+    pct_media pendiente +0.0206 /kg  (cambio 40->80 kg +25 % de la media)  CV 11 %
+    pct_DE    pendiente +0.0611 /kg  (cambio 40->80 kg +25 % de la media)  CV 11 %
+    r         pendiente -0.0001 /kg  (cambio 40->80 kg -0 % de la media)  CV 0 %
+
+Repetición (solo Y, 70 kg, Kp 5 fijo, 2 corridas): pct_BW 2.903 vs 2.916; pct_pico 2.464 vs 2.476; r 0.995 vs 0.995

@@ -1,5 +1,22 @@
 # Protocolo de la próxima sesión con la RPi (preparado 2026-11-20, desde la laptop, sin hardware)
 
+> **OBJETIVO ÚNICO DE LA SESIÓN (Luis, 2026-11-26): CERRAR Fz.** Fy, el lazo sagital por CoP y el AD7606 quedan para después (práctica 1): no se tocan en esta sesión. X y sagital solo se mueven en lazo abierto con la trayectoria, porque así lo exige el criterio para dar Fz por cerrado.
+
+## 0. Objetivo: Fz cerrado por completo (propuesta 2026-11-26, falta OK de Luis)
+**Objetivo:** dejar cerrado el lazo de fuerza vertical: el eje Y sigue en lazo cerrado la curva de Fz de marcha sana a 80 kg, integrado en la interfaz con X y sagital en lazo abierto, estable y repetible, con los parámetros fijados y documentados, para que el simulador quede listo para la práctica 1.
+
+**Fz queda cerrado cuando se cumple todo esto (con la prótesis montada, `pie_pasivo_1`):**
+1. **Flujo completo en la interfaz:** HOME sin prótesis → montar → trayectoria → 10 pisadas seguidas, sin abortos ni cortes USB.
+2. **Carga y escala:** 80 kg a x10 (la escala probada).
+3. **Error de trabajo FIJO:** RMSE ≤ 5 %BW y r ≥ 0,986 en las pisadas 6–10 (cuando el ILC ya aprendió). Por qué %BW y no N ni %pico: `reportes/2026-11-26_analisis_normalizacion_rmse.md` (la curva objetivo es Gutenberg 1,40 m/s; 5 %BW = p75 de la variabilidad paso a paso a 1,24 m/s). Es un valor de trabajo para cerrar el lazo, no el umbral final de la tesis. `analizar_pisadas_interfaz.py --peso_kg 80` da el SI/NO (probado solo con datos sintéticos).
+4. **Repetible:** 2 series que cumplan el punto 3, en arranques distintos.
+5. **Fuerza real comprobada:** masas conocidas contra NetForce (R6). Sin esto el lazo puede seguir la curva perfecto con el sensor midiendo de más (con 2,246 kg dio +1,8/+3,2 %).
+6. **Congelado y entregable:** parámetros del lazo fijados (Kp programado, ff 0,7, adelanto 30 ms, filtro 60 Hz), reporte, commit y push.
+
+**Queda para DESPUÉS (prácticas y tesis), no se trabaja ahora:** Fy y lazo sagital por CoP, AD7606 y validación de la GRF contra bases públicas (práctica 1); umbral final de "misma carga", curva objetivo final y estadística entre pies (tesis, OE2–OE4); k(F) por prótesis y pie patrón (práctica 2); pie de carbono; prótesis activa (práctica 3).
+
+**Se declara como limitación, no bloquea:** k(F) solo con el pie plano; periodo real del lazo 13,7 ms; desplazamiento de Y ordenado, no medido; origen del ruido de 60 Hz.
+
 ## Objetivo
 Dejar ordenado qué está validado y qué no tras la sesión RPi del 2026-11-19, qué falta para pasar al lazo de Fy (regla fija de Luis), y los pasos exactos, con comandos, de la próxima sesión. Reemplaza como guía a `2026-11-19_protocolo_proxima_sesion_rpi.md` (ya ejecutado en lo que a Kp/60 Hz/HOME se refiere).
 
@@ -51,7 +68,7 @@ Lectura de `2026-11-19_RPi_resumen_sesion.md` y de los reportes `prueba_kp5_kp3_
 4. Luis monta la prótesis, acepta en la pantalla táctil (trayectoria `Control_apoyo_talla170_montaje37`, tara automática). Si el pie no está a 0°, ajuste de K en pasos chicos (±100) con Luis mirando el sentido: tras HOME el signo de K NO es el de las notas del 11-10 (incidente 11:45).
 5. Series 3 ejes por el canal de comandos (`echo '<cmd>' > ~/simulador-marcha-control/logs/interfaz_cmd.txt`), formato `fz <trayectoria_id> <kg> <escala> <n_pisadas>`: `fz Control_apoyo_talla170_montaje37 40 10 5`, luego 60, luego 80 (10 pisadas); sustituir la escala si Luis decide otra. Subir de carga solo si la anterior completó sin abortar. Abortar ante cualquier aviso de Luis.
 6. Análisis: copiar CSV de `interfaz/logs/fz/` a `reportes/datos/<fecha>_pisadas_3ejes_interfaz_<kg>kg/` (con LEEME; los CSV de logs no van a git) y
-   `python herramientas/analizar_pisadas_interfaz.py --salida reportes/figuras/<fecha>_analisis_<kg>kg "reportes/datos/<carpeta>/*.csv"`.
+   `python herramientas/analizar_pisadas_interfaz.py --peso_kg <kg> --salida reportes/figuras/<fecha>_analisis_<kg>kg "reportes/datos/<carpeta>/*.csv"`.
    Comparar con la base 3.6 % / r 0.988 (80 kg, 3 ejes sin mejora).
 7. Repetir 80 kg (repetibilidad). Si procede, R6: `pruebas/calibracion_pesas.py --masas ...` y 60 Hz (`pruebas/ruido_60hz_filtro.py`) con Luis.
 8. Cierre: reporte (Objetivo → Metodología → Resultado → Limitaciones → Fuentes), commit y push, actualizar CLAUDE.md e `INICIO_SESION_SIGUIENTE.md`. Antes de apagar la RPi: `sync`.
