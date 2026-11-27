@@ -156,6 +156,46 @@ Esto NO reemplaza el trabajo del practicante (sigue haciendo falta la comparaci�
   - **Nota aparte (no es de P4, es del ADS1256 del simulador):** leer los 6 canales del AMTI por turnos (en vez de simultáneo) SÍ sería un problema ahí — baja la tasa por canal y el desfase entre canales importa porque las fuerzas de contacto cambian rápido. Es justo el motivo ya documentado para comprar el AD7606 (pendiente sin cerrar en `CLAUDE.md`); no aplica al MCP3008 de la prótesis por la diferencia de velocidad mecánica.
   - **Visión de publicación propia** (rediseño mecánico + selección de actuadores validada) **o conjunta con P3** (caracterización biomecánica completa de la activa integrada).
 
+## 3b-octies. 🛑 DECISIÓN FINAL (Luis, 2026-11-26): P3/P4 cierran su alcance de actuador y GRF, con enfoque biomédico explícito
+
+**Corrección de alcance (Luis): rediseñar la prótesis a fondo es otra tesis, no cabe en un solo DPB4.** P4 deja de ser "encontrar el actuador ideal" y pasa a ser **"elegir, dentro de la misma familia/tamaño que el actual (PA-14P), priorizando fuerza sobre velocidad, aceptando el déficit de velocidad que ya existe hoy"**.
+
+**Velocidad real exigida por la cinemática, calculada de los 5 CSV de trayectoria reales del repo de Gonzalo (`ankle_trajectory/data/*_ciclo_final.csv`, derivando el desplazamiento del actuador, no una estimación):**
+
+| Modo | v pico necesaria a x6 (factor propio de la activa) | v pico necesaria a x10 (escala vigente del simulador) |
+|---|---|---|
+| Caminata suelo | 43.9 mm/s | 26.4 mm/s |
+| Rampa subida | 43.2 mm/s | 25.9 mm/s |
+| Rampa bajada | 46.1 mm/s | 27.6 mm/s |
+| Escalera subida | 22.8 mm/s | 13.7 mm/s |
+| Escalera bajada | 31.4 mm/s | 18.9 mm/s |
+
+**Hallazgo importante: ni siquiera HOY, a x6, el actuador actual (222 N, 21.1 mm/s con carga, hasta 29 mm/s sin carga) alcanza el pico de velocidad en caminata/rampas (43-46 mm/s).** Esto ya es una limitación existente, no una introducida por cambiar de actuador. Causa sin confirmar — 3 hipótesis abiertas, asignadas a P3 (es pregunta de control/software, no de selección de hardware):
+1. El pico de velocidad no coincide con el pico de fuerza (a menor fuerza el actuador va más rápido, hasta 29 mm/s sin carga) — ayuda pero no cierra la brecha completa.
+2. `trajectory_executor_node` (interpolación 100Hz + blending de mínimo-jerk) podría estar saturando/suavizando la velocidad comandada al máximo real del actuador, en vez de pedir literalmente la derivada del CSV — el sistema no fallaría, solo se retrasaría.
+3. Tolerancia a error de seguimiento no documentada (riesgo ya anotado en `CLAUDE.md`: "a 6x puede no activarse bien").
+
+**Dimensiones verificadas con datasheet real (no supuestas): PA-14P (actual) y PA-01 225lb (candidato ~1000N) tienen el MISMO tamaño físico** (7.51"/9.51" retraído/extendido, Ø cuerpo 1.57"/1.60") — intercambiables mecánicamente. La línea PA-14P solo llega hasta 150lb (667N); para más fuerza hay que salir a la línea PA-01, manteniendo el tamaño.
+
+**Trade-off fuerza↔velocidad dentro de la familia PA-14P (mismo tamaño, sin rediseño mecánico):**
+
+| Variante | Fuerza | Velocidad c/carga |
+|---|---|---|
+| 50lb (actual) | 222 N | 21.1 mm/s |
+| 75lb | 334 N | 17.8 mm/s |
+| 110lb | 489 N | 15.0 mm/s |
+| 150lb | 667 N | 7.1 mm/s |
+
+Llegar a ~1000 N (PA-01 225lb, mismo tamaño) exige **5.1 mm/s con carga**, lo que requeriría escalar el tiempo a **x27 (escalera subida) hasta x54 (rampa bajada)** — demasiado lento para una demo/prueba útil. **Descartado por excesivo.**
+
+**Decisión final: mantener x10 (no tocarlo) + aceptar el déficit de velocidad ya existente + CAPAR el GRF que el simulador le exige a la activa a lo que el actuador elegido realmente soporta** (no el GRF completo de 80-90 kg que sí usan P1/P2). Recomendación concreta: **PA-14P 75lb (334 N, 17.8 mm/s, mismo tamaño/integración que el actual)** — pendiente: pedir el peso a sales@progressiveautomations.com (su ficha de 7 páginas no lo publica). **Pendiente de cálculo: la ventaja mecánica del 2SPU-1RU (fuerza del actuador → fuerza/momento en el tobillo) para traducir 334 N a un peso corporal equivalente** — sin eso no se puede decir "soporta hasta X kg".
+
+**Enfoque biomédico de cada práctica (Luis, 2026-11-26):**
+- **P3 — fidelidad cinemática en push-off.** Pregunta clínica: ¿la activa reproduce el patrón de flexión plantar/dorsal sano durante el push-off (fase rápida del apoyo), o se retrasa? Es la fase clínicamente más relevante — donde una prótesis pasiva no puede generar propulsión y la activa promete hacerlo. Si el actuador se queda atrás ahí, es un hallazgo biomédico (pérdida de la ventaja teórica de la activa), no solo un dato de control. Entregable: cuantificar el error de seguimiento angular en push-off y discutir su efecto esperado sobre la propulsión.
+- **P4 — representatividad del paciente simulado.** Pregunta clínica: si el actuador solo soporta una fracción del GRF de una marcha sana de 80-90 kg, ¿a qué perfil de paciente corresponde la prueba? No es una falla, es acotar el alcance: el ensayo con la activa representa válidamente un sujeto de menor peso o una fracción de la carga de apoyo — no la comparación plena pasivas-vs-activa a carga completa de P1/P2. Esto debe declararse explícito en la tesis. Entregable: traducir la fuerza del actuador elegido a un peso corporal equivalente y declarar ese como el "paciente simulado" de P4, en vez de prometer 80 kg.
+
+**Entregable de P4 ajustado por tiempo: NO instala ni prueba físicamente el actuador nuevo** (no alcanza comprar+integrar en 15 semanas) — entrega el estudio de selección, la justificación técnica, la traducción a peso-equivalente y el diseño del adaptador/reubicación; la instalación física queda para trabajo futuro.
+
 ## 4. Para preguntar al grupo de la activa
 Resuelto por el Notion: 1 (no detecta fases; trayectorias de archivo en bucle; IMU sin implementar), 3 (sí acepta una entrada externa, cambiando el nodo `gait_provider` — ver §3b-quater), 4 (sin EMG). Falta: si el autor probó la prótesis con carga axial real (ningún doc leído lo menciona).
 1. ¿Cómo detecta hoy las fases (qué sensores: carga, encoder, IMU) y con qué umbrales?
